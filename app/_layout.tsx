@@ -1,24 +1,43 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Stack, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { PaperProvider } from 'react-native-paper';
+import { useAuth } from '../hooks/useAuth';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log('📍 Auth state:', { 
+      user: user?.email, 
+      loading,
+    });
+
+    if (loading) {
+      console.log('⏳ Still loading...');
+      return;
+    }
+
+    // Petit délai pour que l'auth soit bien initialisé
+    const timeout = setTimeout(() => {
+      if (user) {
+        console.log('✅ User found, going to game');
+        router.replace('/(game)');
+      } else {
+        console.log('❌ No user, going to login');
+        router.replace('/(auth)/login');
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [user, loading, router]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <PaperProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(game)" />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </PaperProvider>
   );
 }
