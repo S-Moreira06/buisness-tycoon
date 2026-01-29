@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { Button, Card } from 'react-native-paper';
+import { GAME_CONFIG } from '../constants/gameConfig'; // 🆕 Import
 import { useGameStore } from '../hooks/useGameStore';
 
 interface BusinessCardProps {
@@ -18,32 +19,53 @@ export const BusinessCard = ({
 }: BusinessCardProps) => {
   const { businesses, money, buyBusiness, upgradeBusiness } = useGameStore();
   const business = businesses[businessId];
+  const upgradeCost = Math.floor(buyPrice * (business?.level + 1) * 1.5);
 
+  // 🆕 Calcul du gain adaptatif selon l'intervalle
+  const intervalInSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000;
+  const totalIncome = business?.income * (business?.quantity || 1);
+  const incomePerSecond = totalIncome / intervalInSeconds;
 
-  const upgradeCost = Math.floor(buyPrice * (business.level + 1) * 1.5);
+  // 🆕 Label dynamique selon l'intervalle
+  const incomeLabel = intervalInSeconds === 1 
+    ? 'Gain/sec' 
+    : `Gain/${intervalInSeconds}s`;
+
+  const canUpgrade = business?.owned && money >= upgradeCost;
 
   return (
-    <Card style={[styles.card, styles.owned]}>
+    <Card style={[styles.card, business?.owned && styles.owned]}>
       <Card.Content>
-        <Text>{name} (x{business?.quantity || 0}) Lvl {business?.level}</Text>
-        <Text>💰 Gain/sec: {business?.income * (business?.quantity || 1)}</Text>
-        <Text style={styles.text}>Coût upgrade: ${upgradeCost}</Text>
+        <Text style={styles.title}>
+          {name} (x{business?.quantity || 0}) Lvl {business?.level}
+        </Text>
+        <Text style={styles.text}>
+          {/* 🆕 Affichage avec 2 décimales max */}
+          💰 {incomeLabel}: {incomePerSecond.toFixed(2)}€
+        </Text>
+        <Text style={styles.text}>Coût upgrade: {upgradeCost.toLocaleString()}€</Text>
+      </Card.Content>
+      <Card.Actions style={styles.buttonContainer}>
         <Button
           mode="contained"
           onPress={() => buyBusiness(businessId, buyPrice)}
           disabled={money < buyPrice}
-        >
-          Acheter: ${buyPrice}
-        </Button>
-        {/* <Button
-          mode="contained"
-          onPress={() => upgradeBusiness(businessId, upgradeCost)}
-          disabled={money < upgradeCost}
           style={styles.button}
         >
-          Upgrade
-        </Button> */}
-      </Card.Content>
+          Acheter: ${buyPrice.toLocaleString()}
+        </Button>
+
+        {business?.owned && (
+          <Button
+            mode="contained"
+            onPress={() => upgradeBusiness(businessId, upgradeCost)}
+            disabled={!canUpgrade}
+            style={styles.button}
+          >
+            Upgrade
+          </Button>
+        )}
+      </Card.Actions>
     </Card>
   );
 };
@@ -65,6 +87,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 4,
     color: '#666',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     marginTop: 8,

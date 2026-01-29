@@ -6,6 +6,7 @@ export interface Stock {
 export interface Business {
   level: number;
   income: number;
+  quantity: number;
   owned: boolean;
 }
 
@@ -23,6 +24,8 @@ export interface GameState {
   money: number;
   reputation: number;
   totalPassiveIncome: number;
+  playerLevel: number;      // 🔄 Renommé
+  experience: number;
   ownedStocks: Record<string, Stock>;
   businesses: Record<string, Business>;
   upgrades: Record<string, Upgrade>;

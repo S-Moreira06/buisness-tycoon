@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from '@/constants/gameConfig';
 import { useEffect } from 'react';
 import { useGameStore } from './useGameStore';
 
@@ -7,10 +8,10 @@ export const useAutoIncrement = () => {
   useEffect(() => {
     if (totalPassiveIncome === 0) return;
 
-    // Appelle addPassiveIncome toutes les secondes
+    // Appelle addPassiveIncome toutes les x milisecondes
     const interval = setInterval(() => {
       addPassiveIncome();
-    }, 1000);
+    }, GAME_CONFIG.AUTO_INCREMENT_INTERVAL);
 
     return () => clearInterval(interval);
   }, [totalPassiveIncome, addPassiveIncome]);

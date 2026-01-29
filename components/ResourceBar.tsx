@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from '@/constants/gameConfig';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
@@ -7,12 +8,12 @@ export const ResourceBar = () => {
   const { money, reputation, totalPassiveIncome } = useGameStore();
 
   // Barre de progression basée sur l'argent (0-1M)
-  const moneyProgress = Math.min(money / 1000000, 1);
-
+  const moneyProgress = Math.min(money / GAME_CONFIG.MONEY_PROGRESS_MAX, 1);
+  const intervalSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000
   return (
     <View style={styles.container}>
       <View style={styles.stat}>
-        <Text style={styles.label}>💵 Argent: ${money.toLocaleString()}</Text>
+        <Text style={styles.label}>💵 Argent: {money.toLocaleString()}€</Text>
         <ProgressBar progress={moneyProgress} style={styles.bar} />
       </View>
 
@@ -22,7 +23,7 @@ export const ResourceBar = () => {
 
       <View style={styles.stat}>
         <Text style={styles.label}>
-          📈 Passif/sec: ${totalPassiveIncome.toLocaleString()}
+          📈€ Passif/{intervalSeconds}sec: {totalPassiveIncome.toLocaleString()}€
         </Text>
       </View>
     </View>

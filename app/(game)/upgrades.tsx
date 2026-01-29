@@ -1,10 +1,15 @@
 import { UpgradeCard } from "@/components/UpgradeCard";
 import { useGameStore } from "@/hooks/useGameStore";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
+import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function UpgradesScreen() {
-  const { upgrades, reputation, purchaseUpgrade } = useGameStore();
-
+  const { upgrades, reputation, purchaseUpgrade, businesses } = useGameStore();
+  const availableUpgrades = Object.values(upgrades).filter((upgrade) =>
+    upgrade.affectedBusinesses.some(
+      (businessId) => businesses[businessId]?.owned
+    )
+  );
   return (
     <SafeAreaView style={styles.container}>
       <Text variant="headlineMedium" style={styles.title}>
@@ -16,14 +21,24 @@ export default function UpgradesScreen() {
       </Text>
 
       <ScrollView>
-        {Object.values(upgrades).map((upgrade) => (
-          <UpgradeCard
-            key={upgrade.id}
-            upgrade={upgrade}
-            canAfford={reputation >= upgrade.reputationCost}
-            onPurchase={() => purchaseUpgrade(upgrade.id)}
-          />
-        ))}
+        {availableUpgrades.length === 0 ? (
+          <Text style={styles.emptyMessage}>
+            🏢 Aucune amélioration disponible.{'\n'}
+            Achète des businesses pour débloquer des upgrades !
+          </Text>
+        ) : (
+          availableUpgrades.map((upgrade) => (
+            <UpgradeCard
+              key={upgrade.id}
+              upgrade={upgrade}
+              canAfford={
+                reputation >= upgrade.reputationCost && 
+                !upgrade.purchased
+              }
+              onPurchase={() => purchaseUpgrade(upgrade.id)}
+            />
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -50,6 +65,13 @@ const styles = StyleSheet.create({
     borderLeftColor: '#ffc107',
     fontWeight: '600',
     color: '#333',
+  },
+  emptyMessage: {
+    textAlign: 'center',
+    marginTop: 40,
+    fontSize: 16,
+    color: '#999',
+    lineHeight: 24,
   },
 });
 

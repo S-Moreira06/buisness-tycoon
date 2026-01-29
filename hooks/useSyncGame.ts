@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from '@/constants/gameConfig';
 import { useEffect, useRef } from 'react';
 import { loadGame, saveGame } from '../services/gameSync';
 import { useAuth } from './useAuth';
@@ -6,7 +7,7 @@ import { useGameStore } from './useGameStore';
 export function useSyncGame() {
   const { user } = useAuth();
   const gameState = useGameStore();
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load du serveur au premier render
   useEffect(() => {
@@ -30,14 +31,8 @@ export function useSyncGame() {
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      saveGame(user.uid, {
-        money: gameState.money,
-        reputation: gameState.reputation,
-        totalPassiveIncome: gameState.totalPassiveIncome,
-        ownedStocks: gameState.ownedStocks,
-        businesses: gameState.businesses,
-      });
-    }, 900);
+      saveGame(user.uid, gameState);
+    }, GAME_CONFIG.SAVE_DEBOUNCE_DELAY);
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -49,6 +44,8 @@ export function useSyncGame() {
     gameState.money,
     gameState.reputation,
     gameState.totalPassiveIncome,
+    gameState.playerLevel,
+    gameState.experience,
     gameState.ownedStocks,
     gameState.businesses,
   ]);

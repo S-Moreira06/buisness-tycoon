@@ -37,7 +37,7 @@ export const ClickButton = () => {
         </Animated.View>
       </Pressable>
       <Text style={styles.moneyDisplay}>
-        ${money.toLocaleString()}
+        {money.toLocaleString()} €
       </Text>
     </View>
   );
