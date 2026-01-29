@@ -102,14 +102,14 @@ export const GameHeader = () => {
               showTooltip({
                 title: '💰 Argent',
                 description: 'Ton capital total pour acheter des businesses et faire des upgrades.',
-                value: `${money.toLocaleString()}€`,
+                value: `${money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`,
               })
             }
           >
             <Text style={styles.statEmoji}>💰</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Argent</Text>
-              <Text style={styles.statValue}>{money.toLocaleString()}€</Text>
+              <Text style={styles.statValue}>{money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
             </View>
           </Pressable>
 
@@ -138,14 +138,14 @@ export const GameHeader = () => {
               showTooltip({
                 title: '📈 Revenu Passif',
                 description: `Argent gagné automatiquement toutes les ${intervalSeconds} secondes grâce à tes businesses.`,
-                value: `${totalPassiveIncome.toLocaleString()}€/${intervalSeconds}s`,
+                value: `${totalPassiveIncome.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€/${intervalSeconds}s`,
               })
             }
           >
             <Text style={styles.statEmoji}>📈</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Passif/{intervalSeconds}s</Text>
-              <Text style={styles.statValue}>{totalPassiveIncome.toLocaleString()}€</Text>
+              <Text style={styles.statValue}>{totalPassiveIncome.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
             </View>
           </Pressable>
         </View>
