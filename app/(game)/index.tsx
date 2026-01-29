@@ -1,10 +1,8 @@
-import { LevelBar } from '@/components/LevelBar';
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BusinessCard } from '../../components/BusinessCard';
 import { ClickButton } from '../../components/ClickButton';
-import { ResourceBar } from '../../components/ResourceBar';
 import { BUSINESSES_CONFIG } from '../../constants/businessesConfig';
 import { useAutoIncrement } from '../../hooks/useAutoIncrement';
 import { useImmersiveMode } from '../../hooks/useImmersiveMode';
@@ -27,8 +25,7 @@ export default function GameScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
-      <LevelBar />
-        <ResourceBar />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <ClickButton />
 

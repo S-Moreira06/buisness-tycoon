@@ -59,6 +59,17 @@ export default function SettingsScreen() {
         <Text variant="headlineMedium" style={styles.title}>
           ⚙️ Paramètres
         </Text>
+        <Button
+            mode="contained"
+            icon="gamepad-variant"
+            onPress={() => router.push('/(game)')}
+            style={styles.button}
+            buttonColor="#a855f7"
+            textColor="#ffffff"
+            loading={loading}
+          >
+            🎮 Retour au jeu
+          </Button>
 
         <View style={styles.section}>
           <Text variant="titleMedium" style={styles.sectionTitle}>
