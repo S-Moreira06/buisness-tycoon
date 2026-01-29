@@ -32,18 +32,18 @@ export const ResourceBar = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 8,
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 2,
   },
   stat: {
-    marginBottom: 12,
+    marginBottom: 2,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 2,
     color: '#333',
   },
   bar: {

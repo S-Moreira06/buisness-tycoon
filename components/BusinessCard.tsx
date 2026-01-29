@@ -19,42 +19,30 @@ export const BusinessCard = ({
   const { businesses, money, buyBusiness, upgradeBusiness } = useGameStore();
   const business = businesses[businessId];
 
-  if (!business?.owned) {
-    return (
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text style={styles.title}>{name}</Text>
-          <Text style={styles.text}>💰 Gain/sec: ${baseIncome}</Text>
-          <Text style={styles.text}>Prix: ${buyPrice}</Text>
-          <Button
-            mode="contained"
-            onPress={() => buyBusiness(businessId, buyPrice)}
-            disabled={money < buyPrice}
-            style={styles.button}
-          >
-            Acheter
-          </Button>
-        </Card.Content>
-      </Card>
-    );
-  }
 
   const upgradeCost = Math.floor(buyPrice * (business.level + 1) * 1.5);
 
   return (
     <Card style={[styles.card, styles.owned]}>
       <Card.Content>
-        <Text style={styles.title}>{name} (Lvl {business.level})</Text>
-        <Text style={styles.text}>💰 Gain/sec: ${business.income}</Text>
+        <Text>{name} (x{business?.quantity || 0}) Lvl {business?.level}</Text>
+        <Text>💰 Gain/sec: {business?.income * (business?.quantity || 1)}</Text>
         <Text style={styles.text}>Coût upgrade: ${upgradeCost}</Text>
         <Button
+          mode="contained"
+          onPress={() => buyBusiness(businessId, buyPrice)}
+          disabled={money < buyPrice}
+        >
+          Acheter: ${buyPrice}
+        </Button>
+        {/* <Button
           mode="contained"
           onPress={() => upgradeBusiness(businessId, upgradeCost)}
           disabled={money < upgradeCost}
           style={styles.button}
         >
           Upgrade
-        </Button>
+        </Button> */}
       </Card.Content>
     </Card>
   );
