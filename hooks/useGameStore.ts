@@ -12,6 +12,7 @@ interface ExtendedGameState extends GameState {
   buyBusiness: (businessId: string, price: number) => void;
   upgradeBusiness: (businessId: string, cost: number) => void;
   addPassiveIncome: () => void;
+  purchaseUpgrade: (upgradeId: string) => void; 
   hydrateFromServer: (payload: Partial<GameState>) => void;
   resetGame: () => void;
 }

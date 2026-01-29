@@ -7,7 +7,7 @@ import { useGameStore } from './useGameStore';
 export function useSyncGame() {
   const { user } = useAuth();
   const gameState = useGameStore();
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load du serveur au premier render
   useEffect(() => {
