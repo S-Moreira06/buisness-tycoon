@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BusinessCard } from '../../components/BusinessCard';
-import { ClickButton } from '../../components/ClickButton';
-import { BUSINESSES_CONFIG } from '../../constants/businessesConfig';
-import { useAutoIncrement } from '../../hooks/useAutoIncrement';
-import { useImmersiveMode } from '../../hooks/useImmersiveMode';
-import { useSyncGame } from '../../hooks/useSyncGame';
+import { BusinessCard } from '../../../components/BusinessCard';
+import { ClickButton } from '../../../components/ClickButton';
+import { BUSINESSES_CONFIG } from '../../../constants/businessesConfig';
+import { useAutoIncrement } from '../../../hooks/useAutoIncrement';
+import { useImmersiveMode } from '../../../hooks/useImmersiveMode';
+import { useSyncGame } from '../../../hooks/useSyncGame';
 
 const BUSINESSES = Object.values(BUSINESSES_CONFIG).map((b) => ({
   id: b.id,
@@ -48,7 +48,7 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#3d3d5a',
     paddingHorizontal: 16,
     paddingTop: 10,
   },
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    marginBottom: 0,
+    marginBottom: 60,
   },
 });
