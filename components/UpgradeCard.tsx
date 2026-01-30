@@ -5,7 +5,9 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { Button } from 'react-native-paper';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { GAME_CONFIG } from '../constants/gameConfig';
+import { TIER_CONFIG } from '../constants/tierConfig';
 import { useGameStore } from '../hooks/useGameStore';
+
 
 interface UpgradeCardProps {
   upgrade: any;
@@ -86,17 +88,45 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
           end={{ x: 1, y: 1 }}
           style={[styles.card, upgrade.purchased && styles.purchasedCard]}
         >
-          {!upgrade.purchased && <View style={styles.topGlow} />}
+          {/* 🆕 Barre top avec couleur du tier */}
+          {!upgrade.purchased && (
+            <LinearGradient
+              colors={TIER_CONFIG[upgrade.tier].gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.topGlow}
+            />
+          )}
 
-          {/* Header */}
+
+          {/* Header avec tier badge */}
           <View style={styles.header}>
-            <Text style={styles.title} numberOfLines={2}>
-              {upgrade.name}
-            </Text>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title} numberOfLines={2}>
+                {upgrade.name}
+              </Text>
+              
+              {/* 🆕 Badge Tier */}
+              <LinearGradient
+                colors={TIER_CONFIG[upgrade.tier].gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.tierBadge}
+              >
+                <Text style={styles.tierIcon}>
+                  {TIER_CONFIG[upgrade.tier].icon}
+                </Text>
+                <Text style={styles.tierText}>
+                  {TIER_CONFIG[upgrade.tier].label}
+                </Text>
+              </LinearGradient>
+            </View>
+            
             <View style={styles.multiplierBadge}>
               <Text style={styles.multiplierText}>+{multiplierPercent}%</Text>
             </View>
           </View>
+
 
           {/* Description */}
           <Text style={styles.description} numberOfLines={3}>
@@ -177,13 +207,34 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
                   colors={['#1a1a2e', '#0f0f1e']}
                   style={styles.modalGradient}
                 >
-                  {/* Header */}
+                  {/* Header avec tier dans la modale */}
                   <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>{upgrade.name}</Text>
-                    <View style={styles.modalMultiplierBadge}>
-                      <Text style={styles.modalMultiplierText}>+{multiplierPercent}%</Text>
+                    <View style={styles.modalTitleContainer}>
+                      <Text style={styles.modalTitle}>{upgrade.name}</Text>
+                      
+                      {/* 🆕 Tier dans la modale */}
+                      <View style={styles.modalTierRow}>
+                        <LinearGradient
+                          colors={TIER_CONFIG[upgrade.tier].gradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.modalTierBadge}
+                        >
+                          <Text style={styles.modalTierIcon}>
+                            {TIER_CONFIG[upgrade.tier].icon}
+                          </Text>
+                          <Text style={styles.modalTierText}>
+                            {TIER_CONFIG[upgrade.tier].label}
+                          </Text>
+                        </LinearGradient>
+
+                        <View style={styles.modalMultiplierBadge}>
+                          <Text style={styles.modalMultiplierText}>+{multiplierPercent}%</Text>
+                        </View>
+                      </View>
                     </View>
                   </View>
+
 
                   {/* Description */}
                   <Text style={styles.modalDescription}>{upgrade.description}</Text>
@@ -322,41 +373,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   topGlow: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: '#fbbf24',
-    shadowColor: '#fbbf24',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-    gap: 12,
-  },
-  title: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    lineHeight: 22,
-  },
-  multiplierBadge: {
-    backgroundColor: '#10b981',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-  },
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  height: 3, // 🆕 Un peu plus épais pour mieux voir
+  shadowColor: '#000', // 🆕 Ombre dynamique
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.8,
+  shadowRadius: 8,
+},
   multiplierText: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -468,12 +494,13 @@ const styles = StyleSheet.create({
   // Styles modale
   modalOverlay: {
     flex: 1,
+    marginTop: 115,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   blurContainer: {
-    padding: 20,
+    padding: 0,
     width: '90%',
     maxWidth: 420,
     maxHeight: '80%',
@@ -490,30 +517,6 @@ const styles = StyleSheet.create({
   },
   modalGradient: {
     padding: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 12,
-  },
-  modalTitle: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  modalMultiplierBadge: {
-    backgroundColor: '#10b981',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  modalMultiplierText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ffffff',
   },
   modalDescription: {
     fontSize: 14,
@@ -659,6 +662,110 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 14,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  // 🆕 STYLES TIER - À AJOUTER DANS StyleSheet.create
+  header: {
+    marginBottom: 12,
+  },
+  titleContainer: {
+    flex: 1,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    lineHeight: 22,
+    marginBottom: 6,
+  },
+  tierBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tierIcon: {
+    fontSize: 12,
+  },
+  tierText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#000000',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  multiplierBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#10b981',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+  },
+  // 🆕 STYLES MODALE TIER
+  modalHeader: {
+    marginBottom: 16,
+  },
+  modalTitleContainer: {
+    flex: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 8,
+  },
+  modalTierRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  modalTierBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    gap: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  modalTierIcon: {
+    fontSize: 16,
+  },
+  modalTierText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000000',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  modalMultiplierBadge: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  modalMultiplierText: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#ffffff',
   },

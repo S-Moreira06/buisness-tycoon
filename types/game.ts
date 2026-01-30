@@ -1,3 +1,5 @@
+import { TierType } from "@/constants/tierConfig";
+
 export interface Stock {
   quantity: number;
   buyPrice: number;
@@ -18,6 +20,7 @@ export interface Upgrade {
   multiplier: number;  // ex: 1.2 = +20%
   affectedBusinesses: string[];  // IDs des businesses concernées
   purchased: boolean;  // Si déjà acheté
+  tier: TierType,
 }
 
 export interface GameState {

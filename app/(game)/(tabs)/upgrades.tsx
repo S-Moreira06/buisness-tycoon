@@ -3,13 +3,16 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UpgradeCard } from '../../../components/UpgradeCard';
+import { TIER_CONFIG, type TierFilter } from '../../../constants/tierConfig';
 import { useGameStore } from '../../../hooks/useGameStore';
+
 
 type TabType = 'all' | 'available' | 'purchased';
 
 export default function UpgradesScreen() {
   const { upgrades, reputation, purchaseUpgrade, businesses } = useGameStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [activeTier, setActiveTier] = useState<TierFilter>('all');
 
   const allUpgrades = Object.values(upgrades).filter((upgrade) =>
     upgrade.affectedBusinesses.some(
@@ -19,12 +22,16 @@ export default function UpgradesScreen() {
 
   const purchasedUpgrades = allUpgrades.filter(u => u.purchased);
   const availableUpgrades = allUpgrades.filter(u => !u.purchased);
-
-  // Sélection des upgrades selon l'onglet actif
-  const displayedUpgrades = 
+   // 1. Filtrer par tab (all/purchased/available)
+  let displayedUpgrades = 
     activeTab === 'all' ? allUpgrades :
     activeTab === 'purchased' ? purchasedUpgrades :
     availableUpgrades;
+
+  // 2. Filtrer par tier SI activeTier n'est pas 'all'
+  if (activeTier !== 'all') {
+    displayedUpgrades = displayedUpgrades.filter(u => u.tier === activeTier);
+  }
 
   return (
     <LinearGradient
@@ -123,34 +130,80 @@ export default function UpgradesScreen() {
             </View>
           </Pressable>
         </View>
+        {/* 🆕 Filtres Tier */}
+        <View style={styles.filtersContainer}>
+          <Text style={styles.filtersLabel}>Tier :</Text>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersScroll}
+          >
+            {/* ✅ CORRECTION : Utiliser TierFilter au lieu de TierType */}
+            {(Object.keys(TIER_CONFIG) as TierFilter[]).map((tier) => (
+              <Pressable
+                key={tier}
+                style={[
+                  styles.filterChip,
+                  activeTier === tier && styles.activeFilterChip,
+                  activeTier === tier && { borderColor: TIER_CONFIG[tier].color }
+                ]}
+                onPress={() => setActiveTier(tier)}
+              >
+                {activeTier === tier && (
+                  <View 
+                    style={[
+                      styles.filterChipGlow,
+                      { backgroundColor: TIER_CONFIG[tier].color }
+                    ]} 
+                  />
+                )}
+                <Text style={styles.filterChipIcon}>
+                  {TIER_CONFIG[tier].icon}
+                </Text>
+                <Text style={[
+                  styles.filterChipText,
+                  activeTier === tier && styles.activeFilterChipText
+                ]}>
+                  {TIER_CONFIG[tier].label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
 
         {/* Liste ou message vide */}
         {displayedUpgrades.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <LinearGradient
-              colors={['#1a1a2e', '#16213e']}
-              style={styles.emptyCard}
-            >
-              <Text style={styles.emptyEmoji}>
-                {activeTab === 'all' ? '🏢' : 
-                 activeTab === 'purchased' ? '🎯' : 
-                 '💰'}
-              </Text>
-              <Text style={styles.emptyTitle}>
-                {activeTab === 'all' ? 'Aucune amélioration disponible' :
-                 activeTab === 'purchased' ? 'Aucune amélioration possédée' :
-                 'Aucune amélioration à acheter'}
-              </Text>
-              <Text style={styles.emptyMessage}>
-                {activeTab === 'all' 
-                  ? 'Achète des businesses pour débloquer des upgrades !'
-                  : activeTab === 'purchased'
-                  ? 'Achète des améliorations pour booster tes revenus !'
-                  : 'Félicitations ! Tu as acheté toutes les améliorations disponibles !'}
-              </Text>
-            </LinearGradient>
-          </View>
-        ) : (
+  <View style={styles.emptyContainer}>
+    <LinearGradient
+      colors={['#1a1a2e', '#16213e']}
+      style={styles.emptyCard}
+    >
+      <Text style={styles.emptyEmoji}>
+        {activeTier !== 'all' ? TIER_CONFIG[activeTier].icon : 
+         activeTab === 'all' ? '🏢' : 
+         activeTab === 'purchased' ? '🎯' : 
+         '💰'}
+      </Text>
+      <Text style={styles.emptyTitle}>
+        {activeTier !== 'all' 
+          ? `Aucune amélioration ${TIER_CONFIG[activeTier].label}`
+          : activeTab === 'all' ? 'Aucune amélioration disponible' :
+            activeTab === 'purchased' ? 'Aucune amélioration possédée' :
+            'Aucune amélioration à acheter'}
+      </Text>
+      <Text style={styles.emptyMessage}>
+        {activeTier !== 'all'
+          ? `Achète des businesses pour débloquer des upgrades ${TIER_CONFIG[activeTier].label} !`
+          : activeTab === 'all' 
+            ? 'Achète des businesses pour débloquer des upgrades !'
+            : activeTab === 'purchased'
+            ? 'Achète des améliorations pour booster tes revenus !'
+            : 'Félicitations ! Tu as acheté toutes les améliorations disponibles !'}
+      </Text>
+    </LinearGradient>
+  </View>
+) : (
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
@@ -185,15 +238,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-    gap: 16,
+    paddingTop: 8,
+    gap: 10,
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#ffffff',
     marginBottom: 4,
@@ -206,14 +258,14 @@ const styles = StyleSheet.create({
   reputationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
     borderRadius: 12,
     gap: 8,
     shadowColor: '#fbbf24',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowRadius: 1,
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -235,17 +287,18 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: 5,
+    paddingTop: 10,
+    paddingBottom: 6,
+    gap: 4,
   },
   tab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 10,
     backgroundColor: '#1a1a2e',
     borderWidth: 1,
@@ -256,7 +309,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderColor: '#a855f7',
-    borderWidth: 2,
+    borderWidth: 3,
   },
   tabGradient: {
     position: 'absolute',
@@ -326,5 +379,59 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  // 🆕 STYLES FILTRES
+  filtersContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 12,
+  },
+  filtersLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#9ca3af',
+  },
+  filtersScroll: {
+    gap: 8,
+    paddingRight: 16,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#1a1a2e',
+    borderWidth: 1,
+    borderColor: '#374151',
+    gap: 6,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  activeFilterChip: {
+    backgroundColor: '#0f0f1e',
+    borderWidth: 2,
+  },
+  filterChipGlow: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.15,
+  },
+  filterChipIcon: {
+    fontSize: 14,
+  },
+  filterChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9ca3af',
+  },
+  activeFilterChipText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });
