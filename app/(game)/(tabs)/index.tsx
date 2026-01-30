@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    marginBottom: 0,
+    marginBottom: 60,
   },
 });
