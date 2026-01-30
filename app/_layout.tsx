@@ -22,7 +22,7 @@ export default function RootLayout() {
     const timeout = setTimeout(() => {
       if (user) {
         console.log('✅ User found, going to game');
-        router.replace('/(game)');
+        router.replace('/(game)/');
       } else {
         console.log('❌ No user, going to login');
         router.replace('/(auth)/login');

@@ -1,11 +1,11 @@
+import { useGameStore } from '@/hooks/useGameStore';
+import { auth } from '@/services/firebaseConfig';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Divider, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useGameStore } from '../../hooks/useGameStore';
-import { auth } from '../../services/firebaseConfig';
 
 export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
@@ -132,7 +132,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#3d3d5a',
     paddingHorizontal: 16,
   },
   title: {

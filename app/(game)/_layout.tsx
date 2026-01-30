@@ -30,15 +30,15 @@ export default function GameLayout() {
               <IconButton
                 icon="one-up"
                 size={24}
-                onPress={() => router.push('/(game)/upgrades')}
+                onPress={() => router.push('/(game)/(tabs)/upgrades')}
               />
               </>
             ),
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'Business Tycoon' }} />
+        {/* <Stack.Screen name="index" options={{ title: 'Business Tycoon' }} />
         <Stack.Screen name="settings" options={{ title: 'Paramètres' }} />
-        <Stack.Screen name="upgrades" options={{ title: 'Améliorations' }} />
+        <Stack.Screen name="upgrades" options={{ title: 'Améliorations' }} /> */}
 
       </Stack>
     </>
