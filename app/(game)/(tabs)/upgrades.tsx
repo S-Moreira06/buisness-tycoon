@@ -1,5 +1,7 @@
+//app/(game)/(tabs)
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UpgradeCard } from '../../../components/UpgradeCard';
@@ -7,12 +9,19 @@ import { TIER_CONFIG, type TierFilter } from '../../../constants/tierConfig';
 import { useGameStore } from '../../../hooks/useGameStore';
 
 
+
 type TabType = 'all' | 'available' | 'purchased';
 
 export default function UpgradesScreen() {
+  const params = useLocalSearchParams();
+  const router = useRouter();
+  const scrollToUpgradeId = params.scrollTo as string | undefined;
   const { upgrades, reputation, purchaseUpgrade, businesses } = useGameStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [activeTier, setActiveTier] = useState<TierFilter>('all');
+  // 🆕 Refs pour chaque UpgradeCard
+  const upgradeRefs = useRef<{ [key: string]: View | null }>({});
+  const scrollViewRef = useRef<ScrollView>(null); 
 
   const allUpgrades = Object.values(upgrades).filter((upgrade) =>
     upgrade.affectedBusinesses.some(
@@ -32,6 +41,33 @@ export default function UpgradesScreen() {
   if (activeTier !== 'all') {
     displayedUpgrades = displayedUpgrades.filter(u => u.tier === activeTier);
   }
+  // 🆕 Effet pour scroller vers l'upgrade ciblé
+  useEffect(() => {
+    if (scrollToUpgradeId && upgradeRefs.current[scrollToUpgradeId]) {
+      // Délai pour laisser le temps au rendu
+      setTimeout(() => {
+        upgradeRefs.current[scrollToUpgradeId]?.measureLayout(
+          scrollViewRef.current as any,
+          (x, y) => {
+            scrollViewRef.current?.scrollTo({
+              y: y - 100, // Offset pour ne pas coller en haut
+              animated: true,
+            });
+
+            // 🆕 Nettoyer le paramètre après le scroll
+            setTimeout(() => {
+              router.setParams({ scrollTo: undefined });
+            }, 500); // Attendre la fin de l'animation
+          },
+          () => {
+            console.log('Erreur de mesure');
+            // 🆕 Nettoyer même en cas d'erreur
+            router.setParams({ scrollTo: undefined });
+          }
+        );
+      }, 300);
+    }
+  }, [scrollToUpgradeId, displayedUpgrades, router]);
 
   return (
     <LinearGradient
@@ -205,18 +241,25 @@ export default function UpgradesScreen() {
   </View>
 ) : (
           <ScrollView
+            ref={scrollViewRef}
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
             {displayedUpgrades.map((upgrade) => (
-              <UpgradeCard
+              <View
                 key={upgrade.id}
-                upgrade={upgrade}
-                canAfford={reputation >= upgrade.reputationCost && !upgrade.purchased}
-                onPurchase={() => purchaseUpgrade(upgrade.id)}
-              />
+                ref={(ref) => (upgradeRefs.current[upgrade.id] = ref)} // 🆕 Ajouter la ref
+                collapsable={false} // 🆕 Important pour measureLayout sur Android
+              >
+                <UpgradeCard
+                  upgrade={upgrade}
+                  canAfford={reputation >= upgrade.reputationCost && !upgrade.purchased}
+                  onPurchase={() => purchaseUpgrade(upgrade.id)}
+                />
+              </View>
             ))}
+
             {/* Padding en bas pour la tab bar */}
             <View style={{ height: 100 }} />
           </ScrollView>

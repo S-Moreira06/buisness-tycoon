@@ -1,12 +1,12 @@
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { GAME_CONFIG } from '../constants/gameConfig';
 import { TIER_CONFIG } from '../constants/tierConfig';
 import { useGameStore } from '../hooks/useGameStore';
+import { CustomModal } from './CustomModal';
 
 
 interface UpgradeCardProps {
@@ -193,167 +193,112 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
       </Pressable>
 
       {/* MODALE DÉTAILS UPGRADE */}
-      <Modal
-        transparent
-        visible={modalVisible}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
-          <BlurView intensity={30} style={styles.blurContainer}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <View style={styles.modalContent}>
-                <LinearGradient
-                  colors={['#1a1a2e', '#0f0f1e']}
-                  style={styles.modalGradient}
-                >
-                  {/* Header avec tier dans la modale */}
-                  <View style={styles.modalHeader}>
-                    <View style={styles.modalTitleContainer}>
-                      <Text style={styles.modalTitle}>{upgrade.name}</Text>
-                      
-                      {/* 🆕 Tier dans la modale */}
-                      <View style={styles.modalTierRow}>
-                        <LinearGradient
-                          colors={TIER_CONFIG[upgrade.tier].gradient}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={styles.modalTierBadge}
-                        >
-                          <Text style={styles.modalTierIcon}>
-                            {TIER_CONFIG[upgrade.tier].icon}
-                          </Text>
-                          <Text style={styles.modalTierText}>
-                            {TIER_CONFIG[upgrade.tier].label}
-                          </Text>
-                        </LinearGradient>
+            {/* ================= MODALE REFACTORISÉE ================= */}
+      <CustomModal visible={modalVisible} onDismiss={() => setModalVisible(false)}>
+        <View style={styles.modalInnerContent}>
+          
+          {/* Header Modale */}
+          <View style={styles.modalHeader}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={styles.modalTitle}>{upgrade.name}</Text>
+              <View style={[styles.tierBadge, { alignSelf: 'flex-start' }]}>
+                <Text style={{ fontSize: 12 }}>{TIER_CONFIG[upgrade.tier].icon}</Text>
+                <Text style={styles.tierLabel}>{TIER_CONFIG[upgrade.tier].label}</Text>
+              </View>
+            </View>
+            
+            <View style={styles.multiplierBadge}>
+              <Text style={styles.multiplierText}>+{multiplierPercent}%</Text>
+            </View>
+          </View>
 
-                        <View style={styles.modalMultiplierBadge}>
-                          <Text style={styles.modalMultiplierText}>+{multiplierPercent}%</Text>
-                        </View>
-                      </View>
-                    </View>
+          {/* Contenu Scrollable */}
+          <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+            <Text style={styles.description}>{upgrade.description}</Text>
+
+            <View style={styles.divider} />
+
+            {/* Section Businesses */}
+            <Text style={styles.sectionTitle}>🏢 Businesses affectés</Text>
+            
+            <View style={{ gap: 8 }}>
+              {affectedBusinesses.map((business) => (
+                <View key={business.id} style={styles.businessRow}>
+                  {/* Icone */}
+                  <View style={styles.businessIconContainer}>
+                    <Text style={{ fontSize: 20 }}>{business.emoji}</Text>
                   </View>
-
-
-                  {/* Description */}
-                  <Text style={styles.modalDescription}>{upgrade.description}</Text>
-
-                  {/* Divider */}
-                  <View style={styles.divider} />
-
-                  {/* Liste des businesses affectés */}
-                  <Text style={styles.sectionTitle}>🏢 Businesses affectés</Text>
                   
-                  <ScrollView 
-                    style={styles.businessesList}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {affectedBusinesses.map((business) => (
-                      <View key={business.id} style={styles.businessItem}>
-                        <View style={styles.businessHeader}>
-                          <Text style={styles.businessItemEmoji}>{business.emoji}</Text>
-                          <Text style={styles.businessItemName}>{business.name}</Text>
-                          {!business.owned && (
-                            <View style={styles.notOwnedBadge}>
-                              <Text style={styles.notOwnedBadgeText}>🔒</Text>
-                            </View>
-                          )}
-                        </View>
-
-                        {business.owned && business.quantity > 0 ? (
-                          <View style={styles.businessStats}>
-                            <View style={styles.businessStatRow}>
-                              <Text style={styles.businessStatLabel}>Actuel:</Text>
-                              <Text style={styles.businessStatValue}>
-                                {business.currentIncome.toLocaleString('fr-FR', {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })}€
-                              </Text>
-                            </View>
-
-                            {!upgrade.purchased && (
-                              <>
-                                <View style={styles.businessStatRow}>
-                                  <Text style={styles.businessStatLabel}>Futur:</Text>
-                                  <Text style={[styles.businessStatValue, styles.futureText]}>
-                                    {business.futureIncome.toLocaleString('fr-FR', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })}€
-                                  </Text>
-                                </View>
-
-                                <View style={[styles.businessStatRow, styles.gainRow]}>
-                                  <Text style={styles.businessStatLabel}>Gain:</Text>
-                                  <Text style={styles.gainText}>
-                                    +{business.incomeDiff.toLocaleString('fr-FR', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })}€
-                                  </Text>
-                                </View>
-                              </>
-                            )}
-                          </View>
-                        ) : (
-                          <Text style={styles.notOwnedItemText}>
-                            {business.owned ? 'Aucune unité possédée' : 'Non possédé'}
+                  {/* Infos */}
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.businessName}>{business.name}</Text>
+                    {business.owned && business.quantity > 0 ? (
+                      <View>
+                        <Text style={styles.businessStat}>
+                          Actuel: <Text style={{ color: '#fff' }}>{business.currentIncome.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s</Text>
+                        </Text>
+                        {!upgrade.purchased && (
+                          <Text style={[styles.businessStat, { color: '#10b981' }]}>
+                            Gain: +{business.incomeDiff.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
                           </Text>
                         )}
                       </View>
-                    ))}
-                  </ScrollView>
+                    ) : (
+                      <Text style={styles.businessStat}>{business.owned ? 'Aucune unité' : 'Non possédé'}</Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
 
-                  {/* Total des gains */}
-                  {!upgrade.purchased && ownedBusinesses.length > 0 && totalCurrentIncome > 0 && (
-                    <>
-                      <View style={styles.divider} />
-                      
-                      <LinearGradient
-                        colors={['#10b981', '#059669']}
-                        style={styles.totalGainBadge}
-                      >
-                        <Text style={styles.totalGainIcon}>🎯</Text>
-                        <View style={styles.totalGainContent}>
-                          <Text style={styles.totalGainLabel}>Gain total de l'upgrade</Text>
-                          <Text style={styles.totalGainValue}>
-                            +{totalGain.toLocaleString('fr-FR', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}€/{affectedBusinesses[0]?.intervalInSeconds || 1}s
-                          </Text>
-                          <Text style={styles.totalGainPercent}>
-                            (+{totalGainPercent}% de revenu total)
-                          </Text>
-                        </View>
-                      </LinearGradient>
-                    </>
-                  )}
-
-                  {/* Message si déjà acheté */}
-                  {upgrade.purchased && (
-                    <View style={styles.alreadyPurchasedBanner}>
-                      <Text style={styles.alreadyPurchasedText}>
-                        ✅ Cet upgrade est déjà actif !
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Bouton fermer */}
-                  <Pressable
-                    style={styles.closeButton}
-                    onPress={() => setModalVisible(false)}
-                  >
-                    <Text style={styles.closeButtonText}>Fermer</Text>
-                  </Pressable>
-                </LinearGradient>
+            {/* Total Gains (si applicable) */}
+            {!upgrade.purchased && ownedBusinesses.length > 0 && totalCurrentIncome > 0 && (
+              <View style={styles.totalGainContainer}>
+                <Text style={styles.totalGainTitle}>Gain total estimé</Text>
+                <Text style={styles.totalGainValue}>
+                  +{totalGain.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
+                </Text>
+                <Text style={styles.totalGainSub}>
+                  (+{totalGainPercent}% de revenu total)
+                </Text>
               </View>
-            </Pressable>
-          </BlurView>
-        </Pressable>
-      </Modal>
+            )}
+          </ScrollView>
+
+          {/* Footer Actions */}
+          <View style={styles.modalFooter}>
+            {upgrade.purchased ? (
+              <View style={styles.purchasedBanner}>
+                <Text style={styles.purchasedText}>✅ Amélioration active</Text>
+              </View>
+            ) : (
+              <Button 
+                mode="contained" 
+                onPress={(e) => {
+                  handlePurchase(e);
+                  setModalVisible(false);
+                }}
+                style={styles.modalButton}
+                contentStyle={{ height: 48 }}
+                buttonColor={canAfford ? '#7c3aed' : '#374151'}
+                disabled={!canAfford}
+              >
+                Acheter • {upgrade.reputationCost} 💎
+              </Button>
+            )}
+            
+            <Button 
+              onPress={() => setModalVisible(false)} 
+              textColor="#9ca3af"
+              style={{ marginTop: 8 }}
+            >
+              Fermer
+            </Button>
+          </View>
+
+        </View>
+      </CustomModal>
+
     </>
   );
 };
@@ -717,56 +662,117 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
   },
-  // 🆕 STYLES MODALE TIER
-  modalHeader: {
-    marginBottom: 16,
+    // ... vos styles de carte existants ...
+
+  // NOUVEAUX STYLES MODALE
+  modalInnerContent: {
+    backgroundColor: 'rgba(15, 23, 42, 0.7)', // Fond sombre bleuté semi-transparent
+    padding: 24,
   },
-  modalTitleContainer: {
-    flex: 1,
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 8,
+    color: '#fff',
+    lineHeight: 28,
   },
-  modalTierRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  modalTierBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  modalTierIcon: {
-    fontSize: 16,
-  },
-  modalTierText: {
+  tierLabel: {
     fontSize: 12,
+    color: '#d1d5db',
+    fontWeight: '600',
+  },
+  // tierBadge: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   gap: 6,
+  //   backgroundColor: 'rgba(255,255,255,0.1)',
+  //   paddingHorizontal: 8,
+  //   paddingVertical: 4,
+  //   borderRadius: 8,
+  // },
+  modalScroll: {
+    maxHeight: 300,
+    
+  },
+  // sectionTitle: {
+  //   fontSize: 13,
+  //   fontWeight: '700',
+  //   color: '#9ca3af',
+  //   marginBottom: 12,
+  //   textTransform: 'uppercase',
+  //   letterSpacing: 0.5,
+  // },
+  // divider: {
+  //   height: 1,
+  //   backgroundColor: 'rgba(255,255,255,0.1)',
+  //   marginVertical: 20,
+  // },
+  businessRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 12,
+    borderRadius: 12,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  businessIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#374151',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  businessName: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#000000',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    color: '#e5e7eb',
+    marginBottom: 2,
   },
-  modalMultiplierBadge: {
-    backgroundColor: '#10b981',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
+  businessStat: {
+    fontSize: 12,
+    color: '#9ca3af',
   },
-  modalMultiplierText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ffffff',
+  totalGainContainer: {
+    marginTop: 16,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)', // Vert très léger
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
   },
+  totalGainTitle: {
+    fontSize: 12,
+    color: '#10b981',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  // totalGainValue: {
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  //   color: '#10b981',
+  // },
+  totalGainSub: {
+    fontSize: 12,
+    color: '#10b981',
+    opacity: 0.8,
+  },
+  modalFooter: {
+    marginTop: 24,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  modalButton: {
+    borderRadius: 12,
+  },
+
 });

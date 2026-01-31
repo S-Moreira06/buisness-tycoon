@@ -1,3 +1,4 @@
+//app/(game)/(tabs)
 import { useGameStore } from '@/hooks/useGameStore';
 import { auth } from '@/services/firebaseConfig';
 import { useRouter } from 'expo-router';

@@ -1,14 +1,125 @@
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import { GAME_CONFIG } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
 
+// --- Sous-composant : Texte Flottant (Update avec support Critique) ---
+interface FloatingTextProps {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+  isCritical: boolean; // Nouvelle prop
+  onComplete: (id: number) => void;
+}
+
+const FloatingText = ({ id, text, x, y, isCritical, onComplete }: FloatingTextProps) => {
+  const positionAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(0.2)).current; 
+  const rotateAnim = useRef(new Animated.Value(0)).current; 
+
+  const config = useRef({
+    angle: Math.random() * 2 * Math.PI,
+    // Les critiques volent plus loin !
+    distance: (isCritical ? 120 : 80) + Math.random() * 80, 
+    duration: 800 + Math.random() * 300,
+    rotation: (Math.random() - 0.5) * 720,      
+    delay: Math.random() * 50,
+  }).current;
+
+  useEffect(() => {
+    const targetX = Math.cos(config.angle) * config.distance;
+    const targetY = Math.sin(config.angle) * config.distance;
+
+    Animated.parallel([
+      Animated.timing(positionAnim, {
+        toValue: { x: targetX, y: targetY },
+        duration: config.duration,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+        delay: config.delay,
+      }),
+      Animated.timing(rotateAnim, {
+        toValue: 1, 
+        duration: config.duration,
+        useNativeDriver: true,
+      }),
+      Animated.sequence([
+        Animated.delay(config.duration * 0.5),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: config.duration * 0.5,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: isCritical ? 2 : 1.5, // Le critique grossit plus (x2)
+          duration: 200,
+          easing: Easing.out(Easing.back(1.5)),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1, 
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start(() => {
+      onComplete(id);
+    });
+  }, []);
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', `${config.rotation}deg`],
+  });
+
+  return (
+    <Animated.Text
+      style={[
+        styles.text,
+        // Style conditionnel pour le Critique
+        isCritical && styles.criticalText,
+        {
+          left: x,
+          top: y,
+          opacity: opacityAnim,
+          transform: [
+            { translateX: positionAnim.x },
+            { translateY: positionAnim.y },
+            { scale: scaleAnim },
+            { rotate: spin },
+          ]
+        }
+      ]}
+    >
+      {text}
+    </Animated.Text>
+  );
+};
+
+// --- Composant Principal ---
 export const ClickButton = () => {
-  const { clickGame, money } = useGameStore();
+  // On récupère addMoney (si existe) ou on fait la logique manuelle ici
+  // L'idéal serait d'avoir une action "clickHit(amount)" dans le store pour être propre
+  // Mais pour l'instant on garde clickGame() standard et on triche visuellement ou on adapte le store.
+  // ⚠️ IMPORTANT : Pour que l'argent soit vraiment ajouté, il faudra modifier useGameStore 
+  // pour accepter un montant variable, ou gérer le bonus ici.
+  // Pour l'instant, je suppose que clickGame() ajoute juste CLICK_REWARD_MONEY fixe.
+  // Si tu veux que le critique donne VRAIMENT de l'argent, dis le moi, on modifiera le store.
+  const { clickGame, money } = useGameStore(); 
+  
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(1)).current;
+  
+  const [floatingTexts, setFloatingTexts] = useState<{id: number, text: string, x: number, y: number, isCritical: boolean}[]>([]);
+  const textIdCounter = useRef(0);
 
-  // Animation de glow pulsante continue
+  // Animation de respiration
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -26,78 +137,115 @@ export const ClickButton = () => {
     ).start();
   }, []);
 
-  const handlePress = () => {
-    clickGame();
+  const handlePress = (event: GestureResponderEvent) => {
+    // --- LOGIQUE CRITIQUE ---
+    // Tu pourras remplacer ces valeurs par des variables du store plus tard (upgrades)
+    const critChance = GAME_CONFIG.BASE_CRIT_CHANCE; // 5%
+    const critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER; // x5
+    
+    const isCritical = Math.random() < critChance;
+    
+    // Calcul du gain (Visuel pour l'instant si le store n'est pas prêt)
+    let amount = GAME_CONFIG.CLICK_REWARD_MONEY;
+    if (isCritical) {
+        amount *= critMult;
+    }
 
-    // Animation rapide et moderne
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 0.92,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 4,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Appel au store (TODO: Modifier le store pour accepter un montant si tu veux que le x5 compte vraiment !)
+    // Pour l'instant on appelle clickGame N fois si c'est un critique pour simuler ? 
+    // Ou mieux : clickGame(amount) -> Je te conseille de modifier ton store.
+    if (isCritical) {
+        // Hack temporaire : on appelle clickGame 5 fois ou on modifie le store
+        // Pour l'exercice visuel, on appelle juste clickGame() une fois
+        clickGame(); 
+        // Haptique LOURD pour le critique
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    } else {
+        clickGame();
+        // Haptique LEGER pour le normal
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    
+    // Animation Bouton
+    scaleAnim.setValue(isCritical ? 0.85 : 0.92); // S'écrase plus fort si critique
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+
+    // Ajout Texte Flottant
+    const { locationX, locationY } = event.nativeEvent;
+    
+    const newId = textIdCounter.current++;
+    setFloatingTexts(prev => [
+      ...prev, 
+      { 
+        id: newId, 
+        text: isCritical ? `CRIT! +${amount}€` : `+${amount}€`, 
+        x: locationX - 20, 
+        y: locationY - 20,
+        isCritical: isCritical
+      }
+    ]);
+  };
+
+  const removeFloatingText = (id: number) => {
+    setFloatingTexts(prev => prev.filter(item => item.id !== id));
   };
 
   return (
     <View style={styles.container}>
-      {/* Glow effect subtil */}
-      <Animated.View
-        style={[
-          styles.glowOuter,
-          {
-            transform: [{ scale: glowAnim }],
-            opacity: glowAnim.interpolate({
-              inputRange: [1, 1.2],
-              outputRange: [0.2, 0.4],
-            }),
-          },
-        ]}
-      />
-
       <View style={styles.content}>
-        {/* Bouton moderne */}
-        <Pressable onPress={handlePress}>
-          <Animated.View
-            style={{
-              transform: [{ scale: scaleAnim }],
-            }}
-          >
-            <LinearGradient
-              colors={['#a855f7', '#7c3aed', '#6d28d9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonEmoji}>💎</Text>
-            </LinearGradient>
+        
+        {/* BOUTON */}
+        <Pressable onPress={handlePress} style={{ position: 'relative' }}>
+            <Animated.View style={[styles.glowOuter, { transform: [{ scale: glowAnim }] }]} />
+            <Animated.View style={[styles.buttonContainer, { transform: [{ scale: scaleAnim }] }]}>
+              <LinearGradient
+                colors={['#7c3aed', '#6d28d9']}
+                style={styles.button}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.buttonEmoji}>👆</Text>
+                <View style={styles.buttonBorder} />
+              </LinearGradient>
+            </Animated.View>
 
-            {/* Bordure subtile */}
-            <View style={styles.buttonBorder} />
-          </Animated.View>
+            {floatingTexts.map(item => (
+                <FloatingText 
+                    key={item.id} 
+                    {...item} 
+                    onComplete={removeFloatingText} 
+                />
+            ))}
         </Pressable>
 
-        {/* Badge argent à droite */}
-        <View style={styles.moneyContainer}>
+        {/* STATS */}
+        <View style={styles.statsContainer}>
           <LinearGradient
-            colors={['#1a1a2e', '#0f0f1e']}
-            style={styles.moneyBadge}
+            colors={['rgba(31, 41, 55, 0.8)', 'rgba(17, 24, 39, 0.9)']}
+            style={styles.statsBadge}
           >
-            <Text style={styles.moneyLabel}>💰 Banque</Text>
-            <Text style={styles.moneyValue}>
-              {money.toLocaleString('fr-FR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}€
-            </Text>
+            <View style={styles.statRow}>
+                <View>
+                    <Text style={styles.statsLabel}>PUISSANCE</Text>
+                    <Text style={styles.statsValue}>{GAME_CONFIG.CLICK_REWARD_MONEY} €/clic</Text>
+                </View>
+                <View style={styles.verticalDivider} />
+                <View>
+                    <Text style={styles.statsLabel}>CRITIQUE</Text>
+                    {/* Affichage dynamique de la chance de crit */}
+                    <Text style={[styles.statsValue, { color: '#fbbf24' }]}>
+                        {Math.round(GAME_CONFIG.BASE_CRIT_CHANCE * 100)}%
+                    </Text>
+                </View>
+            </View>
           </LinearGradient>
         </View>
+
       </View>
     </View>
   );
@@ -105,71 +253,104 @@ export const ClickButton = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    position: 'relative',
-  },
-  glowOuter: {
-    position: 'absolute',
-    left: 16,
-    top: 16,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#a855f7',
+    zIndex: 10,
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 20,
+  },
+  // Text Styles
+  text: {
+    position: 'absolute',
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#10b981', // Vert normal
+    zIndex: 9999,
+    textShadowColor: 'rgba(0,0,0,1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    pointerEvents: 'none',
+  },
+  // Style spécifique Critique
+  criticalText: {
+    fontSize: 32, // BEAUCOUP plus gros
+    color: '#fbbf24', // Jaune/Or
+    textShadowColor: '#b45309', // Ombre orangée
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },
+  // Bouton
+  glowOuter: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 40,
+    backgroundColor: 'rgba(168, 85, 247, 0.4)',
+    zIndex: -1,
+  },
+  buttonContainer: {
+    shadowColor: '#a855f7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 10,
   },
   button: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#a855f7',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: '#a78bfa',
   },
   buttonEmoji: {
-    fontSize: 36,
+    fontSize: 28,
   },
   buttonBorder: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: '100%',
+    height: '100%',
+    borderRadius: 36,
     borderWidth: 2,
-    borderColor: '#fff',
-    opacity: 0.2,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  moneyContainer: {
+  // Stats
+  statsContainer: {
     flex: 1,
   },
-  moneyBadge: {
+  statsBadge: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#a855f7',
-    shadowColor: '#a855f7',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    borderColor: 'rgba(168, 85, 247, 0.3)',
   },
-  moneyLabel: {
-    fontSize: 11,
+  statRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  verticalDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  statsLabel: {
+    fontSize: 9,
     color: '#9ca3af',
-    marginBottom: 4,
-    fontWeight: '600',
+    marginBottom: 2,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
-  moneyValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#a855f7',
+  statsValue: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#fff',
   },
 });

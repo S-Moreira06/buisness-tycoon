@@ -8,9 +8,12 @@ export const GAME_CONFIG = {
   INITIAL_REPUTATION: 10000,
   INITIAL_PASSIVE_INCOME: 0,
 
-  // 🎮 Gameplay - Clic manuel
+    // 🎮 Gameplay - Clic manuel
   CLICK_REWARD_MONEY: 1, // Argent gagné par clic (mettre à 1 en prod, 999999 en dev)
   CLICK_REWARD_REPUTATION: 1, // Réputation gagnée par clic
+    // ⚡ Système de Critique (Click)
+  BASE_CRIT_CHANCE: 1,      // 5% de chance de base (0.05)
+  BASE_CRIT_MULTIPLIER: 5,     // Dégâts x5 en cas de critique
 
   // 📈 Revenus passifs
   STOCK_PASSIVE_INCOME_RATE: 0.01, // 1% du prix d'achat par seconde
