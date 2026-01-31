@@ -7,7 +7,11 @@ import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
 import { GameState } from '../types/game';
 
 interface ExtendedGameState extends GameState {
-  clickGame: () => void;
+  clickGame: (overrides?: {
+    moneyGain?: number;
+    reputationGain?: number;
+    xpGain?: number;
+  }) => void;
   buyStock: (stockId: string, price: number) => void;
   buyBusiness: (businessId: string, price: number) => void;
   upgradeBusiness: (businessId: string, cost: number) => void;
@@ -43,18 +47,23 @@ export const useGameStore = create<ExtendedGameState>()(
     (set) => ({
       ...initialState,
 
-      clickGame: () =>
+      clickGame: (overrides) =>
         set((state) => {
-          const newXP = state.experience + GAME_CONFIG.XP_PER_CLICK;
-          const newPlayerLevel = calculateLevelFromXP(newXP);  // 🔄 Renommé
-          
+          const moneyGain = overrides?.moneyGain ?? GAME_CONFIG.CLICK_REWARD_MONEY;
+          const reputationGain = overrides?.reputationGain ?? GAME_CONFIG.CLICK_REWARD_REPUTATION;
+          const xpGain = overrides?.xpGain ?? GAME_CONFIG.XP_PER_CLICK;
+
+          const newXP = state.experience + xpGain;
+          const newPlayerLevel = calculateLevelFromXP(newXP);
+
           return {
-            money: state.money + GAME_CONFIG.CLICK_REWARD_MONEY,
-            reputation: state.reputation + GAME_CONFIG.CLICK_REWARD_REPUTATION,
+            money: state.money + moneyGain,
+            reputation: state.reputation + reputationGain,
             experience: newXP,
-            playerLevel: newPlayerLevel,  // 🔄 Renommé
+            playerLevel: newPlayerLevel,
           };
         }),
+
 
 
       buyStock: (stockId: string, price: number) =>

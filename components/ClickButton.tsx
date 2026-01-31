@@ -150,7 +150,7 @@ export const ClickButton = () => {
     if (isCritical) {
         amount *= critMult;
     }
-
+    clickGame({ moneyGain: amount });
     // Appel au store (TODO: Modifier le store pour accepter un montant si tu veux que le x5 compte vraiment !)
     // Pour l'instant on appelle clickGame N fois si c'est un critique pour simuler ? 
     // Ou mieux : clickGame(amount) -> Je te conseille de modifier ton store.
@@ -183,7 +183,7 @@ export const ClickButton = () => {
       ...prev, 
       { 
         id: newId, 
-        text: isCritical ? `CRIT! +${amount}€` : `+${amount}€`, 
+        text: isCritical ? `+${amount}€` : `+${amount}€`, 
         x: locationX - 20, 
         y: locationY - 20,
         isCritical: isCritical
@@ -236,10 +236,10 @@ export const ClickButton = () => {
                 </View>
                 <View style={styles.verticalDivider} />
                 <View>
-                    <Text style={styles.statsLabel}>CRITIQUE</Text>
+                    <Text style={styles.statsLabel}>CRIT %/ CRIT X</Text>
                     {/* Affichage dynamique de la chance de crit */}
                     <Text style={[styles.statsValue, { color: '#fbbf24' }]}>
-                        {Math.round(GAME_CONFIG.BASE_CRIT_CHANCE * 100)}%
+                        {Math.round(GAME_CONFIG.BASE_CRIT_CHANCE * 100)}% / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
                     </Text>
                 </View>
             </View>
@@ -256,6 +256,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     zIndex: 10,
+    overflow: 'visible',
   },
   content: {
     flexDirection: 'row',
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   },
   // Style spécifique Critique
   criticalText: {
-    fontSize: 32, // BEAUCOUP plus gros
+    fontSize: 30, // BEAUCOUP plus gros
     color: '#fbbf24', // Jaune/Or
     textShadowColor: '#b45309', // Ombre orangée
     textShadowOffset: { width: 2, height: 2 },
@@ -323,6 +324,7 @@ const styles = StyleSheet.create({
   // Stats
   statsContainer: {
     flex: 1,
+    zIndex:0,
   },
   statsBadge: {
     paddingHorizontal: 16,
@@ -352,5 +354,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: '#fff',
+    alignSelf: 'center',
   },
 });

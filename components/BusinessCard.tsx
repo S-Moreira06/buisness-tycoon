@@ -279,8 +279,10 @@ const styles = StyleSheet.create({
   // ========== STYLES EXISTANTS (INCHANGÉS) ==========
   card: {
     marginBottom: 12,
+    marginHorizontal: 16,
     borderRadius: 12,
     padding: 16,
+    paddingBottom: 8,
     borderWidth: 1,
     borderColor: '#374151',
     position: 'relative',
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 6,
   },
   title: {
     fontSize: 16,
@@ -340,13 +342,14 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 6,
     gap: 8,
   },
   statItem: {
     flex: 1,
     backgroundColor: '#0a0a0a',
-    padding: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#374151',

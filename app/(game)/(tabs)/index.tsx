@@ -49,8 +49,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#3d3d5a',
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    // paddingHorizontal: 16,
+    // paddingTop: 10,
+    // overflow:'visible'
   },
   header: {
     flexDirection: 'row',

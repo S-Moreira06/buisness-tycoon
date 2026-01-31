@@ -12,7 +12,7 @@ export const GAME_CONFIG = {
   CLICK_REWARD_MONEY: 1, // Argent gagné par clic (mettre à 1 en prod, 999999 en dev)
   CLICK_REWARD_REPUTATION: 1, // Réputation gagnée par clic
     // ⚡ Système de Critique (Click)
-  BASE_CRIT_CHANCE: 1,      // 5% de chance de base (0.05)
+  BASE_CRIT_CHANCE: 0.05,      // 5% de chance de base (0.05)
   BASE_CRIT_MULTIPLIER: 5,     // Dégâts x5 en cas de critique
 
   // 📈 Revenus passifs

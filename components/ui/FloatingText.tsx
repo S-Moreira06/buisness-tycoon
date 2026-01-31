@@ -111,10 +111,12 @@ const styles = StyleSheet.create({
     fontSize: 26, // Encore un peu plus gros pour l'effet cartoon
     fontWeight: '900',
     color: '#10b981',
+    width:200,
     zIndex: 9999,
     textShadowColor: 'rgba(0,0,0,1)', 
     textShadowOffset: { width: 2, height: 2 }, // Ombre plus profonde
     textShadowRadius: 2,
     pointerEvents: 'none',
+    textAlign: 'center',
   },
 });
