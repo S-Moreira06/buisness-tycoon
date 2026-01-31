@@ -245,8 +245,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   avatarGlow: {
-    position: 'absolute',
-    width: 50,
+    position: 'absolute',\n    width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: '#a855f7',
@@ -272,13 +271,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#374151',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },\n    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   statEmoji: {
-    fontSize: 20,
-    marginRight: 8,
+    fontSize: 20,\n    marginRight: 8,
   },
   statContent: {
     flex: 1,
