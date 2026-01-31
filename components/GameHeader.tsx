@@ -1,11 +1,11 @@
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, ProgressBar } from 'react-native-paper';
 import { calculateXPForLevel, GAME_CONFIG, getXPForNextLevel } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
+import { CustomModal } from './CustomModal';
 
 interface TooltipData {
   title: string;
@@ -113,24 +113,6 @@ export const GameHeader = () => {
             </View>
           </Pressable>
 
-          {/* Réputation */}
-          {/* <Pressable
-            style={styles.statCard}
-            onPress={() =>
-              showTooltip({
-                title: '⭐ Réputation',
-                description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
-                value: `${reputation}`,
-              })
-            }
-          >
-            <Text style={styles.statEmoji}>⭐</Text>
-            <View style={styles.statContent}>
-              <Text style={styles.statLabel}>Réputation</Text>
-              <Text style={styles.statValue}>{reputation}</Text>
-            </View>
-          </Pressable> */}
-
           {/* Revenu Passif */}
           <Pressable
             style={styles.statCard}
@@ -151,44 +133,38 @@ export const GameHeader = () => {
         </View>
       </LinearGradient>
 
-     {/* MODAL TOOLTIP AMÉLIORÉ */}
-      <Modal
-        transparent
+     {/* CUSTOM MODAL POUR LES TOOLTIPS */}
+      <CustomModal
         visible={tooltipVisible}
-        animationType="fade"
-        onRequestClose={hideTooltip}
+        onDismiss={hideTooltip}
       >
-        <Pressable style={styles.modalOverlay} onPress={hideTooltip}>
-          <BlurView intensity={20} style={styles.blurContainer}>
-            <View style={styles.tooltipCard}>
-              <LinearGradient
-                colors={['#1a1a2e', '#0f0f1e']}
-                style={styles.tooltipGradient}
-              >
-                <Text style={styles.tooltipTitle}>{tooltipData?.title}</Text>
-                <Text style={styles.tooltipDescription}>{tooltipData?.description}</Text>
-                <View style={styles.tooltipValueContainer}>
-                  <Text style={styles.tooltipValue}>{tooltipData?.value}</Text>
-                </View>
-
-                {/* 🆕 Bouton Paramètres si c'est le tooltip avatar */}
-                {tooltipData?.isAvatar && (
-                  <Button
-                    mode="contained"
-                    icon="cog"
-                    onPress={goToSettings}
-                    style={styles.settingsButton}
-                    buttonColor="#a855f7"
-                    textColor="#ffffff"
-                  >
-                    Paramètres
-                  </Button>
-                )}
-              </LinearGradient>
+        <View style={styles.tooltipCard}>
+          <LinearGradient
+            colors={['#1a1a2e', '#0f0f1e']}
+            style={styles.tooltipGradient}
+          >
+            <Text style={styles.tooltipTitle}>{tooltipData?.title}</Text>
+            <Text style={styles.tooltipDescription}>{tooltipData?.description}</Text>
+            <View style={styles.tooltipValueContainer}>
+              <Text style={styles.tooltipValue}>{tooltipData?.value}</Text>
             </View>
-          </BlurView>
-        </Pressable>
-      </Modal>
+
+            {/* 🆕 Bouton Paramètres si c'est le tooltip avatar */}
+            {tooltipData?.isAvatar && (
+              <Button
+                mode="contained"
+                icon="cog"
+                onPress={goToSettings}
+                style={styles.settingsButton}
+                buttonColor="#a855f7"
+                textColor="#ffffff"
+              >
+                Paramètres
+              </Button>
+            )}
+          </LinearGradient>
+        </View>
+      </CustomModal>
     </>
   );
 };
@@ -269,8 +245,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   avatarGlow: {
-    position: 'absolute',
-    width: 50,
+    position: 'absolute',\n    width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: '#a855f7',
@@ -295,13 +270,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#374151',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },\n    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   statEmoji: {
-    fontSize: 20,
-    marginRight: 8,
+    fontSize: 20,\n    marginRight: 8,
   },
   statContent: {
     flex: 1,
@@ -317,29 +290,15 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-  blurContainer: {
-    padding: 20,
-  },
+  // Tooltip Styles simplifiés (plus besoin de l'overlay modal ici)
   tooltipCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#a855f7',
-    shadowColor: '#a855f7',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
+    // La CustomModal a déjà un container avec overflow hidden et border radius
+    width: '100%',
   },
   tooltipGradient: {
     padding: 20,
     minWidth: 280,
+    alignItems: 'center', // Centrer le contenu
   },
   tooltipTitle: {
     fontSize: 20,
@@ -361,6 +320,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#a855f7',
+    width: '100%',
   },
   tooltipValue: {
     fontSize: 18,
@@ -371,10 +331,6 @@ const styles = StyleSheet.create({
    settingsButton: {
     marginTop: 16,
     borderRadius: 8,
-    elevation: 4,
-    shadowColor: '#a855f7',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    width: '100%', 
   },
 });
