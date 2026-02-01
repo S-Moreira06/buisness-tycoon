@@ -108,7 +108,7 @@ export default function UpgradesScreen() {
             {displayedUpgrades.map((upgrade: any) => (
               <View
                 key={upgrade.id}
-                ref={(ref) => (upgradeRefs.current[upgrade.id] = ref)}
+                ref={(ref) => {upgradeRefs.current[upgrade.id] = ref}}
                 collapsable={false}
               >
                 <UpgradeCard

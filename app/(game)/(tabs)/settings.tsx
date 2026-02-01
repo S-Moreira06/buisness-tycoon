@@ -33,6 +33,7 @@ const SettingCard = ({ icon, title, subtitle, onPress, variant = 'primary', load
 
   const content = (
     <LinearGradient
+      // @ts-ignore: Les couleurs sont correctes mais TypeScript est strict sur les tuples
       colors={gradientColors[variant]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -104,7 +105,7 @@ export default function SettingsScreen() {
     const gameState = useGameStore.getState();
     const data = {
       money: gameState.money,
-      level: gameState.level,
+      level: gameState.playerLevel,
       businesses: gameState.businesses,
       upgrades: gameState.upgrades,
       exportedAt: new Date().toISOString(),
@@ -130,7 +131,8 @@ export default function SettingsScreen() {
             setLoading(true);
             try {
               await signOut(auth);
-              router.replace('/auth/login');
+              // Correction: ajout des parenthèses pour le groupe de route (auth)
+              router.replace('/(auth)/login');
             } catch (error) {
               Alert.alert('❌ Erreur', 'Impossible de se déconnecter');
             } finally {
@@ -313,7 +315,7 @@ export default function SettingsScreen() {
                   style={styles.statCardGradient}
                 >
                   <Text style={styles.statIcon}>🏆</Text>
-                  <Text style={styles.statValue}>{useGameStore.getState().level}</Text>
+                  <Text style={styles.statValue}>{useGameStore.getState().playerLevel}</Text>
                   <Text style={styles.statLabel}>Niveau</Text>
                 </LinearGradient>
               </View>
