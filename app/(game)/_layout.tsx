@@ -25,7 +25,7 @@ export default function GameLayout() {
               <IconButton
                 icon="cog"
                 size={24}
-                onPress={() => router.push('/(game)/settings')}
+                onPress={() => router.push('/(game)/(tabs)/settings')}
               />
               <IconButton
                 icon="one-up"
@@ -36,10 +36,6 @@ export default function GameLayout() {
             ),
         }}
       >
-        {/* <Stack.Screen name="index" options={{ title: 'Business Tycoon' }} />
-        <Stack.Screen name="settings" options={{ title: 'Paramètres' }} />
-        <Stack.Screen name="upgrades" options={{ title: 'Améliorations' }} /> */}
-
       </Stack>
     </>
   );

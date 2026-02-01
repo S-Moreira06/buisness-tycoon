@@ -5,7 +5,6 @@ import { Animated, Easing, GestureResponderEvent, Pressable, StyleSheet, Text, V
 import { GAME_CONFIG } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
 
-// --- Sous-composant : Texte Flottant (Update avec support Critique) ---
 interface FloatingTextProps {
   id: number;
   text: string;
@@ -139,10 +138,8 @@ export const ClickButton = () => {
 
   const handlePress = (event: GestureResponderEvent) => {
     // --- LOGIQUE CRITIQUE ---
-    // Tu pourras remplacer ces valeurs par des variables du store plus tard (upgrades)
-    const critChance = GAME_CONFIG.BASE_CRIT_CHANCE; // 5%
-    const critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER; // x5
-    
+    const critChance = GAME_CONFIG.BASE_CRIT_CHANCE; 
+    const critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER; 
     const isCritical = Math.random() < critChance;
     
     // Calcul du gain (Visuel pour l'instant si le store n'est pas prêt)
@@ -151,17 +148,11 @@ export const ClickButton = () => {
         amount *= critMult;
     }
     clickGame({ moneyGain: amount });
-    // Appel au store (TODO: Modifier le store pour accepter un montant si tu veux que le x5 compte vraiment !)
-    // Pour l'instant on appelle clickGame N fois si c'est un critique pour simuler ? 
-    // Ou mieux : clickGame(amount) -> Je te conseille de modifier ton store.
+
     if (isCritical) {
-        // Hack temporaire : on appelle clickGame 5 fois ou on modifie le store
-        // Pour l'exercice visuel, on appelle juste clickGame() une fois
-        clickGame(); 
         // Haptique LOURD pour le critique
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     } else {
-        clickGame();
         // Haptique LEGER pour le normal
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
