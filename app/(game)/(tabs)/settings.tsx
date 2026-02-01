@@ -105,7 +105,7 @@ export default function SettingsScreen() {
     const gameState = useGameStore.getState();
     const data = {
       money: gameState.money,
-      level: gameState.playerLevel, // Correction: level -> playerLevel
+      level: gameState.playerLevel,
       businesses: gameState.businesses,
       upgrades: gameState.upgrades,
       exportedAt: new Date().toISOString(),
@@ -131,7 +131,8 @@ export default function SettingsScreen() {
             setLoading(true);
             try {
               await signOut(auth);
-              router.replace('/auth/login');
+              // Correction: ajout des parenthèses pour le groupe de route (auth)
+              router.replace('/(auth)/login');
             } catch (error) {
               Alert.alert('❌ Erreur', 'Impossible de se déconnecter');
             } finally {
@@ -314,7 +315,6 @@ export default function SettingsScreen() {
                   style={styles.statCardGradient}
                 >
                   <Text style={styles.statIcon}>🏆</Text>
-                  {/* Correction: level -> playerLevel */}
                   <Text style={styles.statValue}>{useGameStore.getState().playerLevel}</Text>
                   <Text style={styles.statLabel}>Niveau</Text>
                 </LinearGradient>
@@ -338,7 +338,8 @@ export default function SettingsScreen() {
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Version</Text>
-                  <Text style={styles.aboutValue}>1.0.0</Text>\n                </View>
+                  <Text style={styles.aboutValue}>1.0.0</Text>
+                </View>
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Technologies</Text>
