@@ -85,11 +85,6 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
     triggerSuccess();
     onPurchase();
   };
-  const handleModalPurchase = () => {
-      triggerSuccess();
-      onPurchase();
-      setModalVisible(false);
-  }
 
   return (
     <>
