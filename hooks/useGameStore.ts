@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { calculateLevelFromXP, GAME_CONFIG } from '../constants/gameConfig';
 import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
-import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
-import { GameState, ClickUpgradeState } from '../types/game';
+import { ClickUpgradeState, GameState } from '../types/game';
 
 interface GameActions {
   toggleHaptics: () => void;

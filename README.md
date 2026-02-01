@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+# Business Tycoon
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+[![Expo](https://img.shields.io/badge/Expo-Go-000020?style=flat-square&logo=expo&logoColor=white)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React_Native-0.81-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactnative.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth_%26_Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Get started
+**Business Tycoon** est un idle-game mobile de gestion de patrimoine. Le but est simple : partir de rien, accumuler des ressources via des mécaniques de clic, et bâtir un empire financier en automatisant ses revenus.
 
-1. Install dependencies
+> **Note** : Ce projet est un développement personnel en cours (WIP).
 
+---
+
+## 📱 Fonctionnalités actuelles
+
+- **Core Gameplay** : Système de clic réactif avec retours haptiques (vibrations) immersifs.
+- **Progression** : Gestion des ressources et achat d'améliorations (Upgrades).
+- **Compétition** : Classement général (Leaderboard) pour se comparer aux autres joueurs.
+- **Authentification** : Système complet (Inscription/Connexion) sécurisé via Firebase Auth.
+- **Sauvegarde Cloud** : Vos données sont synchronisées en temps réel.
+
+## 🛠 Stack Technique
+
+Choix technologiques orientés performance et expérience développeur (DX) :
+
+| Technologie | Rôle | Pourquoi ? |
+| :--- | :--- | :--- |
+| **Expo & Expo Router** | Framework | Navigation native fluide (file-based) et itération rapide. |
+| **Zustand** | State Management | Gestion d'état globale simple et performante (vs Redux). |
+| **Firebase** | Backend | Auth & Firestore pour le temps réel sans gérer de serveur. |
+| **React Native Paper** | UI Kit | Composants visuels cohérents et adaptables. |
+
+## 🚀 Installation & Lancement
+
+Pré-requis : [Node.js](https://nodejs.org/) installé.
+
+1. **Cloner le projet**
+   ```bash
+   git clone https://github.com/S-Moreira06/buisness-tycoon.git
+   cd buisness-tycoon
+   ```
+
+2. **Installer les dépendances**
    ```bash
    npm install
    ```
 
-2. Start the app
+3. **Configuration**
+   Créez un projet sur la console Firebase, récupérez vos clés, et ajoutez-les dans votre configuration (ex: `firebaseConfig.js` ou variables d'environnement).
 
+4. **Lancer l'application**
    ```bash
    npx expo start
    ```
+   - Scannez le QR code avec **Expo Go** (Android/iOS).
+   - Ou appuyez sur `w` pour la version Web, `a` pour Android (émulateur), `i` pour iOS (simulateur).
 
-In the output, you'll find options to open the app in a
+## 📂 Structure du code
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+app/
+├── (auth)/          # Login, Register, Reset Password
+├── (game)/          # Zone de jeu protégée
+│   ├── (tabs)/      # Navigation principale (Home, Upgrades, Settings)
+│   └── _layout.tsx  # Layout du jeu (Header, etc.)
+├── _layout.tsx      # Root Navigator & Auth Check
+services/            # Intégration Firebase
+store/               # Logiciel métier (Zustand stores)
+components/          # UI partagée (Boutons, Cards, Modals)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🗺 Roadmap
 
-## Learn more
+- [x] Boucle de jeu (Clics & Ressources)
+- [x] Auth & Cloud Save
+- [x] Navigation par onglets
+- [ ] **Système avancé d'Upgrades de clics** (En cours)
+- [ ] Managers & Revenus passifs
+- [ ] Système de Prestige / Reset
+- [ ] Achievements (Succès)
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Développé par [S-Moreira06](https://github.com/S-Moreira06)**.
+*Projet personnel - Pas de collaboration externe pour le moment.*
