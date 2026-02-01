@@ -1,6 +1,6 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface CategoryTabsProps {
   activeCategory: 'business' | 'click';
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   activeTab: {
-    borderColor: '#a855f7', // Violet pour business par défaut, tu pourras ajuster pour Clics si tu veux
+    borderColor: '#a855f7',
     backgroundColor: '#1f2937', 
   },
   emoji: {
