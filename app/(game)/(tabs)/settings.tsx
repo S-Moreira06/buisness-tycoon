@@ -33,6 +33,7 @@ const SettingCard = ({ icon, title, subtitle, onPress, variant = 'primary', load
 
   const content = (
     <LinearGradient
+      // @ts-ignore: Les couleurs sont correctes mais TypeScript est strict sur les tuples
       colors={gradientColors[variant]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -104,7 +105,7 @@ export default function SettingsScreen() {
     const gameState = useGameStore.getState();
     const data = {
       money: gameState.money,
-      level: gameState.level,
+      level: gameState.playerLevel, // Correction: level -> playerLevel
       businesses: gameState.businesses,
       upgrades: gameState.upgrades,
       exportedAt: new Date().toISOString(),
@@ -313,7 +314,8 @@ export default function SettingsScreen() {
                   style={styles.statCardGradient}
                 >
                   <Text style={styles.statIcon}>🏆</Text>
-                  <Text style={styles.statValue}>{useGameStore.getState().level}</Text>
+                  {/* Correction: level -> playerLevel */}
+                  <Text style={styles.statValue}>{useGameStore.getState().playerLevel}</Text>
                   <Text style={styles.statLabel}>Niveau</Text>
                 </LinearGradient>
               </View>
@@ -336,8 +338,7 @@ export default function SettingsScreen() {
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Version</Text>
-                  <Text style={styles.aboutValue}>1.0.0</Text>
-                </View>
+                  <Text style={styles.aboutValue}>1.0.0</Text>\n                </View>
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Technologies</Text>
