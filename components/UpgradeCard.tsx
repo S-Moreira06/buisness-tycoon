@@ -25,14 +25,32 @@ interface UpgradeCardProps {
   upgrade: any;
   canAfford: boolean;
   onPurchase: () => void;
+  type?: 'business' | 'click';
 }
 
-export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps) => {
-  const multiplierPercent = Math.round((upgrade.multiplier - 1) * 100);
+export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' }: UpgradeCardProps) => {
+  const isClickUpgrade = type === 'click';
+
+  // Calcul du badge bonus (+20% ou +1€)
+  const getBonusLabel = () => {
+    if (isClickUpgrade) {
+        if (upgrade.effectType === 'base_money') return `+${upgrade.effectValue}€`;
+        if (upgrade.effectType === 'crit_chance') return `+${upgrade.effectValue * 100}% Crit`;
+        if (upgrade.effectType === 'crit_multiplier') return `x${upgrade.effectValue} Crit`;
+        return 'Bonus';
+    }
+    return `+${Math.round((upgrade.multiplier - 1) * 100)}%`;
+  };
+
+  const bonusLabel = getBonusLabel();
+
   const [modalVisible, setModalVisible] = useState(false);
   const { businesses } = useGameStore();
   const { triggerSuccess, triggerLight } = useHaptics();
+
+  // --- LOGIQUE BUSINESS ---
   const getAffectedBusinessesInfo = (): AffectedBusinessInfo[] => {
+        if (isClickUpgrade) return []; // Pas de business affectés
         return upgrade.affectedBusinesses.map((businessId: string) => {
             const config = BUSINESSES_CONFIG[businessId];
             const business = businesses[businessId];
@@ -52,8 +70,7 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
             return {
                 id: businessId,
                 emoji: config?.emoji || '❓',
-                name: config?.name || 'Inconnu',
-                owned: business?.owned || false,
+                name: config?.name || 'Inconnu',\n                owned: business?.owned || false,
                 quantity: business?.quantity || 0,
                 level: business?.level || 0,
                 currentIncome: incomePerSecond,
@@ -67,7 +84,7 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
   const affectedBusinesses = getAffectedBusinessesInfo();
   const ownedBusinesses = affectedBusinesses.filter(b => b.owned);
   
-  // Calcul du gain total
+  // Calcul du gain total (seulement pour business)
   const totalCurrentIncome = ownedBusinesses.reduce((sum, b) => sum + b.currentIncome, 0);
   const totalFutureIncome = ownedBusinesses.reduce((sum, b) => sum + b.futureIncome, 0);
   const totalGain = totalFutureIncome - totalCurrentIncome;
@@ -76,19 +93,21 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
     : '0';
 
   const handleCardPress = () => {
+    // Si c'est un click upgrade, on peut désactiver la modale pour l'instant ou afficher une version simple
+    // Pour simplifier ici : on ouvre la modale que si business (ou customiser plus tard)
+    // Mais l'utilisateur veut juste que ça marche -> On laisse la modale mais on adapte le contenu
     triggerLight();
     setModalVisible(true);
   };
 
   const handlePurchase = (e: any) => {
-    e.stopPropagation(); // Empêcher l'ouverture de la modale
+    e.stopPropagation();
     triggerSuccess();
     onPurchase();
   };
 
   return (
     <>
-      {/* Card cliquable */}
       <Pressable onPress={handleCardPress}>
         <LinearGradient
           colors={
@@ -100,7 +119,7 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
           end={{ x: 1, y: 1 }}
           style={[styles.card, upgrade.purchased && styles.purchasedCard]}
         >
-          {/* 🆕 Barre top avec couleur du tier */}
+          {/* Top Glow */}
           {!upgrade.purchased && (
             <LinearGradient
               colors={TIER_CONFIG[upgrade.tier].gradient}
@@ -110,15 +129,13 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
             />
           )}
 
-
-          {/* Header avec tier badge */}
+          {/* Header */}
           <View style={styles.header}>
             <View style={styles.titleContainer}>
               <Text style={styles.title} numberOfLines={2}>
                 {upgrade.name}
               </Text>
               
-              {/* 🆕 Badge Tier */}
               <LinearGradient
                 colors={TIER_CONFIG[upgrade.tier].gradient}
                 start={{ x: 0, y: 0 }}
@@ -127,59 +144,62 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
               >
                 <Text style={styles.tierIcon}>
                   {TIER_CONFIG[upgrade.tier].icon}
-                </Text>
-                <Text style={styles.tierText}>
+                </Text>\n                <Text style={styles.tierText}>
                   {TIER_CONFIG[upgrade.tier].label}
                 </Text>
               </LinearGradient>
             </View>
             
             <View style={styles.multiplierBadge}>
-              <Text style={styles.multiplierText}>+{multiplierPercent}%</Text>
+              <Text style={styles.multiplierText}>{bonusLabel}</Text>
             </View>
           </View>
-
 
           {/* Description */}
           <Text style={styles.description} numberOfLines={3}>
             {upgrade.description}
           </Text>
 
-          {/* Effet */}
-          <View style={styles.effectContainer}>
-            <View style={styles.effectBadge}>
-              <Text style={styles.effectIcon}>📈</Text>
-              <Text style={styles.effectText}>
-                Boost de {multiplierPercent}% de revenu
-              </Text>
-            </View>
-          </View>
-
-          {/* Businesses affectés */}
-          <View style={styles.affectedContainer}>
-            <Text style={styles.affectedLabel}>Affecte:</Text>
-            <View style={styles.affectedBadges}>
-              {upgrade.affectedBusinesses.slice(0, 4).map((businessId: string) => {
-                const config = BUSINESSES_CONFIG[businessId];
-                return (
-                  <View key={businessId} style={styles.businessBadge}>
-                    <Text style={styles.businessEmoji}>
-                      {config?.emoji || '❓'}
-                    </Text>
-                  </View>
-                );
-              })}
-              {upgrade.affectedBusinesses.length > 4 && (
-                <View style={styles.moreBadge}>
-                  <Text style={styles.moreText}>
-                    +{upgrade.affectedBusinesses.length - 4}
-                  </Text>
+          {/* Effet (Click) */}
+          {isClickUpgrade && (
+            <View style={styles.effectContainer}>
+                <View style={styles.effectBadge}>
+                <Text style={styles.effectIcon}>🖱️</Text>
+                <Text style={styles.effectText}>
+                    {upgrade.effectType === 'base_money' ? 'Augmente le gain par clic' : 
+                     upgrade.effectType === 'crit_chance' ? 'Augmente la chance critique' : 'Booste le multiplicateur critique'}
+                </Text>
                 </View>
-              )}
             </View>
-          </View>
+          )}
 
-          {/* Bouton d'achat - empêche la propagation du clic */}
+          {/* Effet (Business) - Affiché seulement si pas click */}
+          {!isClickUpgrade && (
+            <View style={styles.affectedContainer}>
+                <Text style={styles.affectedLabel}>Affecte:</Text>
+                <View style={styles.affectedBadges}>
+                {upgrade.affectedBusinesses.slice(0, 4).map((businessId: string) => {
+                    const config = BUSINESSES_CONFIG[businessId];
+                    return (
+                    <View key={businessId} style={styles.businessBadge}>
+                        <Text style={styles.businessEmoji}>
+                        {config?.emoji || '❓'}
+                        </Text>
+                    </View>
+                    );
+                })}
+                {upgrade.affectedBusinesses.length > 4 && (
+                    <View style={styles.moreBadge}>
+                    <Text style={styles.moreText}>
+                        +{upgrade.affectedBusinesses.length - 4}
+                    </Text>
+                    </View>
+                )}
+                </View>
+            </View>
+          )}
+
+          {/* Bouton Achat */}
           <Pressable onPress={handlePurchase}>
             {upgrade.purchased ? (
               <View style={styles.purchasedBanner}>
@@ -204,80 +224,82 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
         </LinearGradient>
       </Pressable>
 
-      {/* MODALE DÉTAILS UPGRADE */}
-            {/* ================= MODALE REFACTORISÉE ================= */}
+      {/* MODALE DÉTAILS - Adaptée */}
       <CustomModal visible={modalVisible} onDismiss={() => setModalVisible(false)}>
         <View style={styles.modalInnerContent}>
           
-          {/* Header Modale */}
           <View style={styles.modalHeader}>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.modalTitle}>{upgrade.name}</Text>
-              <View style={[styles.tierBadge, { alignSelf: 'flex-start' }]}>
-                <Text style={{ fontSize: 12 }}>{TIER_CONFIG[upgrade.tier].icon}</Text>
+              <View style={[styles.tierBadge, { alignSelf: 'flex-start' }]}>\n                <Text style={{ fontSize: 12 }}>{TIER_CONFIG[upgrade.tier].icon}</Text>
                 <Text style={styles.tierLabel}>{TIER_CONFIG[upgrade.tier].label}</Text>
               </View>
-            </View>
-            
+            </View>\n            
             <View style={styles.multiplierBadge}>
-              <Text style={styles.multiplierText}>+{multiplierPercent}%</Text>
+              <Text style={styles.multiplierText}>{bonusLabel}</Text>
             </View>
           </View>
 
-          {/* Contenu Scrollable */}
           <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
             <Text style={styles.description}>{upgrade.description}</Text>
-
             <View style={styles.divider} />
 
-            {/* Section Businesses */}
-            <Text style={styles.sectionTitle}>🏢 Businesses affectés</Text>
-            
-            <View style={{ gap: 8 }}>
-              {affectedBusinesses.map((business) => (
-                <View key={business.id} style={styles.businessRow}>
-                  {/* Icone */}
-                  <View style={styles.businessIconContainer}>
-                    <Text style={{ fontSize: 20 }}>{business.emoji}</Text>
-                  </View>
-                  
-                  {/* Infos */}
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.businessName}>{business.name}</Text>
-                    {business.owned && business.quantity > 0 ? (
-                      <View>
-                        <Text style={styles.businessStat}>
-                          Actuel: <Text style={{ color: '#fff' }}>{business.currentIncome.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s</Text>
-                        </Text>
-                        {!upgrade.purchased && (
-                          <Text style={[styles.businessStat, { color: '#10b981' }]}>
-                            Gain: +{business.incomeDiff.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
-                          </Text>
+            {/* Section Spécifique Business */}
+            {!isClickUpgrade && (
+                <>
+                <Text style={styles.sectionTitle}>🏢 Businesses affectés</Text>
+                <View style={{ gap: 8 }}>
+                {affectedBusinesses.map((business) => (
+                    <View key={business.id} style={styles.businessRow}>
+                    <View style={styles.businessIconContainer}>
+                        <Text style={{ fontSize: 20 }}>{business.emoji}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.businessName}>{business.name}</Text>
+                        {business.owned && business.quantity > 0 ? (
+                        <View>
+                            <Text style={styles.businessStat}>
+                            Actuel: <Text style={{ color: '#fff' }}>{business.currentIncome.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s</Text>
+                            </Text>
+                            {!upgrade.purchased && (
+                            <Text style={[styles.businessStat, { color: '#10b981' }]}>
+                                Gain: +{business.incomeDiff.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
+                            </Text>
+                            )}
+                        </View>
+                        ) : (
+                        <Text style={styles.businessStat}>{business.owned ? 'Aucune unité' : 'Non possédé'}</Text>
                         )}
-                      </View>
-                    ) : (
-                      <Text style={styles.businessStat}>{business.owned ? 'Aucune unité' : 'Non possédé'}</Text>
-                    )}
-                  </View>
+                    </View>
+                    </View>
+                ))}
                 </View>
-              ))}
-            </View>
 
-            {/* Total Gains (si applicable) */}
-            {!upgrade.purchased && ownedBusinesses.length > 0 && totalCurrentIncome > 0 && (
-              <View style={styles.totalGainContainer}>
-                <Text style={styles.totalGainTitle}>Gain total estimé</Text>
-                <Text style={styles.totalGainValue}>
-                  +{totalGain.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
-                </Text>
-                <Text style={styles.totalGainSub}>
-                  (+{totalGainPercent}% de revenu total)
-                </Text>
-              </View>
+                {!upgrade.purchased && ownedBusinesses.length > 0 && totalCurrentIncome > 0 && (
+                <View style={styles.totalGainContainer}>
+                    <Text style={styles.totalGainTitle}>Gain total estimé</Text>
+                    <Text style={styles.totalGainValue}>
+                    +{totalGain.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}€/s
+                    </Text>
+                    <Text style={styles.totalGainSub}>
+                    (+{totalGainPercent}% de revenu total)
+                    </Text>
+                </View>
+                )}
+                </>
             )}
+
+            {/* Section Spécifique Click (Simple pour l'instant) */}
+            {isClickUpgrade && (
+                <View style={styles.totalGainContainer}>
+                    <Text style={styles.totalGainTitle}>Effet Permanent</Text>
+                    <Text style={styles.totalGainValue}>{bonusLabel}</Text>
+                    <Text style={styles.totalGainSub}>sur vos clics</Text>
+                </View>
+            )}
+
           </ScrollView>
 
-          {/* Footer Actions */}
           <View style={styles.modalFooter}>
             {upgrade.purchased ? (
               <View style={styles.purchasedBanner}>
@@ -298,7 +320,6 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
                 Acheter • {upgrade.reputationCost} 💎
               </Button>
             )}
-            
             <Button 
               onPress={() => setModalVisible(false)} 
               textColor="#9ca3af"
@@ -310,7 +331,6 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
 
         </View>
       </CustomModal>
-
     </>
   );
 };
@@ -334,8 +354,8 @@ const styles = StyleSheet.create({
   top: 0,
   left: 0,
   right: 0,
-  height: 3, // 🆕 Un peu plus épais pour mieux voir
-  shadowColor: '#000', // 🆕 Ombre dynamique
+  height: 3, 
+  shadowColor: '#000', 
   shadowOffset: { width: 0, height: 0 },
   shadowOpacity: 0.8,
   shadowRadius: 8,
@@ -358,8 +378,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0a0a0a',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 12,\n    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#374151',
@@ -408,8 +427,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     backgroundColor: '#1a1a2e',
-    borderWidth: 1,
-    borderColor: '#6b7280',
+    borderWidth: 1,\n    borderColor: '#6b7280',
   },
   moreText: {
     fontSize: 11,
@@ -424,8 +442,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
+    borderRadius: 10,\n    alignItems: 'center',
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
@@ -444,11 +461,9 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: '#10b981',
     shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 0 },\n    shadowOpacity: 1,
     shadowRadius: 12,
   },
-  // Styles modale
   modalOverlay: {
     flex: 1,
     marginTop: 115,
@@ -505,8 +520,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   businessHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row',\n    alignItems: 'center',
     marginBottom: 8,
     gap: 8,
   },
@@ -607,8 +621,7 @@ const styles = StyleSheet.create({
   },
   alreadyPurchasedText: {
     fontSize: 13,
-    color: '#10b981',
-    fontWeight: '600',
+    color: '#10b981',\n    fontWeight: '600',
   },
   closeButton: {
     backgroundColor: '#374151',
@@ -622,7 +635,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
   },
-  // 🆕 STYLES TIER - À AJOUTER DANS StyleSheet.create
   header: {
     marginBottom: 12,
   },
@@ -674,11 +686,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
   },
-    // ... vos styles de carte existants ...
-
-  // NOUVEAUX STYLES MODALE
   modalInnerContent: {
-    backgroundColor: 'rgba(15, 23, 42, 0.7)', // Fond sombre bleuté semi-transparent
+    backgroundColor: 'rgba(15, 23, 42, 0.7)', 
     padding: 24,
   },
   modalHeader: {
@@ -698,32 +707,9 @@ const styles = StyleSheet.create({
     color: '#d1d5db',
     fontWeight: '600',
   },
-  // tierBadge: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   gap: 6,
-  //   backgroundColor: 'rgba(255,255,255,0.1)',
-  //   paddingHorizontal: 8,
-  //   paddingVertical: 4,
-  //   borderRadius: 8,
-  // },
   modalScroll: {
     maxHeight: 300,
-    
   },
-  // sectionTitle: {
-  //   fontSize: 13,
-  //   fontWeight: '700',
-  //   color: '#9ca3af',
-  //   marginBottom: 12,
-  //   textTransform: 'uppercase',
-  //   letterSpacing: 0.5,
-  // },
-  // divider: {
-  //   height: 1,
-  //   backgroundColor: 'rgba(255,255,255,0.1)',
-  //   marginVertical: 20,
-  // },
   businessRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -754,7 +740,7 @@ const styles = StyleSheet.create({
   },
   totalGainContainer: {
     marginTop: 16,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)', // Vert très léger
+    backgroundColor: 'rgba(16, 185, 129, 0.1)', 
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -767,11 +753,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
-  // totalGainValue: {
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  //   color: '#10b981',
-  // },
   totalGainSub: {
     fontSize: 12,
     color: '#10b981',
@@ -786,5 +767,4 @@ const styles = StyleSheet.create({
   modalButton: {
     borderRadius: 12,
   },
-
 });
