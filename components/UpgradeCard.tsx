@@ -70,7 +70,8 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' 
             return {
                 id: businessId,
                 emoji: config?.emoji || '❓',
-                name: config?.name || 'Inconnu',\n                owned: business?.owned || false,
+                name: config?.name || 'Inconnu',
+                owned: business?.owned || false,
                 quantity: business?.quantity || 0,
                 level: business?.level || 0,
                 currentIncome: incomePerSecond,
@@ -144,7 +145,7 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' 
               >
                 <Text style={styles.tierIcon}>
                   {TIER_CONFIG[upgrade.tier].icon}
-                </Text>\n                <Text style={styles.tierText}>
+                </Text><Text style={styles.tierText}>
                   {TIER_CONFIG[upgrade.tier].label}
                 </Text>
               </LinearGradient>
@@ -231,10 +232,11 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' 
           <View style={styles.modalHeader}>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.modalTitle}>{upgrade.name}</Text>
-              <View style={[styles.tierBadge, { alignSelf: 'flex-start' }]}>\n                <Text style={{ fontSize: 12 }}>{TIER_CONFIG[upgrade.tier].icon}</Text>
+              <View style={[styles.tierBadge, { alignSelf: 'flex-start' }]}>
+                <Text style={{ fontSize: 12 }}>{TIER_CONFIG[upgrade.tier].icon}</Text>
                 <Text style={styles.tierLabel}>{TIER_CONFIG[upgrade.tier].label}</Text>
               </View>
-            </View>\n            
+            </View>        
             <View style={styles.multiplierBadge}>
               <Text style={styles.multiplierText}>{bonusLabel}</Text>
             </View>
@@ -378,7 +380,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0a0a0a',
-    paddingHorizontal: 12,\n    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#374151',
@@ -427,7 +430,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     backgroundColor: '#1a1a2e',
-    borderWidth: 1,\n    borderColor: '#6b7280',
+    borderWidth: 1,
+    borderColor: '#6b7280',
   },
   moreText: {
     fontSize: 11,
@@ -442,7 +446,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 10,\n    alignItems: 'center',
+    borderRadius: 10,
+    alignItems: 'center',
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
@@ -461,7 +466,8 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: '#10b981',
     shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 0 },\n    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
     shadowRadius: 12,
   },
   modalOverlay: {
@@ -520,7 +526,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   businessHeader: {
-    flexDirection: 'row',\n    alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
     gap: 8,
   },
@@ -621,7 +628,8 @@ const styles = StyleSheet.create({
   },
   alreadyPurchasedText: {
     fontSize: 13,
-    color: '#10b981',\n    fontWeight: '600',
+    color: '#10b981',
+    fontWeight: '600',
   },
   closeButton: {
     backgroundColor: '#374151',
