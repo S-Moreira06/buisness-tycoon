@@ -1,17 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { calculateLevelFromXP, GAME_CONFIG } from '../constants/gameConfig';
 import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
-import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
-import { GameState, ClickUpgradeState } from '../types/game';
+import { GameState } from '../types/game';
 
-interface GameActions {
+interface ExtendedGameState extends GameState {
+  settings: { // Ajoute ça si pas fait
+    hapticsEnabled: boolean;
+    soundEnabled: boolean;
+    notificationsEnabled: boolean;
+  };
   toggleHaptics: () => void;
-  setPlayerName: (name: string) => void;
-  setProfileEmoji: (emoji: string) => void;
+  setPlayerName: (name: string) => void; 
+  setProfileEmoji: (emoji: string) => void; 
   clickGame: (overrides?: {
     moneyGain?: number;
     reputationGain?: number;
@@ -21,40 +24,30 @@ interface GameActions {
   buyBusiness: (businessId: string, price: number) => void;
   upgradeBusiness: (businessId: string, cost: number) => void;
   addPassiveIncome: () => void;
-  purchaseUpgrade: (upgradeId: string) => void;
+  purchaseUpgrade: (upgradeId: string) => void; 
   hydrateFromServer: (payload: Partial<GameState>) => void;
   resetGame: () => void;
-  purchaseClickUpgrade: (upgradeId: string) => void;
-  getClickPower: () => { moneyPerClick: number; critChance: number; critMult: number };
 }
 
-type ExtendedGameState = GameState & GameActions;
-
 const initialState: GameState = {
-  playerName: 'CEO',
-  profileEmoji: '💼',
+  playerName: 'CEO', // Valeur par défaut
+  profileEmoji: '💼', // Valeur par défaut
   money: GAME_CONFIG.INITIAL_MONEY,
   reputation: GAME_CONFIG.INITIAL_REPUTATION,
   totalPassiveIncome: GAME_CONFIG.INITIAL_PASSIVE_INCOME,
-  playerLevel: GAME_CONFIG.INITIAL_PLAYER_LEVEL,
+  playerLevel: GAME_CONFIG.INITIAL_PLAYER_LEVEL,  // 🔄 Renommé
   experience: GAME_CONFIG.INITIAL_EXPERIENCE,
   ownedStocks: {},
   businesses: Object.fromEntries(
-    Object.values(BUSINESSES_CONFIG).map((business) => [
+    Object.values(BUSINESSES_CONFIG).map(business => [
       business.id,
-      { level: 0, income: business.baseIncome, quantity: 0, owned: false },
+      { level: 0, income: business.baseIncome, quantity: 0, owned: false }
     ])
   ),
   upgrades: Object.fromEntries(
-    Object.values(UPGRADES_CONFIG).map((upgrade) => [
+    Object.values(UPGRADES_CONFIG).map(upgrade => [
       upgrade.id,
-      { ...upgrade, purchased: false },
-    ])
-  ),
-  clickUpgrades: Object.fromEntries(
-    Object.values(CLICK_UPGRADES_CONFIG).map((upg) => [
-      upg.id,
-      { ...upg, purchased: false } as ClickUpgradeState,
+      { ...upgrade, purchased: false }
     ])
   ),
   settings: {
@@ -66,90 +59,38 @@ const initialState: GameState = {
 
 export const useGameStore = create<ExtendedGameState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
-
-      toggleHaptics: () =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            hapticsEnabled: !state.settings.hapticsEnabled,
-          },
-        })),
-
-      setPlayerName: (name) => set({ playerName: name }),
-      setProfileEmoji: (emoji) => set({ profileEmoji: emoji }),
-
-      purchaseClickUpgrade: (upgradeId) =>
-        set((state) => {
-          const upgrade = state.clickUpgrades[upgradeId];
-          if (!upgrade || upgrade.purchased || state.reputation < upgrade.reputationCost) {
-            return state;
-          }
-          return {
-            reputation: state.reputation - upgrade.reputationCost,
-            clickUpgrades: {
-              ...state.clickUpgrades,
-              [upgradeId]: { ...upgrade, purchased: true },
-            },
-          };
-        }),
-
-      getClickPower: () => {
-        const state = get();
-        let moneyPerClick = GAME_CONFIG.CLICK_REWARD_MONEY;
-        let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
-        let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
-
-        Object.values(state.clickUpgrades).forEach((upg) => {
-          if (upg.purchased) {
-            if (upg.effectType === 'base_money') moneyPerClick += upg.effectValue;
-            if (upg.effectType === 'crit_chance') critChance += upg.effectValue;
-            if (upg.effectType === 'crit_multiplier') critMult += upg.effectValue;
-          }
-        });
-        return { moneyPerClick, critChance, critMult };
-      },
-
+      settings: initialState.settings, 
+      toggleHaptics: () => set((state) => ({
+        settings: { ...(state.settings || initialState.settings),
+            hapticsEnabled: !(state.settings?.hapticsEnabled ?? true), }
+      })),
+      setPlayerName: (name: string) => set({ playerName: name }),
+      setProfileEmoji: (emoji: string) => set({ profileEmoji: emoji }),
       clickGame: (overrides) =>
         set((state) => {
-          if (overrides?.moneyGain) {
-            const xpGain = overrides.xpGain ?? GAME_CONFIG.XP_PER_CLICK;
-            return {
-              money: state.money + overrides.moneyGain,
-              reputation: state.reputation + (overrides.reputationGain ?? GAME_CONFIG.CLICK_REWARD_REPUTATION),
-              experience: state.experience + xpGain,
-              playerLevel: calculateLevelFromXP(state.experience + xpGain),
-            };
-          }
+          const moneyGain = overrides?.moneyGain ?? GAME_CONFIG.CLICK_REWARD_MONEY;
+          const reputationGain = overrides?.reputationGain ?? GAME_CONFIG.CLICK_REWARD_REPUTATION;
+          const xpGain = overrides?.xpGain ?? GAME_CONFIG.XP_PER_CLICK;
 
-          let baseMoney = GAME_CONFIG.CLICK_REWARD_MONEY;
-          let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
-          let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
-
-          Object.values(state.clickUpgrades).forEach((upg) => {
-            if (upg.purchased) {
-              if (upg.effectType === 'base_money') baseMoney += upg.effectValue;
-              if (upg.effectType === 'crit_chance') critChance += upg.effectValue;
-              if (upg.effectType === 'crit_multiplier') critMult += upg.effectValue;
-            }
-          });
-
-          const isCrit = Math.random() < critChance;
-          const gain = isCrit ? baseMoney * critMult : baseMoney;
-          const xp = GAME_CONFIG.XP_PER_CLICK;
+          const newXP = state.experience + xpGain;
+          const newPlayerLevel = calculateLevelFromXP(newXP);
 
           return {
-            money: state.money + gain,
-            reputation: state.reputation + GAME_CONFIG.CLICK_REWARD_REPUTATION,
-            experience: state.experience + xp,
-            playerLevel: calculateLevelFromXP(state.experience + xp),
+            money: state.money + moneyGain,
+            reputation: state.reputation + reputationGain,
+            experience: newXP,
+            playerLevel: newPlayerLevel,
           };
         }),
 
-      buyStock: (stockId, price) =>
+
+
+      buyStock: (stockId: string, price: number) =>
         set((state) => {
           if (state.money < price) return state;
+
           return {
             money: state.money - price,
             ownedStocks: {
@@ -159,98 +100,148 @@ export const useGameStore = create<ExtendedGameState>()(
                 buyPrice: price,
               },
             },
-            totalPassiveIncome:
-              state.totalPassiveIncome +
-              Math.floor(price * GAME_CONFIG.STOCK_PASSIVE_INCOME_RATE),
+            totalPassiveIncome: state.totalPassiveIncome + Math.floor(price * GAME_CONFIG.STOCK_PASSIVE_INCOME_RATE),
           };
         }),
 
-      buyBusiness: (businessId, price) =>
+      buyBusiness: (businessId: string, price: number) =>
         set((state) => {
           const business = state.businesses[businessId];
           if (!business || state.money < price) return state;
-          
+
+          const isFirstPurchase = !business.owned;
           const newQuantity = (business.quantity || 0) + 1;
-          const isFirst = !business.owned;
-          const xpGain = isFirst ? GAME_CONFIG.XP_PER_NEW_BUSINESS : 0;
           
+          const xpGain = isFirstPurchase ? GAME_CONFIG.XP_PER_NEW_BUSINESS : 0;
+          const newXP = state.experience + xpGain;
+          const newPlayerLevel = calculateLevelFromXP(newXP);  // 🔄 Renommé
+
           return {
             money: state.money - price,
             businesses: {
               ...state.businesses,
-              [businessId]: { ...business, owned: true, quantity: newQuantity },
+              [businessId]: {
+                ...business,
+                owned: true,
+                quantity: newQuantity,
+              },
             },
             totalPassiveIncome: state.totalPassiveIncome + business.income,
-            experience: state.experience + xpGain,
-            playerLevel: calculateLevelFromXP(state.experience + xpGain),
+            experience: newXP,
+            playerLevel: newPlayerLevel,  // 🔄 Renommé
           };
         }),
 
-      upgradeBusiness: (businessId, cost) =>
+
+      upgradeBusiness: (businessId: string, cost: number) =>
         set((state) => {
           const business = state.businesses[businessId];
-          if (!business || !business.owned || state.money < cost) return state;
-          
+          if (!business || !business.owned || state.money < cost)
+            return state;
+
           const newLevel = business.level + 1;
-          const boost = business.income * GAME_CONFIG.BUSINESS_LEVEL_INCOME_BOOST;
-          
+          const incomeBoost = business.income * GAME_CONFIG.BUSINESS_LEVEL_INCOME_BOOST;
+
           return {
             money: state.money - cost,
             businesses: {
               ...state.businesses,
-              [businessId]: { 
-                  ...business, 
-                  level: newLevel, 
-                  income: business.income + boost 
+              [businessId]: {
+                ...business,
+                level: newLevel,
+                income: business.income + incomeBoost,
               },
             },
-            totalPassiveIncome: state.totalPassiveIncome + boost,
+            totalPassiveIncome: state.totalPassiveIncome + incomeBoost,
           };
         }),
-
-      addPassiveIncome: () =>
-        set((state) => ({ money: state.money + state.totalPassiveIncome })),
-
-      purchaseUpgrade: (upgradeId) =>
+      purchaseUpgrade: (upgradeId: string) =>
         set((state) => {
           const upgrade = state.upgrades[upgradeId];
-          if (!upgrade || upgrade.purchased || state.reputation < upgrade.reputationCost) return state;
+          if (!upgrade || upgrade.purchased || state.reputation < upgrade.reputationCost) 
+            return state;
+          // 🆕 VÉRIFIER QUE LE JOUEUR POSSÈDE AU MOINS UN BUSINESS AFFECTÉ
+          const ownsAffectedBusiness = upgrade.affectedBusinesses.some(
+            (businessId) => state.businesses[businessId]?.owned
+          );
+          if (!ownsAffectedBusiness) return state;
 
-          const ownsAffected = upgrade.affectedBusinesses.some(id => state.businesses[id]?.owned);
-          if (!ownsAffected) return state;
+          // 1. Calculer les nouveaux revenus pour les businesses affectés
+          const updatedBusinesses = { ...state.businesses };
+          let passiveIncomeIncrease = 0;
 
-          const newBusinesses = { ...state.businesses };
-          let incomeGain = 0;
+          upgrade.affectedBusinesses.forEach((businessId) => {
+            const business = updatedBusinesses[businessId];
+            if (business && business.owned) {
+              // Calcul du boost de revenu
+              const oldIncome = business.income;
+              const newIncome = oldIncome * upgrade.multiplier;
+              const incomeBoost = newIncome - oldIncome;
 
-          upgrade.affectedBusinesses.forEach(id => {
-             const bus = newBusinesses[id];
-             if (bus && bus.owned) {
-                const oldInc = bus.income;
-                const newInc = oldInc * upgrade.multiplier;
-                newBusinesses[id] = { ...bus, income: newInc };
-                incomeGain += (newInc - oldInc) * bus.quantity;
-             }
+              // Mise à jour du business
+              updatedBusinesses[businessId] = {
+                ...business,
+                income: newIncome,
+              };
+
+              // Cumul pour le passif total (boost * quantité possédée)\n              passiveIncomeIncrease += incomeBoost * (business.quantity || 1);
+            }
           });
 
+          // 2. Retourner le nouvel état
           return {
-             reputation: state.reputation - upgrade.reputationCost,
-             upgrades: { ...state.upgrades, [upgradeId]: { ...upgrade, purchased: true } },
-             businesses: newBusinesses,
-             totalPassiveIncome: state.totalPassiveIncome + incomeGain
+            reputation: state.reputation - upgrade.reputationCost,
+            upgrades: {\n              ...state.upgrades,
+              [upgradeId]: {
+                ...upgrade,
+                purchased: true,
+              },
+            },
+            businesses: updatedBusinesses,
+            totalPassiveIncome: state.totalPassiveIncome + passiveIncomeIncrease,
           };
         }),
 
-      hydrateFromServer: (payload) => set((state) => ({ ...state, ...payload })),
+
+      addPassiveIncome: () =>
+        set((state) => ({
+          money: state.money + state.totalPassiveIncome,
+        })),
+      
+      addExperience: (amount: number) =>
+        set((state) => {
+          const newXP = state.experience + amount;
+          const newPlayerLevel = calculateLevelFromXP(newXP);  // 🔄 Renommé
+          
+          return {
+            experience: newXP,
+            playerLevel: newPlayerLevel,  // 🔄 Renommé
+          };
+        }),
+
+
+      hydrateFromServer: (payload) =>
+        set((state) => ({
+          ...state,
+          ...payload,
+        })),
+
       resetGame: () => set(initialState),
     }),
     {
       name: 'game-store',
       storage: createJSONStorage(() => AsyncStorage),
-      merge: (persisted: any, current) => ({
-        ...current,
-        ...persisted,
-        settings: { ...current.settings, ...(persisted.settings || {}) },
-      }),
+      merge: (persistedState: any, currentState) => {
+        return {
+          ...currentState,
+          ...persistedState,
+          // On force la fusion profonde pour settings
+          settings: {
+            ...currentState.settings, // Valeurs par défaut
+            ...(persistedState.settings || {}), // Valeurs sauvegardées
+          },
+        };
+      },
     }
   )
 );
