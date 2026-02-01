@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface CategoryTabsProps {
   activeCategory: 'business' | 'click';
@@ -47,7 +47,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginTop: 4,
+    marginBottom: 6,
     gap: 12,
   },
   tab: {
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#374151',

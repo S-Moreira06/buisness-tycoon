@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: 'row',
     paddingHorizontal: 5,
-    paddingTop: 10,
+    paddingTop: 2,
     paddingBottom: 6,
     gap: 4,
   },

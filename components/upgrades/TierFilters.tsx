@@ -10,7 +10,7 @@ interface TierFiltersProps {
 export const TierFilters = ({ activeTier, onTierChange }: TierFiltersProps) => {
   return (
     <View style={styles.filtersContainer}>
-      <Text style={styles.filtersLabel}>Tier :</Text>
+      {/* <Text style={styles.filtersLabel}>Tier :</Text> */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
   filtersContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingHorizontal:10,
+    paddingBottom: 6,
     gap: 12,
   },
   filtersLabel: {

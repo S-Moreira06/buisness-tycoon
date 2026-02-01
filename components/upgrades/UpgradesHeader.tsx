@@ -16,7 +16,7 @@ export const UpgradesHeader = ({
   return (
     <View style={styles.header}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>⭐ Améliorations</Text>
+        <Text style={styles.title}>⭐Boosts</Text>
         {allUpgradesCount > 0 && (
           <Text style={styles.subtitle}>
             {purchasedCount} / {allUpgradesCount} débloquées
@@ -51,6 +51,11 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+
+
   },
   title: {
     fontSize: 20,
@@ -66,11 +71,11 @@ const styles = StyleSheet.create({
   reputationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 12,
-    gap: 8,
-    shadowColor: '#fbbf24',
+    gap: 4,
+    shadowColor: '#fb7324',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 1,
@@ -84,12 +89,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   reputationLabel: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#0a0a0a',
     fontWeight: '600',
   },
   reputationValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#0a0a0a',
   },

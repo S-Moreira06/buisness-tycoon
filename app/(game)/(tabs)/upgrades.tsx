@@ -1,22 +1,25 @@
+import { UpgradeCard } from '@/components/UpgradeCard';
+import { CategoryTabs } from '@/components/upgrades/CategoryTabs';
+import { TierFilters } from '@/components/upgrades/TierFilters';
+import { UpgradesHeader } from '@/components/upgrades/UpgradesHeader';
+import { UpgradesTabs } from '@/components/upgrades/UpgradesTabs';
+import { TierFilter } from '@/constants/tierConfig';
+import { useGameStore } from '@/hooks/useGameStore';
+import { useUpgradesFilters } from '@/hooks/useUpgradesFilters';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UpgradeCard } from '../../../components/UpgradeCard';
-import { TierFilters } from '../../../components/upgrades/TierFilters';
-import { UpgradesHeader } from '../../../components/upgrades/UpgradesHeader';
-import { UpgradesTabs } from '../../../components/upgrades/UpgradesTabs';
-import { TIER_CONFIG } from '../../../constants/tierConfig';
-import { useGameStore } from '../../../hooks/useGameStore';
-import { useUpgradesFilters } from '../../../hooks/useUpgradesFilters';
 
 export default function UpgradesScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const scrollToUpgradeId = params.scrollTo as string | undefined;
-
-  const { upgrades, reputation, purchaseUpgrade, businesses } = useGameStore();
+  const [category, setCategory] = useState<'business' | 'click'>('business');
+  const [clickActiveTier, setClickActiveTier] = useState<TierFilter>('all'); 
+  const [clickActiveTab, setClickActiveTab] = useState<'all' | 'available' | 'purchased'>('all');
+  const { upgrades, reputation, purchaseUpgrade, businesses, clickUpgrades, purchaseClickUpgrade} = useGameStore();
   const {
     activeTab,
     setActiveTab,
@@ -25,9 +28,52 @@ export default function UpgradesScreen() {
     allUpgrades,
     purchasedUpgrades,
     availableUpgrades,
-    displayedUpgrades,
+    displayedUpgrades: displayedBusinessUpgrades,
   } = useUpgradesFilters(upgrades, businesses);
 
+  
+  // --- CALCUL DES TOTAUX ---
+  
+  // 1. Total Business (déjà calculé par ton hook, on le récupère)
+  const totalBusiness = allUpgrades.length;
+  const purchasedBusiness = purchasedUpgrades.length;
+
+  // 2. Total Clics
+const allClickUpgradesList = useMemo(() => {
+  if (!clickUpgrades) return [];
+  return Object.values(clickUpgrades).sort((a: any, b: any) => a.reputationCost - b.reputationCost);
+}, [clickUpgrades]);
+  const totalClick = allClickUpgradesList.length;
+  const purchasedClickUpgrades = useMemo(() => 
+  allClickUpgradesList.filter((u: any) => u.purchased), 
+[allClickUpgradesList]);
+  const purchasedClick = allClickUpgradesList.filter((u: any) => u.purchased).length;
+const availableClickUpgrades = useMemo(() => 
+  allClickUpgradesList.filter((u: any) => !u.purchased), 
+[allClickUpgradesList]);
+  // 3. Grand Total (C'est ça qu'on envoie au Header)
+  const totalUpgradesCount = totalBusiness + totalClick;
+  const totalPurchasedCount = purchasedBusiness + purchasedClick;
+
+  
+  const displayedClickUpgrades = useMemo(() => {
+  let list = allClickUpgradesList;
+
+  // Filtre par Onglet (Tab)
+  if (clickActiveTab === 'purchased') {
+    list = list.filter((u: any) => u.purchased);
+  } else if (clickActiveTab === 'available') {
+    list = list.filter((u: any) => !u.purchased);
+  }
+
+  // Filtre par Tier
+  if (clickActiveTier !== 'all') {
+    list = list.filter((u: any) => u.tier === clickActiveTier);
+  }
+
+  return list;
+}, [allClickUpgradesList, clickActiveTab, clickActiveTier]);
+  const displayedList = category === 'business' ? displayedBusinessUpgrades : displayedClickUpgrades;
   const upgradeRefs = useRef<{ [key: string]: View | null }>({});
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -45,58 +91,57 @@ export default function UpgradesScreen() {
         );
       }, 300);
     }
-  }, [scrollToUpgradeId, displayedUpgrades, router]);
+  }, [scrollToUpgradeId, displayedBusinessUpgrades, router]);
 
-  return (
+ return (
     <LinearGradient colors={['#0a0a0a', '#1a1a2e', '#0a0a0a']} style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
         <UpgradesHeader
-          allUpgradesCount={allUpgrades.length}
-          purchasedCount={purchasedUpgrades.length}
+          allUpgradesCount={totalUpgradesCount}
+          purchasedCount={totalPurchasedCount}
           reputation={reputation}
         />
 
-        <UpgradesTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          counts={{
-            all: allUpgrades.length,
-            available: availableUpgrades.length,
-            purchased: purchasedUpgrades.length,
-          }}
+        {/* 4. AJOUT DU SELECTEUR DE CATEGORIE EN HAUT */}
+        <CategoryTabs 
+          activeCategory={category} 
+          onSelectCategory={setCategory} 
         />
 
-        <TierFilters activeTier={activeTier} onTierChange={setActiveTier} />
+        {/* LES FILTRES BUSINESS (affichés seulement si catégorie = business) */}
+        {category === 'business' ? (
+          <>
+            <UpgradesTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              counts={{
+                all: allUpgrades.length,
+                available: availableUpgrades.length,
+                purchased: purchasedUpgrades.length,
+              }}
+            />
+            <TierFilters activeTier={activeTier} onTierChange={setActiveTier} />
+          </>
+        ):(
+          <>
+            <UpgradesTabs
+              activeTab={clickActiveTab}
+              onTabChange={setClickActiveTab}
+              counts={{
+                all: allClickUpgradesList.length,
+                available: availableClickUpgrades.length,
+                purchased: purchasedClickUpgrades.length,
+              }}
+            />
+            <TierFilters activeTier={clickActiveTier} onTierChange={setClickActiveTier} />
+          </>
+          )}
 
-        {displayedUpgrades.length === 0 ? (
+        {displayedList.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.emptyCard}>
-              <Text style={styles.emptyEmoji}>
-                {activeTier !== 'all'
-                  ? TIER_CONFIG[activeTier].icon
-                  : activeTab === 'all'
-                  ? '📦'
-                  : activeTab === 'purchased'
-                  ? '🎉'
-                  : '🛒'}
-              </Text>
-              <Text style={styles.emptyTitle}>
-                {activeTier !== 'all'
-                  ? `Aucune amélioration ${TIER_CONFIG[activeTier].label}`
-                  : activeTab === 'all'
-                  ? 'Aucune amélioration disponible'
-                  : activeTab === 'purchased'
-                  ? 'Aucune amélioration possédée'
-                  : 'Aucune amélioration à acheter'}
-              </Text>
-              <Text style={styles.emptyMessage}>
-                {activeTier !== 'all'
-                  ? `Achète des businesses pour débloquer des upgrades ${TIER_CONFIG[activeTier].label} !`
-                  : activeTab === 'purchased'
-                  ? 'Achète des amliorations pour booster tes revenus !'
-                  : 'Félicitations ! Tu as acheté toutes les améliorations disponibles !'}
-              </Text>
-            </LinearGradient>
+            {/* ... TON COMPOSANT EMPTY EXISTANT ... */}
+            {/* Tu peux garder ton bloc existant ici, il s'adaptera si la liste est vide */}
+            <Text style={styles.emptyTitle}>Aucune amélioration trouvée</Text>
           </View>
         ) : (
           <ScrollView
@@ -105,7 +150,7 @@ export default function UpgradesScreen() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {displayedUpgrades.map((upgrade: any) => (
+            {displayedList.map((upgrade: any) => (
               <View
                 key={upgrade.id}
                 ref={(ref) => {upgradeRefs.current[upgrade.id] = ref}}
@@ -113,8 +158,17 @@ export default function UpgradesScreen() {
               >
                 <UpgradeCard
                   upgrade={upgrade}
+                  // 5. PASSER LE TYPE 'CLICK' SI NECESSAIRE
+                  type={category} 
                   canAfford={reputation >= upgrade.reputationCost && !upgrade.purchased}
-                  onPurchase={() => purchaseUpgrade(upgrade.id)}
+                  onPurchase={() => {
+                    // 6. APPELER LA BONNE FONCTION D'ACHAT
+                    if (category === 'business') {
+                      purchaseUpgrade(upgrade.id);
+                    } else {
+                      purchaseClickUpgrade(upgrade.id);
+                    }
+                  }}
                 />
               </View>
             ))}
