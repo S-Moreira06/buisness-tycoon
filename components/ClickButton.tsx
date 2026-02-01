@@ -103,7 +103,7 @@ const FloatingText = ({ id, text, x, y, isCritical, onComplete }: FloatingTextPr
 
 // --- Composant Principal ---
 export const ClickButton = () => {
-  const { clickGame, money } = useGameStore(); 
+  const { clickGame, getClickPower } = useGameStore(); 
   const { triggerLight, triggerHeavy } = useHaptics();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(1)).current;
@@ -130,16 +130,11 @@ export const ClickButton = () => {
   }, []);
 
   const handlePress = (event: GestureResponderEvent) => {
+    const { moneyPerClick, critChance, critMult } = getClickPower(); 
     // --- LOGIQUE CRITIQUE ---
-    const critChance = GAME_CONFIG.BASE_CRIT_CHANCE; 
-    const critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER; 
     const isCritical = Math.random() < critChance;
     
-    // Calcul du gain (Visuel pour l'instant si le store n'est pas prêt)
-    let amount = GAME_CONFIG.CLICK_REWARD_MONEY;
-    if (isCritical) {
-        amount *= critMult;
-    }
+     const amount = isCritical ? moneyPerClick * critMult : moneyPerClick;
     clickGame({ moneyGain: amount });
 
     if (isCritical) {
@@ -165,14 +160,14 @@ export const ClickButton = () => {
       ...prev, 
       { 
         id: newId, 
-        text: isCritical ? `+${amount}€` : `+${amount}€`, 
+        text: `+${Math.floor(amount)}€`, 
         x: locationX - 20, 
         y: locationY - 20,
         isCritical: isCritical
       }
     ]);
   };
-
+  const stats = getClickPower();
   const removeFloatingText = (id: number) => {
     setFloatingTexts(prev => prev.filter(item => item.id !== id));
   };
@@ -214,14 +209,14 @@ export const ClickButton = () => {
             <View style={styles.statRow}>
                 <View>
                     <Text style={styles.statsLabel}>PUISSANCE</Text>
-                    <Text style={styles.statsValue}>{GAME_CONFIG.CLICK_REWARD_MONEY} €/clic</Text>
+                    <Text style={styles.statsValue}>{Math.floor(stats.moneyPerClick)} €/clic</Text>
                 </View>
                 <View style={styles.verticalDivider} />
                 <View>
                     <Text style={styles.statsLabel}>CRIT %/ CRIT X</Text>
                     {/* Affichage dynamique de la chance de crit */}
                     <Text style={[styles.statsValue, { color: '#fbbf24' }]}>
-                        {Math.round(GAME_CONFIG.BASE_CRIT_CHANCE * 100)}% / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
+                        {Math.round(stats.critChance * 100)}% Crit / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
                     </Text>
                 </View>
             </View>
