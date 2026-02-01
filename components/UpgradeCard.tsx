@@ -1,19 +1,31 @@
+import { GAME_CONFIG } from '@/constants/gameConfig';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
-import { GAME_CONFIG } from '../constants/gameConfig';
 import { TIER_CONFIG } from '../constants/tierConfig';
 import { useGameStore } from '../hooks/useGameStore';
 import { CustomModal } from './CustomModal';
 
-
+interface AffectedBusinessInfo {
+  id: string;
+  emoji: string;
+  name: string;
+  owned: boolean;
+  quantity: number;
+  level: number;
+  currentIncome: number;
+  futureIncome: number;
+  incomeDiff: number;
+  intervalInSeconds: number;
+}
 interface UpgradeCardProps {
   upgrade: any;
   canAfford: boolean;
   onPurchase: () => void;
 }
+
 
 export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps) => {
   const multiplierPercent = Math.round((upgrade.multiplier - 1) * 100);
@@ -21,38 +33,69 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
   const { businesses } = useGameStore();
 
   // Récupérer les infos de tous les businesses affectés
-  const getAffectedBusinessesInfo = () => {
-    return upgrade.affectedBusinesses.map((businessId: string) => {
-      const config = BUSINESSES_CONFIG[businessId];
-      const business = businesses[businessId];
-      const intervalInSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000;
+  // const getAffectedBusinessesInfo = () => {
+  //   return upgrade.affectedBusinesses.map((businessId: string) => {
+      // const config = BUSINESSES_CONFIG[businessId];
+      // const business = businesses[businessId];
+      // const intervalInSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000;
       
-      const currentIncome = business?.income || 0;
-      const totalIncome = currentIncome * (business?.quantity || 0);
-      const incomePerSecond = totalIncome / intervalInSeconds;
+      // const currentIncome = business?.income || 0;
+      // const totalIncome = currentIncome * (business?.quantity || 0);
+      // const incomePerSecond = totalIncome / intervalInSeconds;
       
-      const futureIncome = upgrade.purchased 
-        ? currentIncome 
-        : currentIncome * upgrade.multiplier;
-      const futureTotalIncome = futureIncome * (business?.quantity || 0);
-      const futureIncomePerSecond = futureTotalIncome / intervalInSeconds;
+      // const futureIncome = upgrade.purchased 
+      //   ? currentIncome 
+      //   : currentIncome * upgrade.multiplier;
+      // const futureTotalIncome = futureIncome * (business?.quantity || 0);
+      // const futureIncomePerSecond = futureTotalIncome / intervalInSeconds;
       
-      const incomeDiff = futureIncomePerSecond - incomePerSecond;
+      // const incomeDiff = futureIncomePerSecond - incomePerSecond;
 
-      return {
-        id: businessId,
-        emoji: config?.emoji || '❓',
-        name: config?.name || 'Inconnu',
-        owned: business?.owned || false,
-        quantity: business?.quantity || 0,
-        level: business?.level || 0,
-        currentIncome: incomePerSecond,
-        futureIncome: futureIncomePerSecond,
-        incomeDiff,
-        intervalInSeconds,
-      };
-    });
-  };
+  //     return {
+  //       id: businessId,
+  //       emoji: config?.emoji || '❓',
+  //       name: config?.name || 'Inconnu',
+  //       owned: business?.owned || false,
+  //       quantity: business?.quantity || 0,
+  //       level: business?.level || 0,
+  //       currentIncome: incomePerSecond,
+  //       futureIncome: futureIncomePerSecond,
+  //       incomeDiff,
+  //       intervalInSeconds,
+  //     };
+  //   });
+  // };
+  const getAffectedBusinessesInfo = (): AffectedBusinessInfo[] => {
+        return upgrade.affectedBusinesses.map((businessId: string) => {
+            const config = BUSINESSES_CONFIG[businessId];
+            const business = businesses[businessId];
+            const intervalInSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000;
+            
+            const currentIncome = business?.income || 0;
+            const totalIncome = currentIncome * (business?.quantity || 0);
+            const incomePerSecond = totalIncome / intervalInSeconds;
+            
+            const futureIncome = upgrade.purchased 
+              ? currentIncome 
+              : currentIncome * upgrade.multiplier;
+            const futureTotalIncome = futureIncome * (business?.quantity || 0);
+            const futureIncomePerSecond = futureTotalIncome / intervalInSeconds;
+            
+            const incomeDiff = futureIncomePerSecond - incomePerSecond;
+            return {
+                id: businessId,
+                emoji: config?.emoji || '❓',
+                name: config?.name || 'Inconnu',
+                owned: business?.owned || false,
+                quantity: business?.quantity || 0,
+                level: business?.level || 0,
+                currentIncome: incomePerSecond,
+                futureIncome: futureIncomePerSecond,
+                incomeDiff,
+                intervalInSeconds,
+            };
+        });
+    };
 
   const affectedBusinesses = getAffectedBusinessesInfo();
   const ownedBusinesses = affectedBusinesses.filter(b => b.owned);

@@ -38,7 +38,7 @@ export const GameHeader = () => {
   };
   const goToSettings = () => {
     hideTooltip();
-    router.push('/(game)/settings');
+    router.push('/(game)/(tabs)/settings');
   };
 
   return (
