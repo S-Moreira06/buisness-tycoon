@@ -1,8 +1,10 @@
+import { CustomModal } from '@/components/CustomModal';
+import { getLeaderboard, LeaderboardEntry } from '@/services/leaderboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from '../../../hooks/useGameStore';
@@ -72,7 +74,9 @@ export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
-  
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const resetGame = useGameStore((s) => s.resetGame);
   const router = useRouter();
 
@@ -144,6 +148,19 @@ export default function SettingsScreen() {
       ]
     );
   };
+  const handleOpenLeaderboard = async () => {
+    setIsLeaderboardOpen(true);
+    setIsLoadingLeaderboard(true);
+    try {
+      const data = await getLeaderboard(10);
+      setLeaderboardData(data);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de charger le classement");
+    } finally {
+      setIsLoadingLeaderboard(false);
+    }
+  };
+  const formatUid = (uid: string) => `Joueur ${uid.slice(0, 4)}...${uid.slice(-4)}`;
 
   return (
     <LinearGradient
@@ -242,6 +259,18 @@ export default function SettingsScreen() {
                   thumbColor={hapticsEnabled ? '#ffffff' : '#9ca3af'}
                 />
               }
+            />
+          </View>
+
+          {/* SECTION CLASSEMENT */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Classement</Text>
+            <SettingCard
+              icon="🏆"
+              title="Top Joueurs"
+              subtitle="Voir les 10 meilleures fortunes"
+              onPress={handleOpenLeaderboard}
+              variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
             />
           </View>
 
@@ -360,9 +389,101 @@ export default function SettingsScreen() {
           </View>
         </ScrollView>
       </SafeAreaView>
+      <CustomModal
+        visible={isLeaderboardOpen}
+        onDismiss={() => setIsLeaderboardOpen(false)}
+      >
+        {/* 
+           On utilise une View simple avec un fond semi-transparent ou 
+           un dégradé qui remplit L'INTÉRIEUR de la CustomModal existante.
+           La CustomModal gère déjà le contour et l'ombre.
+        */}
+        <LinearGradient
+          colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']} // Fond sombre légèrement transparent
+          style={{
+            width: '100%',
+            height: '100%', // Remplit l'espace alloué par CustomModal
+            padding: 20,
+            alignItems: 'center'
+          }}
+        >
+          <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 16 }}>
+            🏆 Top 10 Mondial
+          </Text>
+
+          {isLoadingLeaderboard ? (
+            <ActivityIndicator size="large" color="#a855f7" style={{ marginVertical: 20 }} />
+          ) : (
+            <FlatList
+              data={leaderboardData}
+              keyExtractor={(item) => item.uid}
+              style={{ width: '100%' }}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 12,
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'rgba(255,255,255,0.1)'
+                }}>
+                  {/* Rang */}
+                  <View style={{ width: 30, alignItems: 'center' }}>
+                    <Text style={{ 
+                      fontSize: 16, 
+                      fontWeight: 'bold', 
+                      color: index === 0 ? '#fbbf24' : index === 1 ? '#9ca3af' : index === 2 ? '#b45309' : '#fff' 
+                    }}>
+                      #{index + 1}
+                    </Text>
+                  </View>
+
+                  {/* UID (Nom) */}
+                  <View style={{ flex: 1, paddingHorizontal: 12 }}>
+                    <Text style={{ color: '#e5e7eb', fontSize: 14, fontFamily: 'monospace' }}>
+                      {/* Fonction formatUid définie plus haut dans ton composant */}
+                      {`Joueur ${item.uid.slice(0, 4)}...`}
+                    </Text>
+                  </View>
+
+                  {/* Argent - Utilise ton formateur si dispo, sinon format simple */}
+                  <Text style={{ color: '#4ade80', fontWeight: 'bold', fontSize: 14 }}>
+                    $ {(item.money / 1000000).toFixed(1)}M
+                  </Text>
+                </View>
+              )}
+              ListEmptyComponent={
+                <Text style={{ color: '#9ca3af', textAlign: 'center', marginTop: 20 }}>
+                  Aucun classement disponible.
+                </Text>
+              }
+            />
+          )}
+
+          <Pressable
+            onPress={() => setIsLeaderboardOpen(false)}
+            style={({ pressed }) => ({
+              marginTop: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 24,
+              backgroundColor: pressed ? 'rgba(255,255,255,0.1)' : 'transparent',
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.2)'
+            })}
+          >
+            <Text style={{ color: '#e5e7eb', fontSize: 14, fontWeight: '500' }}>Fermer</Text>
+          </Pressable>
+
+        </LinearGradient>
+      </CustomModal>
     </LinearGradient>
+
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
