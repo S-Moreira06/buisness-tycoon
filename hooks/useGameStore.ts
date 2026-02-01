@@ -7,6 +7,8 @@ import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
 import { GameState } from '../types/game';
 
 interface ExtendedGameState extends GameState {
+  setPlayerName: (name: string) => void; 
+  setProfileEmoji: (emoji: string) => void; 
   clickGame: (overrides?: {
     moneyGain?: number;
     reputationGain?: number;
@@ -22,6 +24,8 @@ interface ExtendedGameState extends GameState {
 }
 
 const initialState: GameState = {
+  playerName: 'CEO', // Valeur par défaut
+  profileEmoji: '💼', // Valeur par défaut
   money: GAME_CONFIG.INITIAL_MONEY,
   reputation: GAME_CONFIG.INITIAL_REPUTATION,
   totalPassiveIncome: GAME_CONFIG.INITIAL_PASSIVE_INCOME,
@@ -46,7 +50,8 @@ export const useGameStore = create<ExtendedGameState>()(
   persist(
     (set) => ({
       ...initialState,
-
+      setPlayerName: (name: string) => set({ playerName: name }),
+      setProfileEmoji: (emoji: string) => set({ profileEmoji: emoji }),
       clickGame: (overrides) =>
         set((state) => {
           const moneyGain = overrides?.moneyGain ?? GAME_CONFIG.CLICK_REWARD_MONEY;

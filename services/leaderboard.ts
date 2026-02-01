@@ -23,6 +23,8 @@ export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
     const entries: LeaderboardEntry[] = Object.entries(data).map(([uid, val]: [string, any]) => ({
       uid, 
       money: typeof val.money === 'number' ? val.money : 0,
+      playerName: val.playerName || null, 
+      profileEmoji: val.profileEmoji || null,
     }));
 
     // Tri Client : Descendant (Le plus riche en haut)

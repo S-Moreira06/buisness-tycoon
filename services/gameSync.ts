@@ -8,6 +8,8 @@ export async function saveGame(uid: string, state: GameState) {
     
     // 👇 SAUVEGARDE SEULEMENT LES DONNÉES (pas les fonctions)
     const dataToSave = {
+      playerName: state.playerName, 
+      profileEmoji: state.profileEmoji,
       money: state.money,
       reputation: state.reputation,
       businesses: state.businesses,

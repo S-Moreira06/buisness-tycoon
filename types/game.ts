@@ -24,10 +24,12 @@ export interface Upgrade {
 }
 
 export interface GameState {
+  playerName: string; 
+  profileEmoji: string; 
   money: number;
   reputation: number;
   totalPassiveIncome: number;
-  playerLevel: number;      // 🔄 Renommé
+  playerLevel: number; 
   experience: number;
   ownedStocks: Record<string, Stock>;
   businesses: Record<string, Business>;

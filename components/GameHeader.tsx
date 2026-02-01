@@ -16,7 +16,7 @@ interface TooltipData {
 
 export const GameHeader = () => {
   const router = useRouter();
-  const { money, reputation, totalPassiveIncome, playerLevel, experience } = useGameStore();
+  const { money, reputation, totalPassiveIncome, playerLevel, experience, profileEmoji, playerName} = useGameStore();
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
@@ -69,28 +69,26 @@ export const GameHeader = () => {
             </View>
           </View>
 
-          {/* Avatar (placeholder) */}
-          <Pressable
+          {/* Avatar (Dynamique) */}
+          <Pressable 
             style={styles.avatarContainer}
-            onPress={() =>
-              showTooltip({
-                title: '👤 Profil',
-                description: 'Ton avatar de joueur',
-                value: `Niveau ${playerLevel}`,
-                isAvatar: true,
-              })
-            }
+            onPress={() => showTooltip({
+              title: `${profileEmoji || '👤'} Profil`, // Affiche l'emoji dans le titre
+              description: `PDG : ${playerName || 'Non défini'}`, // Affiche le nom du joueur
+              value: `Niveau ${playerLevel}`,
+              isAvatar: true
+            })}
           >
             <LinearGradient
-              colors={['#a855f7', '#7c3aed']}
+              colors={['rgba(168, 85, 247, 0.2)', 'rgba(124, 58, 237, 0.1)']}
               style={styles.avatar}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
             >
-              <Text style={styles.avatarEmoji}>👤</Text>
+              {/* Affiche l'emoji du store, ou un fallback */}
+              <Text style={styles.avatarEmoji}>{profileEmoji || '👤'}</Text>
             </LinearGradient>
             <View style={styles.avatarGlow} />
           </Pressable>
+
         </View>
 
         {/* LIGNE 2 : Ressources (Money, Reputation, Passif) */}
