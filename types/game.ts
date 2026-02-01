@@ -34,4 +34,9 @@ export interface GameState {
   ownedStocks: Record<string, Stock>;
   businesses: Record<string, Business>;
   upgrades: Record<string, Upgrade>;
+  settings: {
+    hapticsEnabled: boolean;
+    soundEnabled: boolean;
+    notificationsEnabled: boolean;
+  };
 }

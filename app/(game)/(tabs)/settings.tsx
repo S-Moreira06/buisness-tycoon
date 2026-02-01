@@ -73,7 +73,8 @@ export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
+  const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
@@ -266,7 +267,7 @@ export default function SettingsScreen() {
               rightElement={
                 <Switch
                   value={hapticsEnabled}
-                  onValueChange={setHapticsEnabled}
+                  onValueChange={() => toggleHaptics()}
                   trackColor={{ false: '#374151', true: '#a855f7' }}
                   thumbColor={hapticsEnabled ? '#ffffff' : '#9ca3af'}
                 />

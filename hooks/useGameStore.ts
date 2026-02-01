@@ -7,6 +7,12 @@ import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
 import { GameState } from '../types/game';
 
 interface ExtendedGameState extends GameState {
+  settings: { // Ajoute ça si pas fait
+    hapticsEnabled: boolean;
+    soundEnabled: boolean;
+    notificationsEnabled: boolean;
+  };
+  toggleHaptics: () => void;
   setPlayerName: (name: string) => void; 
   setProfileEmoji: (emoji: string) => void; 
   clickGame: (overrides?: {
@@ -44,12 +50,22 @@ const initialState: GameState = {
       { ...upgrade, purchased: false }
     ])
   ),
+  settings: {
+    hapticsEnabled: true,
+    soundEnabled: true,
+    notificationsEnabled: true,
+  },
 };
 
 export const useGameStore = create<ExtendedGameState>()(
   persist(
     (set) => ({
       ...initialState,
+      settings: initialState.settings, 
+      toggleHaptics: () => set((state) => ({
+        settings: { ...(state.settings || initialState.settings),
+            hapticsEnabled: !(state.settings?.hapticsEnabled ?? true), }
+      })),
       setPlayerName: (name: string) => set({ playerName: name }),
       setProfileEmoji: (emoji: string) => set({ profileEmoji: emoji }),
       clickGame: (overrides) =>
@@ -217,7 +233,17 @@ export const useGameStore = create<ExtendedGameState>()(
     {
       name: 'game-store',
       storage: createJSONStorage(() => AsyncStorage),
-      
+      merge: (persistedState: any, currentState) => {
+        return {
+          ...currentState,
+          ...persistedState,
+          // On force la fusion profonde pour settings
+          settings: {
+            ...currentState.settings, // Valeurs par défaut
+            ...(persistedState.settings || {}), // Valeurs sauvegardées
+          },
+        };
+      },
     }
   )
 );
