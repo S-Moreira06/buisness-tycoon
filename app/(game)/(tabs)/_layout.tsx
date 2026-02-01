@@ -78,9 +78,10 @@ function TabIcon({ emoji, color, focused }: { emoji: string; color: string; focu
     <Text
       style={{
         fontSize: 20,
+        // @ts-ignore: filter n'est pas supporté nativement mais peut marcher sur le web
         filter: focused ? `drop-shadow(0 0 8px ${color})` : 'none',
-        transform: focused ? 'scale(1.4)' : 'scale(1)',
-        transition: 'all 0.2s ease',
+        // Correction du transform pour React Native (array instead of string)
+        transform: [{ scale: focused ? 1.4 : 1 }],
       }}
     >
       {emoji}
