@@ -131,12 +131,12 @@ export const ClickButton = () => {
 
   const handlePress = (event: GestureResponderEvent) => {
     const { moneyPerClick, critChance, critMult } = getClickPower(); 
+    clickGame();
     // --- LOGIQUE CRITIQUE ---
     const isCritical = Math.random() < critChance;
     
      const amount = isCritical ? moneyPerClick * critMult : moneyPerClick;
-    clickGame({ moneyGain: amount });
-
+    
     if (isCritical) {
       triggerHeavy(); // Gère déjà la vérification on/off
     } else {

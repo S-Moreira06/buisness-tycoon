@@ -1,4 +1,5 @@
 import { CustomModal } from '@/components/CustomModal';
+import { StatsModal } from '@/components/StatsModal';
 import { getLeaderboard, LeaderboardEntry } from '@/services/leaderboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -76,6 +77,7 @@ export default function SettingsScreen() {
   const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
   const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -286,7 +288,17 @@ export default function SettingsScreen() {
               variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
             />
           </View>
-
+          {/* SECTION STATS */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Statistiques</Text>
+            <SettingCard
+              icon="📊"
+              title="Statistiques"
+              subtitle="Voir les statistiques"
+               onPress={() => setIsStatsVisible(true)}
+              variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
+            />
+          </View>
           {/* Section Données */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>💾 Données du jeu</Text>
@@ -310,7 +322,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Section Stats */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.sectionTitle}>📊 Statistiques</Text>
             
             <View style={styles.statsGrid}>
@@ -362,7 +374,7 @@ export default function SettingsScreen() {
                 </LinearGradient>
               </View>
             </View>
-          </View>
+          </View> */}
 
           {/* Section À propos */}
           <View style={styles.section}>
@@ -512,6 +524,10 @@ export default function SettingsScreen() {
 
         </LinearGradient>
       </CustomModal>
+      <StatsModal 
+        visible={isStatsVisible} 
+        onClose={() => setIsStatsVisible(false)} 
+      />
       {/* MODALE ÉDITION PROFIL */}
       <CustomModal
         visible={isEditProfileOpen}

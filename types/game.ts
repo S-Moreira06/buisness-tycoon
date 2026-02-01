@@ -34,6 +34,21 @@ export interface Upgrade {
   tier: TierType,
 }
 
+export interface GameStats {
+  // Clics
+  totalClicks: number;
+  totalCriticalClicks: number;
+  
+  // Économie
+  totalMoneyEarned: number; // Cumulatif (ne baisse jamais)
+  totalMoneySpent: number;
+  maxMoneyReached: number; // Le record de solde max
+  
+  // Progression
+  totalPlayTime: number; // En secondes (à implémenter plus tard avec un timer)
+  itemsPurchased: number; // Nombre d'upgrades achetées
+}
+
 export interface GameState {
   playerName: string; 
   profileEmoji: string; 
@@ -46,6 +61,7 @@ export interface GameState {
   businesses: Record<string, Business>;
   upgrades: Record<string, Upgrade>;
   clickUpgrades: Record<string, ClickUpgradeState>;
+  stats: GameStats;
   settings: {
     hapticsEnabled: boolean;
     soundEnabled: boolean;

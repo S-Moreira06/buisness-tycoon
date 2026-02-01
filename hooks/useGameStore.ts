@@ -6,7 +6,7 @@ import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { calculateLevelFromXP, GAME_CONFIG } from '../constants/gameConfig';
 import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
-import { ClickUpgradeState, GameState } from '../types/game';
+import { ClickUpgradeState, GameState, GameStats } from '../types/game';
 
 interface GameActions {
   toggleHaptics: () => void;
@@ -24,13 +24,25 @@ interface GameActions {
   purchaseUpgrade: (upgradeId: string) => void;
   hydrateFromServer: (payload: Partial<GameState>) => void;
   resetGame: () => void;
+  tickPlayTime: () => void;
   purchaseClickUpgrade: (upgradeId: string) => void;
   getClickPower: () => { moneyPerClick: number; critChance: number; critMult: number };
 }
 
 type ExtendedGameState = GameState & GameActions;
 
+const initialStats: GameStats = {
+  totalClicks: 0,
+  totalCriticalClicks: 0,
+  totalMoneyEarned: 0,
+  totalMoneySpent: 0,
+  maxMoneyReached: 0,
+  totalPlayTime: 0,
+  itemsPurchased: 0,
+};
+
 const initialState: GameState = {
+  stats: initialStats,
   playerName: 'CEO',
   profileEmoji: '💼',
   money: GAME_CONFIG.INITIAL_MONEY,
@@ -113,16 +125,43 @@ export const useGameStore = create<ExtendedGameState>()(
 
       clickGame: (overrides) =>
         set((state) => {
+          // 🛡️ SÉCURITÉ : On s'assure que stats existe toujours
+          // Si c'est une vieille sauvegarde, on initialise avec des zéros
+          const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            itemsPurchased: 0,
+          };
+
+          // ---------------------------------------------------------
+          // CAS 1 : Clic Automatique / Bonus (Overrides)
+          // ---------------------------------------------------------
           if (overrides?.moneyGain) {
             const xpGain = overrides.xpGain ?? GAME_CONFIG.XP_PER_CLICK;
+            const moneyGain = overrides.moneyGain;
+            const newMoney = state.money + moneyGain;
+
             return {
-              money: state.money + overrides.moneyGain,
+              money: newMoney,
               reputation: state.reputation + (overrides.reputationGain ?? GAME_CONFIG.CLICK_REWARD_REPUTATION),
               experience: state.experience + xpGain,
               playerLevel: calculateLevelFromXP(state.experience + xpGain),
+              // ✅ IMPORTANT : On met à jour l'économie totale même ici
+              stats: {
+                ...currentStats,
+                totalMoneyEarned: currentStats.totalMoneyEarned + moneyGain,
+                maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
+              }
             };
           }
 
+          // ---------------------------------------------------------
+          // CAS 2 : Clic Manuel du Joueur
+          // ---------------------------------------------------------
           let baseMoney = GAME_CONFIG.CLICK_REWARD_MONEY;
           let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
           let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
@@ -138,14 +177,27 @@ export const useGameStore = create<ExtendedGameState>()(
           const isCrit = Math.random() < critChance;
           const gain = isCrit ? baseMoney * critMult : baseMoney;
           const xp = GAME_CONFIG.XP_PER_CLICK;
+          
+          const newTotalMoney = currentStats.totalMoneyEarned + gain;
+          const newMoney = state.money + gain;
 
           return {
-            money: state.money + gain,
+            money: newMoney,
             reputation: state.reputation + GAME_CONFIG.CLICK_REWARD_REPUTATION,
             experience: state.experience + xp,
             playerLevel: calculateLevelFromXP(state.experience + xp),
+            
+            // ✅ MISE À JOUR DES STATS DE CLIC
+            stats: {
+              ...currentStats,
+              totalClicks: currentStats.totalClicks + 1,
+              totalCriticalClicks: isCrit ? currentStats.totalCriticalClicks + 1 : currentStats.totalCriticalClicks,
+              totalMoneyEarned: newTotalMoney,
+              maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
+            }
           };
         }),
+
 
       buyStock: (stockId, price) =>
         set((state) => {
@@ -183,6 +235,11 @@ export const useGameStore = create<ExtendedGameState>()(
             totalPassiveIncome: state.totalPassiveIncome + business.income,
             experience: state.experience + xpGain,
             playerLevel: calculateLevelFromXP(state.experience + xpGain),
+            stats: {
+              ...state.stats,
+              totalMoneySpent: state.stats.totalMoneySpent + price,
+              itemsPurchased: state.stats.itemsPurchased + 1, // Si on compte les business comme items
+            }
           };
         }),
 
@@ -209,7 +266,19 @@ export const useGameStore = create<ExtendedGameState>()(
         }),
 
       addPassiveIncome: () =>
-        set((state) => ({ money: state.money + state.totalPassiveIncome })),
+        set((state) => {
+          const gain = state.totalPassiveIncome;
+          const newMoney = state.money + gain;
+          
+          return { 
+            money: newMoney,
+            stats: {
+              ...state.stats,
+              totalMoneyEarned: state.stats.totalMoneyEarned + gain,
+              maxMoneyReached: Math.max(state.stats.maxMoneyReached, newMoney),
+            }
+          };
+        }),
 
       purchaseUpgrade: (upgradeId) =>
         set((state) => {
@@ -238,8 +307,24 @@ export const useGameStore = create<ExtendedGameState>()(
              businesses: newBusinesses,
              totalPassiveIncome: state.totalPassiveIncome + incomeGain
           };
-        }),
-
+        }
+      ),
+      tickPlayTime: () =>
+        set((state) => {
+          // Sécurité anti-crash
+          const currentStats = state.stats || { 
+            totalClicks: 0, totalCriticalClicks: 0, totalMoneyEarned: 0, 
+            totalMoneySpent: 0, maxMoneyReached: state.money, 
+            totalPlayTime: 0, itemsPurchased: 0 
+          };
+          return {
+            stats: {
+              ...currentStats,
+              totalPlayTime: currentStats.totalPlayTime + 1, // +1 seconde
+            },
+          };
+        }
+      ),
       hydrateFromServer: (payload) => set((state) => ({ ...state, ...payload })),
       resetGame: () => set(initialState),
     }),
@@ -249,6 +334,7 @@ export const useGameStore = create<ExtendedGameState>()(
       merge: (persisted: any, current) => ({
         ...current,
         ...persisted,
+        stats: { ...current.stats, ...(persisted.stats || {}) },
         settings: { ...current.settings, ...(persisted.settings || {}) },
       }),
     }
