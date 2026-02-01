@@ -38,7 +38,8 @@ const initialStats: GameStats = {
   totalMoneySpent: 0,
   maxMoneyReached: 0,
   totalPlayTime: 0,
-  itemsPurchased: 0,
+  businessesBought: 0,
+  upgradesPurchased: 0,
 };
 
 const initialState: GameState = {
@@ -98,12 +99,27 @@ export const useGameStore = create<ExtendedGameState>()(
           if (!upgrade || upgrade.purchased || state.reputation < upgrade.reputationCost) {
             return state;
           }
+          const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
           return {
             reputation: state.reputation - upgrade.reputationCost,
             clickUpgrades: {
               ...state.clickUpgrades,
               [upgradeId]: { ...upgrade, purchased: true },
             },
+            stats: {
+              ...currentStats,
+              // On incrémente ici aussi car c'est une "amélioration"
+              upgradesPurchased: (currentStats.upgradesPurchased || 0) + 1
+            }
           };
         }),
 
@@ -134,7 +150,8 @@ export const useGameStore = create<ExtendedGameState>()(
             totalMoneySpent: 0,
             maxMoneyReached: state.money,
             totalPlayTime: 0,
-            itemsPurchased: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
           };
 
           // ---------------------------------------------------------
@@ -225,7 +242,16 @@ export const useGameStore = create<ExtendedGameState>()(
           const newQuantity = (business.quantity || 0) + 1;
           const isFirst = !business.owned;
           const xpGain = isFirst ? GAME_CONFIG.XP_PER_NEW_BUSINESS : 0;
-          
+           const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
           return {
             money: state.money - price,
             businesses: {
@@ -238,7 +264,7 @@ export const useGameStore = create<ExtendedGameState>()(
             stats: {
               ...state.stats,
               totalMoneySpent: state.stats.totalMoneySpent + price,
-              itemsPurchased: state.stats.itemsPurchased + 1, // Si on compte les business comme items
+              businessesBought: (currentStats.businessesBought || 0) + 1, 
             }
           };
         }),
@@ -300,12 +326,27 @@ export const useGameStore = create<ExtendedGameState>()(
                 incomeGain += (newInc - oldInc) * bus.quantity;
              }
           });
+           const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
 
           return {
              reputation: state.reputation - upgrade.reputationCost,
              upgrades: { ...state.upgrades, [upgradeId]: { ...upgrade, purchased: true } },
              businesses: newBusinesses,
-             totalPassiveIncome: state.totalPassiveIncome + incomeGain
+             totalPassiveIncome: state.totalPassiveIncome + incomeGain,
+            stats: {
+                ...currentStats,
+                // On incrémente bien ce champ spécifique
+                upgradesPurchased: (currentStats.upgradesPurchased || 0) + 1
+            }
           };
         }
       ),
@@ -313,9 +354,14 @@ export const useGameStore = create<ExtendedGameState>()(
         set((state) => {
           // Sécurité anti-crash
           const currentStats = state.stats || { 
-            totalClicks: 0, totalCriticalClicks: 0, totalMoneyEarned: 0, 
-            totalMoneySpent: 0, maxMoneyReached: state.money, 
-            totalPlayTime: 0, itemsPurchased: 0 
+            totalClicks: 0, 
+            totalCriticalClicks: 0, 
+            totalMoneyEarned: 0, 
+            totalMoneySpent: 0, 
+            maxMoneyReached: state.money, 
+            totalPlayTime: 0, 
+            businessesBought: 0,
+            upgradesPurchased: 0, 
           };
           return {
             stats: {

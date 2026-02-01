@@ -76,7 +76,9 @@ export const StatsModal = ({ visible, onClose }: StatsModalProps) => {
           <StatRow label="Fortune Max" value={numeral(stats.maxMoneyReached).format('$0.00a')} color="#fcd34d" />
           
           <SectionTitle title="Progression" color="#60a5fa" />
-          <StatRow label="Affaires achetées" value={stats.itemsPurchased} />
+          <StatRow label="Affaires achetées" value={stats.businessesBought} />
+          <StatRow label="Boosts possédés" value={stats.upgradesPurchased} />
+
         </ScrollView>
 
         <Pressable

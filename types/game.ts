@@ -46,8 +46,8 @@ export interface GameStats {
   
   // Progression
   totalPlayTime: number; // En secondes (à implémenter plus tard avec un timer)
-  itemsPurchased: number; // Nombre d'upgrades achetées
-}
+  businessesBought: number; // Quantité totale de business achetés (via $)
+  upgradesPurchased: number;}
 
 export interface GameState {
   playerName: string; 
