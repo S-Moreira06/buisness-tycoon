@@ -4,9 +4,9 @@ export interface ClickUpgradeConfig {
   id: string;
   name: string;
   description: string;
-  reputationCost: number; // ou moneyCost selon ton choix (ici reputation pour cohérence)
+  reputationCost: number;
   effectType: 'base_money' | 'crit_chance' | 'crit_multiplier';
-  effectValue: number; // ex: +1 (money), +0.05 (5% chance), +0.5 (x0.5 mult)
+  effectValue: number;
   tier: TierType;
 }
 
@@ -40,5 +40,4 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectValue: 5,
     tier: 'silver',
   },
-  // ... tu peux en ajouter d'autres
 };

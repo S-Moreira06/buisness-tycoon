@@ -1,4 +1,5 @@
 import { TierType } from "@/constants/tierConfig";
+
 export interface ClickUpgradeState {
   id: string;
   name: string;
@@ -9,6 +10,7 @@ export interface ClickUpgradeState {
   tier: TierType;
   purchased: boolean;
 }
+
 export interface Stock {
   quantity: number;
   buyPrice: number;
