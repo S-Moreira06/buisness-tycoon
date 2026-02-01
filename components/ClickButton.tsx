@@ -1,4 +1,4 @@
-import * as Haptics from 'expo-haptics';
+import { useHaptics } from '@/hooks/useHaptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -103,15 +103,8 @@ const FloatingText = ({ id, text, x, y, isCritical, onComplete }: FloatingTextPr
 
 // --- Composant Principal ---
 export const ClickButton = () => {
-  // On récupère addMoney (si existe) ou on fait la logique manuelle ici
-  // L'idéal serait d'avoir une action "clickHit(amount)" dans le store pour être propre
-  // Mais pour l'instant on garde clickGame() standard et on triche visuellement ou on adapte le store.
-  // ⚠️ IMPORTANT : Pour que l'argent soit vraiment ajouté, il faudra modifier useGameStore 
-  // pour accepter un montant variable, ou gérer le bonus ici.
-  // Pour l'instant, je suppose que clickGame() ajoute juste CLICK_REWARD_MONEY fixe.
-  // Si tu veux que le critique donne VRAIMENT de l'argent, dis le moi, on modifiera le store.
   const { clickGame, money } = useGameStore(); 
-  
+  const { triggerLight, triggerHeavy } = useHaptics();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(1)).current;
   
@@ -150,11 +143,9 @@ export const ClickButton = () => {
     clickGame({ moneyGain: amount });
 
     if (isCritical) {
-        // Haptique LOURD pour le critique
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      triggerHeavy(); // Gère déjà la vérification on/off
     } else {
-        // Haptique LEGER pour le normal
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      triggerLight(); // Gère déjà la vérification on/off
     }
     
     // Animation Bouton

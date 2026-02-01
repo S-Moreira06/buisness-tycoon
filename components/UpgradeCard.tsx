@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from '@/constants/gameConfig';
+import { useHaptics } from '@/hooks/useHaptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -26,45 +27,11 @@ interface UpgradeCardProps {
   onPurchase: () => void;
 }
 
-
 export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps) => {
   const multiplierPercent = Math.round((upgrade.multiplier - 1) * 100);
   const [modalVisible, setModalVisible] = useState(false);
   const { businesses } = useGameStore();
-
-  // Récupérer les infos de tous les businesses affectés
-  // const getAffectedBusinessesInfo = () => {
-  //   return upgrade.affectedBusinesses.map((businessId: string) => {
-      // const config = BUSINESSES_CONFIG[businessId];
-      // const business = businesses[businessId];
-      // const intervalInSeconds = GAME_CONFIG.AUTO_INCREMENT_INTERVAL / 1000;
-      
-      // const currentIncome = business?.income || 0;
-      // const totalIncome = currentIncome * (business?.quantity || 0);
-      // const incomePerSecond = totalIncome / intervalInSeconds;
-      
-      // const futureIncome = upgrade.purchased 
-      //   ? currentIncome 
-      //   : currentIncome * upgrade.multiplier;
-      // const futureTotalIncome = futureIncome * (business?.quantity || 0);
-      // const futureIncomePerSecond = futureTotalIncome / intervalInSeconds;
-      
-      // const incomeDiff = futureIncomePerSecond - incomePerSecond;
-
-  //     return {
-  //       id: businessId,
-  //       emoji: config?.emoji || '❓',
-  //       name: config?.name || 'Inconnu',
-  //       owned: business?.owned || false,
-  //       quantity: business?.quantity || 0,
-  //       level: business?.level || 0,
-  //       currentIncome: incomePerSecond,
-  //       futureIncome: futureIncomePerSecond,
-  //       incomeDiff,
-  //       intervalInSeconds,
-  //     };
-  //   });
-  // };
+  const { triggerSuccess, triggerLight } = useHaptics();
   const getAffectedBusinessesInfo = (): AffectedBusinessInfo[] => {
         return upgrade.affectedBusinesses.map((businessId: string) => {
             const config = BUSINESSES_CONFIG[businessId];
@@ -109,13 +76,20 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase }: UpgradeCardProps
     : '0';
 
   const handleCardPress = () => {
+    triggerLight();
     setModalVisible(true);
   };
 
   const handlePurchase = (e: any) => {
     e.stopPropagation(); // Empêcher l'ouverture de la modale
+    triggerSuccess();
     onPurchase();
   };
+  const handleModalPurchase = () => {
+      triggerSuccess();
+      onPurchase();
+      setModalVisible(false);
+  }
 
   return (
     <>

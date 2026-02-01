@@ -1,3 +1,4 @@
+import { useHaptics } from '@/hooks/useHaptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -23,6 +24,7 @@ export const BusinessCard = ({
 }: BusinessCardProps) => {
   const router = useRouter();
   const { businesses, money, buyBusiness, upgradeBusiness, upgrades } = useGameStore();
+  const { triggerSuccess, triggerMedium } = useHaptics();
   const business = businesses[businessId];
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -47,7 +49,15 @@ export const BusinessCard = ({
       params: { scrollTo: upgradeId },
     });
   };
+  const handleBuy = () => {
+    triggerSuccess(); // Feedback de succès pour l'achat [code_file:1]
+    buyBusiness(businessId, buyPrice);
+  };
 
+  const handleUpgrade = () => {
+    triggerMedium(); // Feedback sec pour l'upgrade [code_file:1]
+    upgradeBusiness(businessId, upgradeCost);
+  };
   return (
     <>
       <LinearGradient
@@ -80,8 +90,8 @@ export const BusinessCard = ({
           upgradeCost={upgradeCost}
           canBuy={canBuy}
           canUpgrade={canUpgrade}
-          onBuy={() => buyBusiness(businessId, buyPrice)}
-          onUpgrade={() => upgradeBusiness(businessId, upgradeCost)}
+          onBuy={handleBuy} 
+          onUpgrade={handleUpgrade}
         />
 
         {business?.owned && <View style={styles.glowBorder} />}

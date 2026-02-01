@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
-import { ActivityIndicator, Text } from 'react-native-paper';
+import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from '../../../hooks/useGameStore';
 import { auth } from '../../../services/firebaseConfig';
@@ -73,10 +73,19 @@ export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
+  const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [tempName, setTempName] = useState('');
+  const [tempEmoji, setTempEmoji] = useState('👤'); // Valeur par défaut
+  const playerName = useGameStore((s) => s.playerName);
+  const setPlayerName = useGameStore((s) => s.setPlayerName);
+  const profileEmoji = useGameStore((s) => s.profileEmoji);
+  const setProfileEmoji = useGameStore((s) => s.setProfileEmoji);
+
   const resetGame = useGameStore((s) => s.resetGame);
   const router = useRouter();
 
@@ -190,18 +199,22 @@ export default function SettingsScreen() {
 
           {/* Section Compte */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>👤 Compte</Text>
+            <Text style={styles.sectionTitle}>Compte</Text>
             
-            <View style={styles.infoCard}>
-              <LinearGradient
-                colors={['rgba(168, 85, 247, 0.1)', 'rgba(124, 58, 237, 0.05)']}
-                style={styles.infoCardGradient}
-              >
-                <Text style={styles.infoLabel}>Email connecté</Text>
-                <Text style={styles.infoValue}>{auth.currentUser?.email}</Text>
-              </LinearGradient>
-            </View>
-
+            {/* Carte Profil Éditable */}
+            <SettingCard
+              icon={profileEmoji || '👤'} // Affiche l'emoji du joueur
+              title={playerName || 'Nom du CEO'}
+              subtitle={auth.currentUser?.email || 'Non connecté'}
+              onPress={() => {
+                setTempName(playerName); 
+                setTempEmoji(profileEmoji);
+                setIsEditProfileOpen(true);
+              }}
+              variant="primary"
+              rightElement={<Text style={{color: '#a855f7', fontSize: 12}}>Modifier</Text>}
+            />
+            
             <SettingCard
               icon="🚪"
               title="Se déconnecter"
@@ -254,7 +267,7 @@ export default function SettingsScreen() {
               rightElement={
                 <Switch
                   value={hapticsEnabled}
-                  onValueChange={setHapticsEnabled}
+                  onValueChange={() => toggleHaptics()}
                   trackColor={{ false: '#374151', true: '#a855f7' }}
                   thumbColor={hapticsEnabled ? '#ffffff' : '#9ca3af'}
                 />
@@ -389,6 +402,7 @@ export default function SettingsScreen() {
           </View>
         </ScrollView>
       </SafeAreaView>
+      {/* MODALE CLASSEMENT */}
       <CustomModal
         visible={isLeaderboardOpen}
         onDismiss={() => setIsLeaderboardOpen(false)}
@@ -429,10 +443,10 @@ export default function SettingsScreen() {
                   borderBottomWidth: 1,
                   borderBottomColor: 'rgba(255,255,255,0.1)'
                 }}>
-                  {/* Rang */}
-                  <View style={{ width: 30, alignItems: 'center' }}>
+                  {/* 1. RANG */}
+                  <View style={{ width: 40, alignItems: 'center' }}>
                     <Text style={{ 
-                      fontSize: 16, 
+                      fontSize: 18, 
                       fontWeight: 'bold', 
                       color: index === 0 ? '#fbbf24' : index === 1 ? '#9ca3af' : index === 2 ? '#b45309' : '#fff' 
                     }}>
@@ -440,20 +454,39 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
 
-                  {/* UID (Nom) */}
-                  <View style={{ flex: 1, paddingHorizontal: 12 }}>
-                    <Text style={{ color: '#e5e7eb', fontSize: 14, fontFamily: 'monospace' }}>
-                      {/* Fonction formatUid définie plus haut dans ton composant */}
-                      {`Joueur ${item.uid.slice(0, 4)}...`}
-                    </Text>
+                  {/* 2. AVATAR + NOM (Nouveau design) */}
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10 }}>
+                    {/* Cercle pour l'emoji */}
+                    <View style={{
+                      width: 36, 
+                      height: 36, 
+                      borderRadius: 18, 
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 12,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.2)'
+                    }}>
+                      {/* Affiche l'emoji ou un fallback */}
+                      <Text style={{ fontSize: 20 }}>{item.profileEmoji || '👤'}</Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      {/* Affiche le nom ou un fallback */}
+                      <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }} numberOfLines={1}>
+                        {item.playerName || `Joueur ${item.uid.slice(0, 4)}`}
+                      </Text>
+                    </View>
                   </View>
 
-                  {/* Argent - Utilise ton formateur si dispo, sinon format simple */}
-                  <Text style={{ color: '#4ade80', fontWeight: 'bold', fontSize: 14 }}>
+                  {/* 3. ARGENT */}
+                  <Text style={{ color: '#4ade80', fontWeight: 'bold', fontSize: 15 }}>
                     $ {(item.money / 1000000).toFixed(1)}M
                   </Text>
                 </View>
               )}
+
               ListEmptyComponent={
                 <Text style={{ color: '#9ca3af', textAlign: 'center', marginTop: 20 }}>
                   Aucun classement disponible.
@@ -479,6 +512,121 @@ export default function SettingsScreen() {
 
         </LinearGradient>
       </CustomModal>
+      {/* MODALE ÉDITION PROFIL */}
+      <CustomModal
+        visible={isEditProfileOpen}
+        onDismiss={() => setIsEditProfileOpen(false)}
+      >
+        <LinearGradient
+          colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']}
+          style={{
+            width: '90%',
+            borderRadius: 24,
+            padding: 24,
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: 'rgba(168, 85, 247, 0.3)',
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 20 }}>
+            Modifier mon Profil
+          </Text>
+
+          {/* 1. PRÉVISUALISATION ACTUELLE */}
+          <View style={{ alignItems: 'center', marginBottom: 24 }}>
+            <View style={{
+              width: 80, height: 80, borderRadius: 40,
+              backgroundColor: 'rgba(168, 85, 247, 0.2)',
+              justifyContent: 'center', alignItems: 'center',
+              borderWidth: 2, borderColor: '#a855f7', marginBottom: 8
+            }}>
+              <Text style={{ fontSize: 40 }}>{tempEmoji}</Text>
+            </View>
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>
+              {tempName || 'Nom du CEO'}
+            </Text>
+          </View>
+
+          {/* 2. CHAMP NOM */}
+          <View style={{ width: '100%', marginBottom: 20 }}>
+            <Text style={{ color: '#9ca3af', marginBottom: 8, fontSize: 14 }}>Votre Nom</Text>
+            <TextInput
+              value={tempName}
+              onChangeText={setTempName}
+              placeholder="Entrez votre nom..."
+              placeholderTextColor="#6b7280"
+              maxLength={15}
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                borderRadius: 12,
+                padding: 16,
+                color: '#fff',
+                fontSize: 16,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.1)'
+              }}
+            />
+          </View>
+
+          {/* 3. SÉLECTEUR D'EMOJI (GRID) */}
+          <View style={{ width: '100%', marginBottom: 24 }}>
+            <Text style={{ color: '#9ca3af', marginBottom: 8, fontSize: 14 }}>Choisir un Avatar</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
+              {['👨‍💼', '👩‍💼', '🚀', '🦁', '🤖', '🎩', '💎', '🐺', '🦊', '🐯'].map((emoji) => (
+                <Pressable
+                  key={emoji}
+                  onPress={() => setTempEmoji(emoji)}
+                  style={{
+                    width: 45, height: 45,
+                    borderRadius: 22.5,
+                    backgroundColor: tempEmoji === emoji ? '#a855f7' : 'rgba(255,255,255,0.05)',
+                    justifyContent: 'center', alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: tempEmoji === emoji ? '#fff' : 'transparent'
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>{emoji}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* BOUTONS D'ACTION */}
+          <Pressable
+            onPress={() => {
+              if (tempName.trim().length > 0) {
+                // On sauvegarde les DEUX : Nom et Emoji
+                setPlayerName(tempName.trim());
+setProfileEmoji(tempEmoji);
+                setIsEditProfileOpen(false);
+                // Le hook useSyncGame détectera les changements et sauvegardera tout seul
+              } else {
+                Alert.alert("Erreur", "Le nom ne peut pas être vide");
+              }
+            }}
+            style={({ pressed }) => ({
+              backgroundColor: '#a855f7',
+              paddingVertical: 12,
+              paddingHorizontal: 32,
+              borderRadius: 20,
+              opacity: pressed ? 0.8 : 1,
+              width: '100%',
+              alignItems: 'center'
+            })}
+          >
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Sauvegarder</Text>
+          </Pressable>
+          
+          <Pressable 
+            onPress={() => setIsEditProfileOpen(false)}
+            style={{ marginTop: 16 }}
+          >
+            <Text style={{ color: '#9ca3af' }}>Annuler</Text>
+          </Pressable>
+        </LinearGradient>
+      </CustomModal>
+
+
     </LinearGradient>
 
   );
