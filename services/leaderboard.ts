@@ -5,6 +5,9 @@ import { database } from './firebaseConfig';
 export interface LeaderboardEntry {
   uid: string; // On utilise l'UID comme demandé
   money: number;
+  playerName: string;
+  profileEmoji: any;
+
 }
 
 export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {

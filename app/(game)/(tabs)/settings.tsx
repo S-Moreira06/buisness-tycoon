@@ -419,11 +419,6 @@ export default function SettingsScreen() {
         visible={isLeaderboardOpen}
         onDismiss={() => setIsLeaderboardOpen(false)}
       >
-        {/* 
-           On utilise une View simple avec un fond semi-transparent ou 
-           un dégradé qui remplit L'INTÉRIEUR de la CustomModal existante.
-           La CustomModal gère déjà le contour et l'ombre.
-        */}
         <LinearGradient
           colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']} // Fond sombre légèrement transparent
           style={{
