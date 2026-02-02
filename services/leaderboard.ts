@@ -3,39 +3,63 @@ import { get, limitToLast, orderByChild, query, ref } from 'firebase/database';
 import { database } from './firebaseConfig';
 
 export interface LeaderboardEntry {
-  uid: string; // On utilise l'UID comme demandé
+  uid: string;
+  value: number; // Valeur générique (peut être money, maxMoney, etc.)
   money: number;
   playerName: string;
-  profileEmoji: any;
-
+  profileEmoji: string;
 }
 
-export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
+// Enum pour les types de classement
+export type LeaderboardSortType = 'currentMoney' | 'maxMoney' | 'totalMoney';
+
+export async function getLeaderboard(limit = 10, sortBy: LeaderboardSortType = 'maxMoney'): Promise<LeaderboardEntry[]> {
   try {
     const gamesRef = ref(database, 'games');
-    // On demande à Firebase de trier par argent et de prendre les X derniers (les plus riches)
-    const topQuery = query(gamesRef, orderByChild('money'), limitToLast(limit));
     
+    // Détermination de la clé de tri Firebase
+    let orderByPath = 'stats/maxMoneyReached'; // Par défaut : Fortune Max
+
+    if (sortBy === 'currentMoney') {
+        orderByPath = 'money';
+    } else if (sortBy === 'totalMoney') {
+        orderByPath = 'stats/totalMoneyEarned';
+    }
+
+    // On demande à Firebase de trier par la clé choisie
+    const topQuery = query(gamesRef, orderByChild(orderByPath), limitToLast(limit));
     const snapshot = await get(topQuery);
 
     if (!snapshot.exists()) return [];
 
     const data = snapshot.val();
-    
-    // Transformation : Object -> Array
-    const entries: LeaderboardEntry[] = Object.entries(data).map(([uid, val]: [string, any]) => ({
-      uid, 
-      money: typeof val.money === 'number' ? val.money : 0,
-      playerName: val.playerName || null, 
-      profileEmoji: val.profileEmoji || null,
-    }));
 
-    // Tri Client : Descendant (Le plus riche en haut)
-    // Firebase limitToLast renvoie les "plus grands", mais l'ordre des clés JS n'est pas garanti
-    return entries.sort((a, b) => b.money - a.money);
+    // Transformation : Object -> Array
+    const entries: LeaderboardEntry[] = Object.entries(data).map(([uid, val]: [string, any]) => {
+        // On récupère la bonne valeur selon le tri pour l'afficher
+        let displayValue = 0;
+        
+        if (sortBy === 'currentMoney') {
+            displayValue = Number(val.money) || 0;
+        } else if (sortBy === 'maxMoney') {
+            displayValue = Number(val.stats?.maxMoneyReached) || 0;
+        } else if (sortBy === 'totalMoney') {
+            displayValue = Number(val.stats?.totalMoneyEarned) || 0;
+        }
+
+        return {
+            uid,
+            value: displayValue,
+            playerName: val.playerName || `Joueur ${uid.slice(0,4)}`,
+            profileEmoji: val.profileEmoji || '👤',
+        };
+    });
+
+    // Tri Client : Descendant (Le plus grand en haut)
+    return entries.sort((a, b) => b.value - a.value);
 
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
-    return []; // Fail safe: tableau vide plutôt que crash
+    return [];
   }
 }
