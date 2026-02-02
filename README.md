@@ -5,7 +5,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Auth_%26_Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Business Tycoon** est un idle-game mobile de gestion de patrimoine. Le but est simple : partir de rien, accumuler des ressources via des mécaniques de clic, et bâtir un empire financier en automatisant ses revenus.
+**Business Tycoon** est un idle-game mobile de gestion de patrimoine. Le but est simple : partir de rien, accumuler des ressources via des mécaniques de clic et de gestions d'evenements, et bâtir un empire financier en automatisant ses revenus et dominer le classement.
 
 > **Note** : Ce projet est un développement personnel en cours (WIP).
 
@@ -71,13 +71,20 @@ components/          # UI partagée (Boutons, Cards, Modals)
 
 ## 🗺 Roadmap
 
+**Done**
+
 - [x] Boucle de jeu (Clics & Ressources)
 - [x] Auth & Cloud Save
 - [x] Navigation par onglets
-- [ ] **Système avancé d'Upgrades de clics** (En cours)
+- [x] Système avancé d'Upgrades de clics et de businesses
+- [x] Achievements (Succès)
+
+**A Venir**
+- [ ] Early Game (Stats personnages/Metiers/Evenements)
+- [ ] Systeme d'upgrades spécifique a chaque business
+- [ ] GamePlay spécifique a chaque business (en étude)
 - [ ] Managers & Revenus passifs
 - [ ] Système de Prestige / Reset
-- [ ] Achievements (Succès)
 
 ---
 

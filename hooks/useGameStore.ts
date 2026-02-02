@@ -27,6 +27,7 @@ interface GameActions {
   tickPlayTime: () => void;
   purchaseClickUpgrade: (upgradeId: string) => void;
   getClickPower: () => { moneyPerClick: number; critChance: number; critMult: number };
+  unlockAchievement: (id: string) => void;
 }
 
 type ExtendedGameState = GameState & GameActions;
@@ -75,6 +76,7 @@ const initialState: GameState = {
     soundEnabled: true,
     notificationsEnabled: true,
   },
+  unlockedAchievements: [],
 };
 
 export const useGameStore = create<ExtendedGameState>()(
@@ -371,8 +373,38 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }
       ),
-      hydrateFromServer: (payload) => set((state) => ({ ...state, ...payload })),
-      resetGame: () => set(initialState),
+      unlockAchievement: (id) =>
+        set((state) => {
+          // Sécurité : ne pas ajouter si déjà présent
+          if (state.unlockedAchievements.includes(id)) return state;
+          
+          return {
+            unlockedAchievements: [...state.unlockedAchievements, id],
+          };
+        }),
+hydrateFromServer: (payload: any) => set((state) => {
+    // 1. FUSION INTELLIGENTE DES SUCCÈS
+    // On combine ce qu'on a en local + ce qui vient du cloud
+    const localAch = state.unlockedAchievements || [];
+    const cloudAch = payload.unlockedAchievements || [];
+    const mergedAchievements = Array.from(new Set([...localAch, ...cloudAch]));
+
+    // 2. FUSION DES STATS (On garde le meilleur des deux mondes)
+    // Exemple : Si j'ai gagné plus d'argent en offline, je garde mon record local
+    const mergedStats = {
+      ...state.stats,          // Base locale
+      ...(payload.stats || {}), // Override cloud
+      totalMoneyEarned: Math.max(state.stats.totalMoneyEarned, payload.stats?.totalMoneyEarned || 0),
+      maxMoneyReached: Math.max(state.stats.maxMoneyReached, payload.stats?.maxMoneyReached || 0),
+    };
+
+    return {
+        ...state,
+        ...payload, // On applique le reste du cloud (Money, Reputation...)
+        stats: mergedStats,
+        unlockedAchievements: mergedAchievements,
+    };
+}),      resetGame: () => set(initialState),
     }),
     {
       name: 'game-store',

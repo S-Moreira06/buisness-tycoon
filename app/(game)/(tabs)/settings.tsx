@@ -1,3 +1,4 @@
+import { AchievementsModal } from '@/components/AchievementsModal';
 import { CustomModal } from '@/components/CustomModal';
 import { StatsModal } from '@/components/StatsModal';
 import { getLeaderboard, LeaderboardEntry, LeaderboardSortType } from '@/services/leaderboard';
@@ -85,6 +86,7 @@ export default function SettingsScreen() {
   const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isStatsVisible, setIsStatsVisible] = useState(false);
+   const [isAchievementsVisible, setIsAchievementsVisible] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -307,6 +309,18 @@ export default function SettingsScreen() {
               variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
             />
           </View>
+          {/* ✅ NOUVELLE SECTION : SUCCÈS */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Progression</Text>
+          </View>
+          
+          <SettingCard
+            icon="🏆"
+            title="Succès"
+            subtitle="Voir les défis débloqués"
+            onPress={() => setIsAchievementsVisible(true)}
+            variant="warning" // Utilise 'warning' pour avoir le thème Orange/Or qui fait 'Trophée'
+          />
           {/* SECTION STATS */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Statistiques</Text>
@@ -565,10 +579,16 @@ export default function SettingsScreen() {
 
         </LinearGradient>
       </CustomModal>
+      <AchievementsModal 
+            visible={isAchievementsVisible}
+            onClose={() => setIsAchievementsVisible(false)}
+          />
+      {/* MODALE STATS */}
       <StatsModal 
         visible={isStatsVisible} 
         onClose={() => setIsStatsVisible(false)} 
       />
+      
       {/* MODALE ÉDITION PROFIL */}
       <CustomModal
         visible={isEditProfileOpen}

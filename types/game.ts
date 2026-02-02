@@ -47,7 +47,16 @@ export interface GameStats {
   // Progression
   totalPlayTime: number; // En secondes (à implémenter plus tard avec un timer)
   businessesBought: number; // Quantité totale de business achetés (via $)
-  upgradesPurchased: number;}
+  upgradesPurchased: number;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string; // Emoji ou nom d'icône
+  condition: (state: GameState) => boolean; // La fonction magique
+}
 
 export interface GameState {
   playerName: string; 
@@ -62,6 +71,7 @@ export interface GameState {
   upgrades: Record<string, Upgrade>;
   clickUpgrades: Record<string, ClickUpgradeState>;
   stats: GameStats;
+  unlockedAchievements: string[];
   settings: {
     hapticsEnabled: boolean;
     soundEnabled: boolean;
