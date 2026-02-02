@@ -14,6 +14,7 @@ export async function saveGame(uid: string, state: GameState) {
       reputation: state.reputation,
       businesses: state.businesses,
       upgrades: state.upgrades,
+      stats: state.stats,
     };
     
     await set(gameRef, dataToSave);

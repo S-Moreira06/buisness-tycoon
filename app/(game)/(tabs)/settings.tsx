@@ -1,9 +1,11 @@
 import { CustomModal } from '@/components/CustomModal';
-import { getLeaderboard, LeaderboardEntry } from '@/services/leaderboard';
+import { StatsModal } from '@/components/StatsModal';
+import { getLeaderboard, LeaderboardEntry, LeaderboardSortType } from '@/services/leaderboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
-import React, { useState } from 'react';
+import numeral from 'numeral';
+import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -68,6 +70,12 @@ const SettingCard = ({ icon, title, subtitle, onPress, variant = 'primary', load
 
   return content;
 };
+const SORT_OPTIONS: { type: LeaderboardSortType; label: string }[] = [
+  { type: 'maxMoney', label: 'Record Fortune 🏆' },
+  { type: 'currentMoney', label: 'Argent Actuel 💰' },
+  { type: 'totalMoney', label: 'Total Généré 📈' },
+];
+
 
 export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
@@ -76,6 +84,7 @@ export default function SettingsScreen() {
   const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
   const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isStatsVisible, setIsStatsVisible] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -88,7 +97,14 @@ export default function SettingsScreen() {
 
   const resetGame = useGameStore((s) => s.resetGame);
   const router = useRouter();
+   const [leaderboardSort, setLeaderboardSort] = useState<LeaderboardSortType>('maxMoney');
 
+  // Fonction pour changer de mode en boucle
+  const cycleSortMode = () => {
+    const currentIndex = SORT_OPTIONS.findIndex(opt => opt.type === leaderboardSort);
+    const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length;
+    setLeaderboardSort(SORT_OPTIONS[nextIndex].type);
+  };
   const handleResetGame = () => {
     Alert.alert(
       '⚠️ Réinitialiser le jeu',
@@ -161,7 +177,7 @@ export default function SettingsScreen() {
     setIsLeaderboardOpen(true);
     setIsLoadingLeaderboard(true);
     try {
-      const data = await getLeaderboard(10);
+      const data = await getLeaderboard(10, leaderboardSort);
       setLeaderboardData(data);
     } catch (error) {
       Alert.alert("Erreur", "Impossible de charger le classement");
@@ -169,8 +185,13 @@ export default function SettingsScreen() {
       setIsLoadingLeaderboard(false);
     }
   };
+  useEffect(() => {
+    if (isLeaderboardOpen) {
+      handleOpenLeaderboard();
+    }
+  }, [leaderboardSort]);
   const formatUid = (uid: string) => `Joueur ${uid.slice(0, 4)}...${uid.slice(-4)}`;
-
+  
   return (
     <LinearGradient
       colors={['#0a0a0a', '#1a1a2e', '#0a0a0a']}
@@ -286,7 +307,17 @@ export default function SettingsScreen() {
               variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
             />
           </View>
-
+          {/* SECTION STATS */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Statistiques</Text>
+            <SettingCard
+              icon="📊"
+              title="Statistiques"
+              subtitle="Voir les statistiques"
+               onPress={() => setIsStatsVisible(true)}
+              variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
+            />
+          </View>
           {/* Section Données */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>💾 Données du jeu</Text>
@@ -310,7 +341,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Section Stats */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.sectionTitle}>📊 Statistiques</Text>
             
             <View style={styles.statsGrid}>
@@ -362,7 +393,7 @@ export default function SettingsScreen() {
                 </LinearGradient>
               </View>
             </View>
-          </View>
+          </View> */}
 
           {/* Section À propos */}
           <View style={styles.section}>
@@ -407,11 +438,6 @@ export default function SettingsScreen() {
         visible={isLeaderboardOpen}
         onDismiss={() => setIsLeaderboardOpen(false)}
       >
-        {/* 
-           On utilise une View simple avec un fond semi-transparent ou 
-           un dégradé qui remplit L'INTÉRIEUR de la CustomModal existante.
-           La CustomModal gère déjà le contour et l'ombre.
-        */}
         <LinearGradient
           colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']} // Fond sombre légèrement transparent
           style={{
@@ -421,9 +447,36 @@ export default function SettingsScreen() {
             alignItems: 'center'
           }}
         >
-          <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff', marginBottom: 16 }}>
-            🏆 Top 10 Mondial
-          </Text>
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            width: '100%', 
+            marginBottom: 16 
+          }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}>
+              🏆 Top 10
+            </Text>
+            
+            <Pressable
+              onPress={cycleSortMode}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: pressed ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.2)'
+              })}
+            >
+              <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '600', marginRight: 6 }}>
+                {SORT_OPTIONS.find(opt => opt.type === leaderboardSort)?.label}
+              </Text>
+              <Text style={{ color: '#fbbf24', fontSize: 10 }}>▼</Text>
+            </Pressable>
+          </View>
 
           {isLoadingLeaderboard ? (
             <ActivityIndicator size="large" color="#a855f7" style={{ marginVertical: 20 }} />
@@ -482,7 +535,7 @@ export default function SettingsScreen() {
 
                   {/* 3. ARGENT */}
                   <Text style={{ color: '#4ade80', fontWeight: 'bold', fontSize: 15 }}>
-                    $ {(item.money / 1000000).toFixed(1)}M
+                    {numeral(item.value || 0).format('$0.00a')}
                   </Text>
                 </View>
               )}
@@ -512,6 +565,10 @@ export default function SettingsScreen() {
 
         </LinearGradient>
       </CustomModal>
+      <StatsModal 
+        visible={isStatsVisible} 
+        onClose={() => setIsStatsVisible(false)} 
+      />
       {/* MODALE ÉDITION PROFIL */}
       <CustomModal
         visible={isEditProfileOpen}

@@ -6,7 +6,7 @@ import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
 import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
 import { calculateLevelFromXP, GAME_CONFIG } from '../constants/gameConfig';
 import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
-import { ClickUpgradeState, GameState } from '../types/game';
+import { ClickUpgradeState, GameState, GameStats } from '../types/game';
 
 interface GameActions {
   toggleHaptics: () => void;
@@ -24,13 +24,26 @@ interface GameActions {
   purchaseUpgrade: (upgradeId: string) => void;
   hydrateFromServer: (payload: Partial<GameState>) => void;
   resetGame: () => void;
+  tickPlayTime: () => void;
   purchaseClickUpgrade: (upgradeId: string) => void;
   getClickPower: () => { moneyPerClick: number; critChance: number; critMult: number };
 }
 
 type ExtendedGameState = GameState & GameActions;
 
+const initialStats: GameStats = {
+  totalClicks: 0,
+  totalCriticalClicks: 0,
+  totalMoneyEarned: 0,
+  totalMoneySpent: 0,
+  maxMoneyReached: 0,
+  totalPlayTime: 0,
+  businessesBought: 0,
+  upgradesPurchased: 0,
+};
+
 const initialState: GameState = {
+  stats: initialStats,
   playerName: 'CEO',
   profileEmoji: '💼',
   money: GAME_CONFIG.INITIAL_MONEY,
@@ -86,12 +99,27 @@ export const useGameStore = create<ExtendedGameState>()(
           if (!upgrade || upgrade.purchased || state.reputation < upgrade.reputationCost) {
             return state;
           }
+          const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
           return {
             reputation: state.reputation - upgrade.reputationCost,
             clickUpgrades: {
               ...state.clickUpgrades,
               [upgradeId]: { ...upgrade, purchased: true },
             },
+            stats: {
+              ...currentStats,
+              // On incrémente ici aussi car c'est une "amélioration"
+              upgradesPurchased: (currentStats.upgradesPurchased || 0) + 1
+            }
           };
         }),
 
@@ -113,16 +141,44 @@ export const useGameStore = create<ExtendedGameState>()(
 
       clickGame: (overrides) =>
         set((state) => {
+          // 🛡️ SÉCURITÉ : On s'assure que stats existe toujours
+          // Si c'est une vieille sauvegarde, on initialise avec des zéros
+          const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
+
+          // ---------------------------------------------------------
+          // CAS 1 : Clic Automatique / Bonus (Overrides)
+          // ---------------------------------------------------------
           if (overrides?.moneyGain) {
             const xpGain = overrides.xpGain ?? GAME_CONFIG.XP_PER_CLICK;
+            const moneyGain = overrides.moneyGain;
+            const newMoney = state.money + moneyGain;
+
             return {
-              money: state.money + overrides.moneyGain,
+              money: newMoney,
               reputation: state.reputation + (overrides.reputationGain ?? GAME_CONFIG.CLICK_REWARD_REPUTATION),
               experience: state.experience + xpGain,
               playerLevel: calculateLevelFromXP(state.experience + xpGain),
+              // ✅ IMPORTANT : On met à jour l'économie totale même ici
+              stats: {
+                ...currentStats,
+                totalMoneyEarned: currentStats.totalMoneyEarned + moneyGain,
+                maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
+              }
             };
           }
 
+          // ---------------------------------------------------------
+          // CAS 2 : Clic Manuel du Joueur
+          // ---------------------------------------------------------
           let baseMoney = GAME_CONFIG.CLICK_REWARD_MONEY;
           let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
           let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
@@ -138,14 +194,27 @@ export const useGameStore = create<ExtendedGameState>()(
           const isCrit = Math.random() < critChance;
           const gain = isCrit ? baseMoney * critMult : baseMoney;
           const xp = GAME_CONFIG.XP_PER_CLICK;
+          
+          const newTotalMoney = currentStats.totalMoneyEarned + gain;
+          const newMoney = state.money + gain;
 
           return {
-            money: state.money + gain,
+            money: newMoney,
             reputation: state.reputation + GAME_CONFIG.CLICK_REWARD_REPUTATION,
             experience: state.experience + xp,
             playerLevel: calculateLevelFromXP(state.experience + xp),
+            
+            // ✅ MISE À JOUR DES STATS DE CLIC
+            stats: {
+              ...currentStats,
+              totalClicks: currentStats.totalClicks + 1,
+              totalCriticalClicks: isCrit ? currentStats.totalCriticalClicks + 1 : currentStats.totalCriticalClicks,
+              totalMoneyEarned: newTotalMoney,
+              maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
+            }
           };
         }),
+
 
       buyStock: (stockId, price) =>
         set((state) => {
@@ -173,7 +242,16 @@ export const useGameStore = create<ExtendedGameState>()(
           const newQuantity = (business.quantity || 0) + 1;
           const isFirst = !business.owned;
           const xpGain = isFirst ? GAME_CONFIG.XP_PER_NEW_BUSINESS : 0;
-          
+           const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
           return {
             money: state.money - price,
             businesses: {
@@ -183,6 +261,11 @@ export const useGameStore = create<ExtendedGameState>()(
             totalPassiveIncome: state.totalPassiveIncome + business.income,
             experience: state.experience + xpGain,
             playerLevel: calculateLevelFromXP(state.experience + xpGain),
+            stats: {
+              ...state.stats,
+              totalMoneySpent: state.stats.totalMoneySpent + price,
+              businessesBought: (currentStats.businessesBought || 0) + 1, 
+            }
           };
         }),
 
@@ -209,7 +292,19 @@ export const useGameStore = create<ExtendedGameState>()(
         }),
 
       addPassiveIncome: () =>
-        set((state) => ({ money: state.money + state.totalPassiveIncome })),
+        set((state) => {
+          const gain = state.totalPassiveIncome;
+          const newMoney = state.money + gain;
+          
+          return { 
+            money: newMoney,
+            stats: {
+              ...state.stats,
+              totalMoneyEarned: state.stats.totalMoneyEarned + gain,
+              maxMoneyReached: Math.max(state.stats.maxMoneyReached, newMoney),
+            }
+          };
+        }),
 
       purchaseUpgrade: (upgradeId) =>
         set((state) => {
@@ -231,15 +326,51 @@ export const useGameStore = create<ExtendedGameState>()(
                 incomeGain += (newInc - oldInc) * bus.quantity;
              }
           });
+           const currentStats = state.stats || {
+            totalClicks: 0,
+            totalCriticalClicks: 0,
+            totalMoneyEarned: 0,
+            totalMoneySpent: 0,
+            maxMoneyReached: state.money,
+            totalPlayTime: 0,
+            businessesBought: 0,
+            upgradesPurchased: 0,
+          };
 
           return {
              reputation: state.reputation - upgrade.reputationCost,
              upgrades: { ...state.upgrades, [upgradeId]: { ...upgrade, purchased: true } },
              businesses: newBusinesses,
-             totalPassiveIncome: state.totalPassiveIncome + incomeGain
+             totalPassiveIncome: state.totalPassiveIncome + incomeGain,
+            stats: {
+                ...currentStats,
+                // On incrémente bien ce champ spécifique
+                upgradesPurchased: (currentStats.upgradesPurchased || 0) + 1
+            }
           };
-        }),
-
+        }
+      ),
+      tickPlayTime: () =>
+        set((state) => {
+          // Sécurité anti-crash
+          const currentStats = state.stats || { 
+            totalClicks: 0, 
+            totalCriticalClicks: 0, 
+            totalMoneyEarned: 0, 
+            totalMoneySpent: 0, 
+            maxMoneyReached: state.money, 
+            totalPlayTime: 0, 
+            businessesBought: 0,
+            upgradesPurchased: 0, 
+          };
+          return {
+            stats: {
+              ...currentStats,
+              totalPlayTime: currentStats.totalPlayTime + 1, // +1 seconde
+            },
+          };
+        }
+      ),
       hydrateFromServer: (payload) => set((state) => ({ ...state, ...payload })),
       resetGame: () => set(initialState),
     }),
@@ -249,6 +380,7 @@ export const useGameStore = create<ExtendedGameState>()(
       merge: (persisted: any, current) => ({
         ...current,
         ...persisted,
+        stats: { ...current.stats, ...(persisted.stats || {}) },
         settings: { ...current.settings, ...(persisted.settings || {}) },
       }),
     }
