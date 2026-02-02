@@ -41,6 +41,8 @@ export function useSyncGame() {
     };
   }, [
     user,
+    gameState.unlockedAchievements,
+    gameState.stats, 
     gameState.money,
     gameState.reputation,
     gameState.totalPassiveIncome,
@@ -48,5 +50,6 @@ export function useSyncGame() {
     gameState.experience,
     gameState.ownedStocks,
     gameState.businesses,
+    gameState.upgrades,
   ]);
 }

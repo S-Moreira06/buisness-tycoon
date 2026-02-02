@@ -1,9 +1,13 @@
+import { toastConfig } from '@/components/ToastConfig';
+import { useAchievementSystem } from '@/hooks/useAchievementSystem';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 import { useAuth } from '../hooks/useAuth';
 
 export default function RootLayout() {
+  useAchievementSystem();
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -38,6 +42,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(game)" />
       </Stack>
+      <Toast config={toastConfig} />
     </PaperProvider>
   );
 }
