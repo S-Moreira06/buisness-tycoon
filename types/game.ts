@@ -56,6 +56,11 @@ export interface Achievement {
   description: string;
   icon: string; // Emoji ou nom d'icône
   condition: (state: GameState) => boolean; // La fonction magique
+  rewards: {
+    reputation?: number;
+    xp?: number;
+    money?: number; // Au cas où tu veux donner du cash aussi
+  };
 }
 
 export interface GameState {
