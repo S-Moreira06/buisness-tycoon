@@ -4,27 +4,27 @@
  */
 export const GAME_CONFIG = {
   // 💰 Valeurs de départ
-  INITIAL_MONEY: 5000000,
-  INITIAL_REPUTATION: 10000,
+  INITIAL_MONEY: 100,
+  INITIAL_REPUTATION: 0,
   INITIAL_PASSIVE_INCOME: 0,
 
     // 🎮 Gameplay - Clic manuel
   CLICK_REWARD_MONEY: 1, // Argent gagné par clic (mettre à 1 en prod, 999999 en dev)
-  CLICK_REWARD_REPUTATION: 1, // Réputation gagnée par clic
+  CLICK_REWARD_REPUTATION: 0.1, // Réputation gagnée par clic
     // ⚡ Système de Critique (Click)
   BASE_CRIT_CHANCE: 0.05,      // 5% de chance de base (0.05)
-  BASE_CRIT_MULTIPLIER: 5,     // Dégâts x5 en cas de critique
+  BASE_CRIT_MULTIPLIER: 2,     // Dégâts x2 en cas de critique
 
   // 📈 Revenus passifs
   STOCK_PASSIVE_INCOME_RATE: 0.01, // 1% du prix d'achat par seconde
   
   // ⏱️ Timers (en millisecondes)
   AUTO_INCREMENT_INTERVAL: 1000, // Fréquence de gain passif (1000ms = 1 seconde)
-  SAVE_DEBOUNCE_DELAY: 900, // Délai avant sauvegarde auto
+  SAVE_INTERVAL: 5000, //Sauvegarde automatique toutes les 5 secondes
   
   // 🔧 Upgrades de business
-  BUSINESS_UPGRADE_COST_MULTIPLIER: 1.5, // Coût x1.5 à chaque niveau
-  BUSINESS_LEVEL_INCOME_BOOST: 0.1, // +10% de revenu par niveau
+  BUSINESS_UPGRADE_COST_MULTIPLIER: 1.9, // Coût x1.9 à chaque niveau
+  BUSINESS_LEVEL_INCOME_BOOST: 0.2, // +20% de revenu par niveau
   
   // ⭐ Progression
   UPGRADE_MULTIPLIER: 1.1, // +10% de revenu par upgrade acheté (défini aussi dans chaque upgrade)
@@ -33,10 +33,10 @@ export const GAME_CONFIG = {
   MONEY_PROGRESS_MAX: 1_000_000, // Montant max pour la barre de progression
 
   // 🎯 Système d'expérience et de niveau
-  XP_PER_CLICK: 12,              // XP gagnée par clic
+  XP_PER_CLICK: 10,              // XP gagnée par clic
   XP_PER_NEW_BUSINESS: 30,       // XP pour l'achat d'un nouveau business
   BASE_XP_REQUIRED: 100,         // XP nécessaire pour passer du niveau 1 au niveau 2
-  XP_MULTIPLIER_PER_LEVEL: 2,    // Doublement de l'XP requise à chaque niveau
+  XP_MULTIPLIER_PER_LEVEL: 2.2,    // Doublement de l'XP requise à chaque niveau
   INITIAL_PLAYER_LEVEL: 1,              // Niveau de départ
   INITIAL_EXPERIENCE: 0,         // XP de départ
 

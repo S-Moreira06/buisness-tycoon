@@ -1,9 +1,14 @@
+import { AchievementsModal } from '@/components/AchievementsModal';
+import { CustomModal } from '@/components/CustomModal';
+import { StatsModal } from '@/components/StatsModal';
+import { getLeaderboard, LeaderboardEntry, LeaderboardSortType } from '@/services/leaderboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
-import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
-import { ActivityIndicator, Text } from 'react-native-paper';
+import numeral from 'numeral';
+import React, { useEffect, useState } from 'react';
+import { Alert, FlatList, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from '../../../hooks/useGameStore';
 import { auth } from '../../../services/firebaseConfig';
@@ -66,16 +71,42 @@ const SettingCard = ({ icon, title, subtitle, onPress, variant = 'primary', load
 
   return content;
 };
+const SORT_OPTIONS: { type: LeaderboardSortType; label: string }[] = [
+  { type: 'maxMoney', label: 'Record Fortune 🏆' },
+  { type: 'currentMoney', label: 'Argent Actuel 💰' },
+  { type: 'totalMoney', label: 'Total Généré 📈' },
+];
+
 
 export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [hapticsEnabled, setHapticsEnabled] = useState(true);
-  
+  const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
+  const toggleHaptics = useGameStore((s) => s.toggleHaptics);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isStatsVisible, setIsStatsVisible] = useState(false);
+   const [isAchievementsVisible, setIsAchievementsVisible] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [tempName, setTempName] = useState('');
+  const [tempEmoji, setTempEmoji] = useState('👤'); // Valeur par défaut
+  const playerName = useGameStore((s) => s.playerName);
+  const setPlayerName = useGameStore((s) => s.setPlayerName);
+  const profileEmoji = useGameStore((s) => s.profileEmoji);
+  const setProfileEmoji = useGameStore((s) => s.setProfileEmoji);
+
   const resetGame = useGameStore((s) => s.resetGame);
   const router = useRouter();
+   const [leaderboardSort, setLeaderboardSort] = useState<LeaderboardSortType>('maxMoney');
 
+  // Fonction pour changer de mode en boucle
+  const cycleSortMode = () => {
+    const currentIndex = SORT_OPTIONS.findIndex(opt => opt.type === leaderboardSort);
+    const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length;
+    setLeaderboardSort(SORT_OPTIONS[nextIndex].type);
+  };
   const handleResetGame = () => {
     Alert.alert(
       '⚠️ Réinitialiser le jeu',
@@ -144,7 +175,25 @@ export default function SettingsScreen() {
       ]
     );
   };
-
+  const handleOpenLeaderboard = async () => {
+    setIsLeaderboardOpen(true);
+    setIsLoadingLeaderboard(true);
+    try {
+      const data = await getLeaderboard(10, leaderboardSort);
+      setLeaderboardData(data);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de charger le classement");
+    } finally {
+      setIsLoadingLeaderboard(false);
+    }
+  };
+  useEffect(() => {
+    if (isLeaderboardOpen) {
+      handleOpenLeaderboard();
+    }
+  }, [leaderboardSort]);
+  const formatUid = (uid: string) => `Joueur ${uid.slice(0, 4)}...${uid.slice(-4)}`;
+  
   return (
     <LinearGradient
       colors={['#0a0a0a', '#1a1a2e', '#0a0a0a']}
@@ -173,18 +222,22 @@ export default function SettingsScreen() {
 
           {/* Section Compte */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>👤 Compte</Text>
+            <Text style={styles.sectionTitle}>Compte</Text>
             
-            <View style={styles.infoCard}>
-              <LinearGradient
-                colors={['rgba(168, 85, 247, 0.1)', 'rgba(124, 58, 237, 0.05)']}
-                style={styles.infoCardGradient}
-              >
-                <Text style={styles.infoLabel}>Email connecté</Text>
-                <Text style={styles.infoValue}>{auth.currentUser?.email}</Text>
-              </LinearGradient>
-            </View>
-
+            {/* Carte Profil Éditable */}
+            <SettingCard
+              icon={profileEmoji || '👤'} // Affiche l'emoji du joueur
+              title={playerName || 'Nom du CEO'}
+              subtitle={auth.currentUser?.email || 'Non connecté'}
+              onPress={() => {
+                setTempName(playerName); 
+                setTempEmoji(profileEmoji);
+                setIsEditProfileOpen(true);
+              }}
+              variant="primary"
+              rightElement={<Text style={{color: '#a855f7', fontSize: 12}}>Modifier</Text>}
+            />
+            
             <SettingCard
               icon="🚪"
               title="Se déconnecter"
@@ -237,7 +290,7 @@ export default function SettingsScreen() {
               rightElement={
                 <Switch
                   value={hapticsEnabled}
-                  onValueChange={setHapticsEnabled}
+                  onValueChange={() => toggleHaptics()}
                   trackColor={{ false: '#374151', true: '#a855f7' }}
                   thumbColor={hapticsEnabled ? '#ffffff' : '#9ca3af'}
                 />
@@ -245,6 +298,40 @@ export default function SettingsScreen() {
             />
           </View>
 
+          {/* SECTION CLASSEMENT */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Classement</Text>
+            <SettingCard
+              icon="🏆"
+              title="Top Joueurs"
+              subtitle="Voir les 10 meilleures fortunes"
+              onPress={handleOpenLeaderboard}
+              variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
+            />
+          </View>
+          {/* ✅ NOUVELLE SECTION : SUCCÈS */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Progression</Text>
+          </View>
+          
+          <SettingCard
+            icon="🏆"
+            title="Succès"
+            subtitle="Voir les défis débloqués"
+            onPress={() => setIsAchievementsVisible(true)}
+            variant="warning" // Utilise 'warning' pour avoir le thème Orange/Or qui fait 'Trophée'
+          />
+          {/* SECTION STATS */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Statistiques</Text>
+            <SettingCard
+              icon="📊"
+              title="Statistiques"
+              subtitle="Voir les statistiques"
+               onPress={() => setIsStatsVisible(true)}
+              variant="primary" // Ou une couleur 'gold' si tu veux créer une variante
+            />
+          </View>
           {/* Section Données */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>💾 Données du jeu</Text>
@@ -268,7 +355,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Section Stats */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.sectionTitle}>📊 Statistiques</Text>
             
             <View style={styles.statsGrid}>
@@ -320,7 +407,7 @@ export default function SettingsScreen() {
                 </LinearGradient>
               </View>
             </View>
-          </View>
+          </View> */}
 
           {/* Section À propos */}
           <View style={styles.section}>
@@ -360,9 +447,268 @@ export default function SettingsScreen() {
           </View>
         </ScrollView>
       </SafeAreaView>
+      {/* MODALE CLASSEMENT */}
+      <CustomModal
+        visible={isLeaderboardOpen}
+        onDismiss={() => setIsLeaderboardOpen(false)}
+      >
+        <LinearGradient
+          colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']} // Fond sombre légèrement transparent
+          style={{
+            width: '100%',
+            height: '100%', // Remplit l'espace alloué par CustomModal
+            padding: 20,
+            alignItems: 'center'
+          }}
+        >
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            width: '100%', 
+            marginBottom: 16 
+          }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}>
+              🏆 Top 10
+            </Text>
+            
+            <Pressable
+              onPress={cycleSortMode}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: pressed ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.2)'
+              })}
+            >
+              <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '600', marginRight: 6 }}>
+                {SORT_OPTIONS.find(opt => opt.type === leaderboardSort)?.label}
+              </Text>
+              <Text style={{ color: '#fbbf24', fontSize: 10 }}>▼</Text>
+            </Pressable>
+          </View>
+
+          {isLoadingLeaderboard ? (
+            <ActivityIndicator size="large" color="#a855f7" style={{ marginVertical: 20 }} />
+          ) : (
+            <FlatList
+              data={leaderboardData}
+              keyExtractor={(item) => item.uid}
+              style={{ width: '100%' }}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 12,
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'rgba(255,255,255,0.1)'
+                }}>
+                  {/* 1. RANG */}
+                  <View style={{ width: 40, alignItems: 'center' }}>
+                    <Text style={{ 
+                      fontSize: 18, 
+                      fontWeight: 'bold', 
+                      color: index === 0 ? '#fbbf24' : index === 1 ? '#9ca3af' : index === 2 ? '#b45309' : '#fff' 
+                    }}>
+                      #{index + 1}
+                    </Text>
+                  </View>
+
+                  {/* 2. AVATAR + NOM (Nouveau design) */}
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10 }}>
+                    {/* Cercle pour l'emoji */}
+                    <View style={{
+                      width: 36, 
+                      height: 36, 
+                      borderRadius: 18, 
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 12,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.2)'
+                    }}>
+                      {/* Affiche l'emoji ou un fallback */}
+                      <Text style={{ fontSize: 20 }}>{item.profileEmoji || '👤'}</Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      {/* Affiche le nom ou un fallback */}
+                      <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }} numberOfLines={1}>
+                        {item.playerName || `Joueur ${item.uid.slice(0, 4)}`}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* 3. ARGENT */}
+                  <Text style={{ color: '#4ade80', fontWeight: 'bold', fontSize: 15 }}>
+                    {numeral(item.value || 0).format('$0.00a')}
+                  </Text>
+                </View>
+              )}
+
+              ListEmptyComponent={
+                <Text style={{ color: '#9ca3af', textAlign: 'center', marginTop: 20 }}>
+                  Aucun classement disponible.
+                </Text>
+              }
+            />
+          )}
+
+          <Pressable
+            onPress={() => setIsLeaderboardOpen(false)}
+            style={({ pressed }) => ({
+              marginTop: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 24,
+              backgroundColor: pressed ? 'rgba(255,255,255,0.1)' : 'transparent',
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.2)'
+            })}
+          >
+            <Text style={{ color: '#e5e7eb', fontSize: 14, fontWeight: '500' }}>Fermer</Text>
+          </Pressable>
+
+        </LinearGradient>
+      </CustomModal>
+      <AchievementsModal 
+            visible={isAchievementsVisible}
+            onClose={() => setIsAchievementsVisible(false)}
+          />
+      {/* MODALE STATS */}
+      <StatsModal 
+        visible={isStatsVisible} 
+        onClose={() => setIsStatsVisible(false)} 
+      />
+      
+      {/* MODALE ÉDITION PROFIL */}
+      <CustomModal
+        visible={isEditProfileOpen}
+        onDismiss={() => setIsEditProfileOpen(false)}
+      >
+        <LinearGradient
+          colors={['rgba(30, 27, 75, 0.95)', 'rgba(49, 46, 129, 0.95)']}
+          style={{
+            width: '90%',
+            borderRadius: 24,
+            padding: 24,
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: 'rgba(168, 85, 247, 0.3)',
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 20 }}>
+            Modifier mon Profil
+          </Text>
+
+          {/* 1. PRÉVISUALISATION ACTUELLE */}
+          <View style={{ alignItems: 'center', marginBottom: 24 }}>
+            <View style={{
+              width: 80, height: 80, borderRadius: 40,
+              backgroundColor: 'rgba(168, 85, 247, 0.2)',
+              justifyContent: 'center', alignItems: 'center',
+              borderWidth: 2, borderColor: '#a855f7', marginBottom: 8
+            }}>
+              <Text style={{ fontSize: 40 }}>{tempEmoji}</Text>
+            </View>
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>
+              {tempName || 'Nom du CEO'}
+            </Text>
+          </View>
+
+          {/* 2. CHAMP NOM */}
+          <View style={{ width: '100%', marginBottom: 20 }}>
+            <Text style={{ color: '#9ca3af', marginBottom: 8, fontSize: 14 }}>Votre Nom</Text>
+            <TextInput
+              value={tempName}
+              onChangeText={setTempName}
+              placeholder="Entrez votre nom..."
+              placeholderTextColor="#6b7280"
+              maxLength={15}
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                borderRadius: 12,
+                padding: 16,
+                color: '#fff',
+                fontSize: 16,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.1)'
+              }}
+            />
+          </View>
+
+          {/* 3. SÉLECTEUR D'EMOJI (GRID) */}
+          <View style={{ width: '100%', marginBottom: 24 }}>
+            <Text style={{ color: '#9ca3af', marginBottom: 8, fontSize: 14 }}>Choisir un Avatar</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
+              {['👨‍💼', '👩‍💼', '🚀', '🦁', '🤖', '🎩', '💎', '🐺', '🦊', '🐯'].map((emoji) => (
+                <Pressable
+                  key={emoji}
+                  onPress={() => setTempEmoji(emoji)}
+                  style={{
+                    width: 45, height: 45,
+                    borderRadius: 22.5,
+                    backgroundColor: tempEmoji === emoji ? '#a855f7' : 'rgba(255,255,255,0.05)',
+                    justifyContent: 'center', alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: tempEmoji === emoji ? '#fff' : 'transparent'
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>{emoji}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* BOUTONS D'ACTION */}
+          <Pressable
+            onPress={() => {
+              if (tempName.trim().length > 0) {
+                // On sauvegarde les DEUX : Nom et Emoji
+                setPlayerName(tempName.trim());
+setProfileEmoji(tempEmoji);
+                setIsEditProfileOpen(false);
+                // Le hook useSyncGame détectera les changements et sauvegardera tout seul
+              } else {
+                Alert.alert("Erreur", "Le nom ne peut pas être vide");
+              }
+            }}
+            style={({ pressed }) => ({
+              backgroundColor: '#a855f7',
+              paddingVertical: 12,
+              paddingHorizontal: 32,
+              borderRadius: 20,
+              opacity: pressed ? 0.8 : 1,
+              width: '100%',
+              alignItems: 'center'
+            })}
+          >
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Sauvegarder</Text>
+          </Pressable>
+          
+          <Pressable 
+            onPress={() => setIsEditProfileOpen(false)}
+            style={{ marginTop: 16 }}
+          >
+            <Text style={{ color: '#9ca3af' }}>Annuler</Text>
+          </Pressable>
+        </LinearGradient>
+      </CustomModal>
+
+
     </LinearGradient>
+
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

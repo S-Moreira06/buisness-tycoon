@@ -1,4 +1,4 @@
-import * as Haptics from 'expo-haptics';
+import { useHaptics } from '@/hooks/useHaptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -103,15 +103,8 @@ const FloatingText = ({ id, text, x, y, isCritical, onComplete }: FloatingTextPr
 
 // --- Composant Principal ---
 export const ClickButton = () => {
-  // On récupère addMoney (si existe) ou on fait la logique manuelle ici
-  // L'idéal serait d'avoir une action "clickHit(amount)" dans le store pour être propre
-  // Mais pour l'instant on garde clickGame() standard et on triche visuellement ou on adapte le store.
-  // ⚠️ IMPORTANT : Pour que l'argent soit vraiment ajouté, il faudra modifier useGameStore 
-  // pour accepter un montant variable, ou gérer le bonus ici.
-  // Pour l'instant, je suppose que clickGame() ajoute juste CLICK_REWARD_MONEY fixe.
-  // Si tu veux que le critique donne VRAIMENT de l'argent, dis le moi, on modifiera le store.
-  const { clickGame, money } = useGameStore(); 
-  
+  const { clickGame, getClickPower } = useGameStore(); 
+  const { triggerLight, triggerHeavy } = useHaptics();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(1)).current;
   
@@ -137,24 +130,17 @@ export const ClickButton = () => {
   }, []);
 
   const handlePress = (event: GestureResponderEvent) => {
+    const { moneyPerClick, critChance, critMult } = getClickPower(); 
+    clickGame();
     // --- LOGIQUE CRITIQUE ---
-    const critChance = GAME_CONFIG.BASE_CRIT_CHANCE; 
-    const critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER; 
     const isCritical = Math.random() < critChance;
     
-    // Calcul du gain (Visuel pour l'instant si le store n'est pas prêt)
-    let amount = GAME_CONFIG.CLICK_REWARD_MONEY;
+     const amount = isCritical ? moneyPerClick * critMult : moneyPerClick;
+    
     if (isCritical) {
-        amount *= critMult;
-    }
-    clickGame({ moneyGain: amount });
-
-    if (isCritical) {
-        // Haptique LOURD pour le critique
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      triggerHeavy(); // Gère déjà la vérification on/off
     } else {
-        // Haptique LEGER pour le normal
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      triggerLight(); // Gère déjà la vérification on/off
     }
     
     // Animation Bouton
@@ -174,14 +160,14 @@ export const ClickButton = () => {
       ...prev, 
       { 
         id: newId, 
-        text: isCritical ? `+${amount}€` : `+${amount}€`, 
+        text: `+${Math.floor(amount)}€`, 
         x: locationX - 20, 
         y: locationY - 20,
         isCritical: isCritical
       }
     ]);
   };
-
+  const stats = getClickPower();
   const removeFloatingText = (id: number) => {
     setFloatingTexts(prev => prev.filter(item => item.id !== id));
   };
@@ -223,14 +209,14 @@ export const ClickButton = () => {
             <View style={styles.statRow}>
                 <View>
                     <Text style={styles.statsLabel}>PUISSANCE</Text>
-                    <Text style={styles.statsValue}>{GAME_CONFIG.CLICK_REWARD_MONEY} €/clic</Text>
+                    <Text style={styles.statsValue}>{Math.floor(stats.moneyPerClick)} €/clic</Text>
                 </View>
                 <View style={styles.verticalDivider} />
                 <View>
                     <Text style={styles.statsLabel}>CRIT %/ CRIT X</Text>
                     {/* Affichage dynamique de la chance de crit */}
                     <Text style={[styles.statsValue, { color: '#fbbf24' }]}>
-                        {Math.round(GAME_CONFIG.BASE_CRIT_CHANCE * 100)}% / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
+                        {Math.round(stats.critChance * 100)}% Crit / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
                     </Text>
                 </View>
             </View>

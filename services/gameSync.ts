@@ -1,4 +1,4 @@
-import { get, ref, set } from 'firebase/database';
+import { get, ref, serverTimestamp, set } from 'firebase/database';
 import { GameState } from '../types/game';
 import { database } from './firebaseConfig';
 
@@ -8,10 +8,15 @@ export async function saveGame(uid: string, state: GameState) {
     
     // 👇 SAUVEGARDE SEULEMENT LES DONNÉES (pas les fonctions)
     const dataToSave = {
+      playerName: state.playerName, 
+      profileEmoji: state.profileEmoji,
       money: state.money,
       reputation: state.reputation,
       businesses: state.businesses,
       upgrades: state.upgrades,
+      stats: state.stats,
+      unlockedAchievements: state.unlockedAchievements || [],
+      lastSavedAt: serverTimestamp(),
     };
     
     await set(gameRef, dataToSave);
