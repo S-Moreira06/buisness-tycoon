@@ -4,8 +4,8 @@
  */
 export const GAME_CONFIG = {
   // 💰 Valeurs de départ
-  INITIAL_MONEY: 1000000,
-  INITIAL_REPUTATION: 100000,
+  INITIAL_MONEY: 100,
+  INITIAL_REPUTATION: 0,
   INITIAL_PASSIVE_INCOME: 0,
 
     // 🎮 Gameplay - Clic manuel
@@ -20,7 +20,7 @@ export const GAME_CONFIG = {
   
   // ⏱️ Timers (en millisecondes)
   AUTO_INCREMENT_INTERVAL: 1000, // Fréquence de gain passif (1000ms = 1 seconde)
-  SAVE_DEBOUNCE_DELAY: 10000, // Délai avant sauvegarde auto
+  SAVE_INTERVAL: 5000, //Sauvegarde automatique toutes les 5 secondes
   
   // 🔧 Upgrades de business
   BUSINESS_UPGRADE_COST_MULTIPLIER: 1.9, // Coût x1.9 à chaque niveau
