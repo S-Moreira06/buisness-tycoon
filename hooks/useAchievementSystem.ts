@@ -1,46 +1,87 @@
+// hooks/useAchievementSystem.ts
 import { ACHIEVEMENTS } from '@/constants/achievementsConfig';
 import { useEffect } from 'react';
-import Toast from 'react-native-toast-message'; // ✅ Import direct
+import Toast from 'react-native-toast-message';
 import { useGameStore } from './useGameStore';
 
 export const useAchievementSystem = () => {
   const unlockAchievement = useGameStore((state) => state.unlockAchievement);
-  const unlockedAchievements = useGameStore((state) => state.unlockedAchievements);
 
   useEffect(() => {
     const checkAchievements = (state: any) => {
-      // Optimisation : On ne vérifie que ceux verrouillés
       const lockedAchievements = ACHIEVEMENTS.filter(
         (ach) => !state.unlockedAchievements.includes(ach.id)
       );
 
       if (lockedAchievements.length === 0) return;
 
+      // ✅ NOUVEAU : On accumule les succès débloqués dans cette vérification
+      const unlockedNow: typeof ACHIEVEMENTS = [];
+
       lockedAchievements.forEach((achievement) => {
         try {
           if (achievement.condition(state)) {
-            // 1. Débloquer dans le store
-            unlockAchievement(achievement.id);
-            
-            // 2. Afficher le Toast (La librairie gère la file d'attente automatiquement)
-            Toast.show({
-              type: 'achievement', // Correspond à ta clé dans toastConfig
-              text1: 'Succès Débloqué !',
-              text2: achievement.title,
-              props: { icon: achievement.icon }, // On passe l'icône en prop
-              visibilityTime: 4000,
-            });
+            unlockAchievement(achievement.id, achievement.rewards);
+            unlockedNow.push(achievement);
           }
         } catch (error) {
           console.error(`Erreur succès ${achievement.id}`, error);
         }
       });
+
+      // ✅ Si plusieurs succès débloqués, on les affiche groupés
+      if (unlockedNow.length > 0) {
+        showAchievementToast(unlockedNow);
+      }
     };
 
-    // Check initial + Abonnement
     checkAchievements(useGameStore.getState());
     const unsubscribe = useGameStore.subscribe(checkAchievements);
 
     return () => unsubscribe();
-  }, [unlockAchievement]); // Ajout de dépendance propre
+  }, [unlockAchievement]);
 };
+
+// ✅ NOUVELLE FONCTION : Affichage intelligent (1 ou plusieurs)
+function showAchievementToast(achievements: typeof ACHIEVEMENTS) {
+  if (achievements.length === 1) {
+    // UN SEUL SUCCÈS : Toast classique
+    const ach = achievements[0];
+    const rewardText = [
+      ach.rewards.xp ? `+${ach.rewards.xp} XP` : null,
+      ach.rewards.reputation ? `+${ach.rewards.reputation} Rep` : null,
+      ach.rewards.money ? `+${ach.rewards.money}$` : null,
+    ].filter(Boolean).join('  •  ');
+
+    Toast.show({
+      type: 'achievement',
+      text1: 'Succès Débloqué !',
+      text2: `${ach.title}\n${rewardText}`,
+      props: { icon: ach.icon },
+      visibilityTime: 4000,
+    });
+  } else {
+    // PLUSIEURS SUCCÈS : Toast groupé
+    const icons = achievements.map(a => a.icon).join(' ');
+    const titles = achievements.map(a => `• ${a.title}`).join('\n');
+    
+    // Calcul des récompenses totales
+    const totalXp = achievements.reduce((sum, a) => sum + (a.rewards.xp || 0), 0);
+    const totalRep = achievements.reduce((sum, a) => sum + (a.rewards.reputation || 0), 0);
+    const totalMoney = achievements.reduce((sum, a) => sum + (a.rewards.money || 0), 0);
+
+    const totalRewards = [
+      totalXp ? `+${totalXp} XP` : null,
+      totalRep ? `+${totalRep} Rep` : null,
+      totalMoney ? `+${totalMoney}$` : null,
+    ].filter(Boolean).join('  •  ');
+
+    Toast.show({
+      type: 'achievement',
+      text1: `${achievements.length} Succès Débloqués ! ${icons}`,
+      text2: `${titles}\n\n${totalRewards}`,
+      props: { icon: '🎉' },
+      visibilityTime: 6000, // Plus long car plus d'infos
+    });
+  }
+}

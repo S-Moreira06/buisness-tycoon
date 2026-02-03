@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { BUSINESSES_CONFIG } from '@/constants/businessesConfig';
 import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
-import { BUSINESSES_CONFIG } from '../constants/businessesConfig';
-import { calculateLevelFromXP, GAME_CONFIG } from '../constants/gameConfig';
-import { UPGRADES_CONFIG } from '../constants/upgradesConfig';
-import { ClickUpgradeState, GameState, GameStats } from '../types/game';
+import { calculateLevelFromXP, GAME_CONFIG } from '@/constants/gameConfig';
+import { UPGRADES_CONFIG } from '@/constants/upgradesConfig';
+import { ClickUpgradeState, GameState, GameStats } from '@/types/game';
 
 interface GameActions {
   toggleHaptics: () => void;
@@ -27,8 +27,8 @@ interface GameActions {
   tickPlayTime: () => void;
   purchaseClickUpgrade: (upgradeId: string) => void;
   getClickPower: () => { moneyPerClick: number; critChance: number; critMult: number };
-  unlockAchievement: (id: string) => void;
-}
+  unlockAchievement: (id: string, rewards: { reputation?: number; xp?: number; money?: number }) => void;
+};
 
 type ExtendedGameState = GameState & GameActions;
 
@@ -352,6 +352,7 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }
       ),
+
       tickPlayTime: () =>
         set((state) => {
           // Sécurité anti-crash
@@ -373,38 +374,52 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }
       ),
-      unlockAchievement: (id) =>
+      
+      unlockAchievement: (id, rewards) =>
         set((state) => {
           // Sécurité : ne pas ajouter si déjà présent
           if (state.unlockedAchievements.includes(id)) return state;
-          
+          const newXp = state.experience + (rewards.xp || 0);
+          const newLevel = calculateLevelFromXP(newXp);
+          const newMoney = state.money + (rewards.money || 0);
           return {
             unlockedAchievements: [...state.unlockedAchievements, id],
+            reputation: state.reputation + (rewards.reputation || 0),
+            experience: newXp,
+            playerLevel: newLevel,
+            money: newMoney,
+            // Mettre à jour maxMoneyReached si on donne de l'argent
+            stats: {
+              ...state.stats,
+              maxMoneyReached: Math.max(state.stats.maxMoneyReached, newMoney),
+              totalMoneyEarned: state.stats.totalMoneyEarned + (rewards.money || 0),
+            }
           };
         }),
-hydrateFromServer: (payload: any) => set((state) => {
-    // 1. FUSION INTELLIGENTE DES SUCCÈS
-    // On combine ce qu'on a en local + ce qui vient du cloud
-    const localAch = state.unlockedAchievements || [];
-    const cloudAch = payload.unlockedAchievements || [];
-    const mergedAchievements = Array.from(new Set([...localAch, ...cloudAch]));
+      hydrateFromServer: (payload: any) => set((state) => {
+        // 1. FUSION INTELLIGENTE DES SUCCÈS
+        // On combine ce qu'on a en local + ce qui vient du cloud
+        const localAch = state.unlockedAchievements || [];
+        const cloudAch = payload.unlockedAchievements || [];
+        const mergedAchievements = Array.from(new Set([...localAch, ...cloudAch]));
 
-    // 2. FUSION DES STATS (On garde le meilleur des deux mondes)
-    // Exemple : Si j'ai gagné plus d'argent en offline, je garde mon record local
-    const mergedStats = {
-      ...state.stats,          // Base locale
-      ...(payload.stats || {}), // Override cloud
-      totalMoneyEarned: Math.max(state.stats.totalMoneyEarned, payload.stats?.totalMoneyEarned || 0),
-      maxMoneyReached: Math.max(state.stats.maxMoneyReached, payload.stats?.maxMoneyReached || 0),
-    };
+        // 2. FUSION DES STATS (On garde le meilleur des deux mondes)
+        // Exemple : Si j'ai gagné plus d'argent en offline, je garde mon record local
+        const mergedStats = {
+          ...state.stats,          // Base locale
+          ...(payload.stats || {}), // Override cloud
+          totalMoneyEarned: Math.max(state.stats.totalMoneyEarned, payload.stats?.totalMoneyEarned || 0),
+          maxMoneyReached: Math.max(state.stats.maxMoneyReached, payload.stats?.maxMoneyReached || 0),
+        };
 
-    return {
-        ...state,
-        ...payload, // On applique le reste du cloud (Money, Reputation...)
-        stats: mergedStats,
-        unlockedAchievements: mergedAchievements,
-    };
-}),      resetGame: () => set(initialState),
+        return {
+            ...state,
+            ...payload, // On applique le reste du cloud (Money, Reputation...)
+            stats: mergedStats,
+            unlockedAchievements: mergedAchievements,
+        };
+      }),      
+      resetGame: () => set(initialState),
     }),
     {
       name: 'game-store',

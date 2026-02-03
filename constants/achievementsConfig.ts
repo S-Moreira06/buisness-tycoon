@@ -10,6 +10,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Premiers Pas',
     description: 'Effectuer 10 clics manuels',
     icon: '👆',
+    rewards: { reputation: 5, xp: 10 },
     condition: (state: GameState) => state.stats.totalClicks >= 10,
   },
   {
@@ -17,6 +18,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Échauffement',
     description: 'Effectuer 100 clics manuels',
     icon: '👆',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalClicks >= 100,
   },
   {
@@ -24,6 +26,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Doigts de Fée',
     description: 'Effectuer 1 000 clics manuels',
     icon: '🖐️',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalClicks >= 1000,
   },
   {
@@ -31,6 +34,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Est-ce un bot ?',
     description: 'Atteindre 10 000 clics manuels',
     icon: '🤖',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalClicks >= 10000,
   },
   {
@@ -38,6 +42,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Coup de Chance',
     description: 'Réaliser 50 clics critiques',
     icon: '⚡',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalCriticalClicks >= 50,
   },
 
@@ -49,6 +54,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Petit Économe',
     description: 'Avoir 1 000 $ en banque',
     icon: '💰',
+    rewards: { reputation: 5, xp: 10 },
     condition: (state: GameState) => state.money >= 1000,
   },
   {
@@ -56,6 +62,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Tirelire Pleine',
     description: 'Avoir 10 000 $ en banque',
     icon: '🐷',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.money >= 10000,
   },
   {
@@ -63,6 +70,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Nouveau Riche',
     description: 'Accumuler un total de 1 Million $ (Carrière)',
     icon: '💵',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000000,
   },
   {
@@ -70,6 +78,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Multimillionnaire',
     description: 'Posséder 10 Millions $ sur le compte',
     icon: '🏦',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.money >= 10000000,
   },
   {
@@ -77,6 +86,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Club des 3 Virgules',
     description: 'Gagner 1 Milliard $ au total',
     icon: '🚀',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000000000,
   },
 
@@ -86,6 +96,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Premier Investissement',
     description: 'Acheter votre premier business',
     icon: '🍋',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.businessesBought >= 1,
   },
   {
@@ -93,6 +104,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Manager',
     description: 'Posséder 5 business différents',
     icon: '🏢',
+    rewards: { reputation: 5, xp: 10 },
     condition: (state: GameState) => 
       Object.values(state.businesses).filter(b => b.owned).length >= 5,
   },
@@ -101,6 +113,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Gestionnaire',
     description: 'Posséder 5 business différents',
     icon: '🏢',
+    rewards: { reputation: 5, xp: 10 },
     condition: (state: GameState) => 
       Object.values(state.businesses).filter(b => b.owned).length >= 5,
   },
@@ -109,6 +122,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Expansion Rapide',
     description: 'Posséder 50 business au total',
     icon: '🏗️',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => 
       Object.values(s.businesses).reduce((acc, b) => acc + (b.quantity || 0), 0) >= 50,
   },
@@ -117,6 +131,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Monopole',
     description: 'Posséder au moins 1 exemplaire de CHAQUE business',
     icon: '🎩',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => 
       Object.values(s.businesses).every(b => b.owned), // Suppose que tous les business sont dans l'objet
   },
@@ -126,6 +141,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: 'Monter un business au niveau 100',
     icon: '📈',
     // On vérifie si AU MOINS UN business a level >= 100
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => 
       Object.values(s.businesses).some(b => b.level >= 100),
   },
@@ -134,6 +150,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Flambeur',
     description: 'Dépenser un total de 1 000 000 $',
     icon: '💸',
+    rewards: { reputation: 5, xp: 10 },
     condition: (state: GameState) => state.stats.totalMoneySpent >= 1000000,
   },
 
@@ -143,6 +160,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'R&D Débutant',
     description: 'Acheter 5 améliorations',
     icon: '🧪',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.upgradesPurchased >= 5,
   },
   {
@@ -150,6 +168,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Visionnaire',
     description: 'Acheter 20 améliorations',
     icon: '🧠',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.upgradesPurchased >= 20,
   },
 
@@ -159,6 +178,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Accro',
     description: 'Jouer pendant 1 heure (temps actif)',
     icon: '⏳',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalPlayTime >= 3600, // 3600 secondes
   },
   {
@@ -166,6 +186,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'PDG à plein temps',
     description: 'Jouer pendant 24 heures cumulées',
     icon: '🌙',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.stats.totalPlayTime >= 86400,
   },
 
@@ -175,6 +196,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Influenceur Local',
     description: 'Atteindre 1 000 de Réputation',
     icon: '✨',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.reputation >= 1000,
   },
   {
@@ -182,6 +204,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Le Parrain',
     description: 'Atteindre 100 000 de Réputation',
     icon: '🕶️',
+    rewards: { reputation: 5, xp: 10 },
     condition: (s: GameState) => s.reputation >= 100000,
   }
 ];
