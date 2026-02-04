@@ -4,7 +4,7 @@
  */
 export const GAME_CONFIG = {
   // 💰 Valeurs de départ
-  INITIAL_MONEY: 100,
+  INITIAL_MONEY: 1000000000000000,
   INITIAL_REPUTATION: 0,
   INITIAL_PASSIVE_INCOME: 0,
 

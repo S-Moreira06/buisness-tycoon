@@ -495,20 +495,485 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
   },
 
   // 🆕 COMBO GLOBAL DOMINATION
-  ultimate_combo: {
+ ultimate_combo: {
     id: 'ultimate_combo',
-    name: '🌟 Domination Totale',
-    description: 'Synergies ultimes entre TOUS tes empires. Chaque business booste les autres exponentiellement. Tu contrôles l\'économie mondiale.',
-    reputationCost: 10000,
-    multiplier: 2.0,
+    name: '👑 Domination Totale',
+    description: 'Synergies ultimes entre TOUS tes empires. Chaque business booste les autres exponentiellement. Tu contrôles l\'économie multiverselle. GG WP.',
+    reputationCost: 15000, // ⬆️ Augmenté de 10k → 15k (cohérent avec difficulté)
+    multiplier: 2.5,       // ⬆️ Augmenté de 2.0 → 2.5 (récompense proportionnelle)
     tier: 'master',
     affectedBusinesses: [
-      'coffeeMachine', 'foodTruck', 'smallShop', 'airbnb', 'library', 
-      'gym', 'cinema', 'restaurant', 'hotel', 'gamingStudio', 
+      // ✅ TOUS LES 40 BUSINESSES (via helper dynamique)
+      'coffeeMachine', 'foodTruck', 'smallShop', 'airbnb', 'library',
+      'gym', 'cinema', 'restaurant', 'hotel', 'gamingStudio',
       'factory', 'hospital', 'techStartup', 'themePark', 'autoDealer',
-      'cryptoFarm', 'techCorp', 'spaceX', 'bank', 'globalCorp'
+      'cryptoFarm', 'techCorp', 'spaceX', 'bank', 'globalCorp',
+      // 🆕 TIER 3 MEGA-CORPS
+      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
+      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
+      'nuclearPlant', 'underwaterCity',
+      // 🆕 TIER 4 CIVILIZATION
+      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
+      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
+      'multiverseHub', 'realityEngine'
     ],
   },
+    // ========================================
+  // 🆕 NOUVEAUX COMBOS - TIER 3 & 4
+  // ========================================
+
+  // 💎 COMBO TIER 3 : MEGA-CORPORATIONS SYNERGY
+  megaCorp_combo: {
+    id: 'megaCorp_combo',
+    name: '💎 Synergie Mega-Corporations',
+    description: 'Alliances stratégiques entre géants pharmaceutiques, pétroliers, médias et tech. Lobbying coordonné, monopoles légaux, influence politique maximale.',
+    reputationCost: 5000,
+    multiplier: 1.4,
+    tier: 'diamond',
+    affectedBusinesses: [
+      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
+      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
+      'nuclearPlant', 'underwaterCity'
+    ], // 10 businesses tier 3
+  },
+
+  // 🌌 COMBO TIER 4 : CIVILIZATION SCALE
+  civilization_combo: {
+    id: 'civilization_combo',
+    name: '🌌 Civilisation Interplanétaire',
+    description: 'Infrastructure unifiée Terre/Lune/Mars/astéroïdes. Économie spatiale intégrée, portails inter-systèmes, manipulation réalité. Tu transcendes l\'humanité.',
+    reputationCost: 8000,
+    multiplier: 1.6,
+    tier: 'master',
+    affectedBusinesses: [
+      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
+      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
+      'multiverseHub', 'realityEngine'
+    ], // 10 businesses tier 4
+  },
+
+  // 🌟 COMBO INTERMÉDIAIRE : INNOVATION LEADERS
+  innovation_combo: {
+    id: 'innovation_combo',
+    name: '🚀 Leaders Innovation Mondiale',
+    description: 'Écosystème R&D intégré entre startup tech, IA, quantum, crypto et spatial. Brevets croisés, talents partagés, time-to-market divisé par 10.',
+    reputationCost: 3500,
+    multiplier: 1.35,
+    tier: 'diamond',
+    affectedBusinesses: [
+      'techStartup', 'aiResearch', 'quantumComputing', 
+      'cryptoFarm', 'spaceX', 'satelliteNetwork'
+    ], // 6 businesses tech-focused
+  },
+
+    // ========================================
+  // 💎 TIER 3 : MEGA CORPORATIONS (21-30)
+  // ========================================
+
+  // 💊 PHARMA GIANT
+  pharmaGiant_gain1: {
+    id: 'pharmaGiant_gain1',
+    name: '💊 Brevets Blockbusters',
+    description: 'Portfolio de 50 médicaments brevetés générant royalties mondiales. Monopole pharmaceutique légal avec exclusivité 20 ans.',
+    reputationCost: 1000,
+    multiplier: 1.5,
+    tier: 'diamond',
+    affectedBusinesses: ['pharmaGiant'],
+  },
+  pharmaGiant_gain2: {
+    id: 'pharmaGiant_gain2',
+    name: '🧬 Thérapie Génique CRISPR',
+    description: 'Révolution médicale : traiter le cancer à la source génétique. Prix Nobel assuré + contrats gouvernementaux illimités.',
+    reputationCost: 2200,
+    multiplier: 2.0,
+    tier: 'master',
+    affectedBusinesses: ['pharmaGiant'],
+  },
+
+  // 🛢️ OIL EMPIRE
+  oilEmpire_gain1: {
+    id: 'oilEmpire_gain1',
+    name: '🛢️ Méga-Gisements Offshore',
+    description: 'Extraction deepwater à 3000m de profondeur. Réserves prouvées 50 ans, production 10M barils/jour.',
+    reputationCost: 1100,
+    multiplier: 1.55,
+    tier: 'diamond',
+    affectedBusinesses: ['oilEmpire'],
+  },
+  oilEmpire_gain2: {
+    id: 'oilEmpire_gain2',
+    name: '⚡ Transition Hydrogène Vert',
+    description: 'Pivot stratégique vers H2 tout en maintenant infrastructure fossile. Double flux de revenus : pétrole + renouvelable.',
+    reputationCost: 2400,
+    multiplier: 2.1,
+    tier: 'master',
+    affectedBusinesses: ['oilEmpire'],
+  },
+
+  // 📡 MEDIA CONGLOMERATE
+  mediaConglomerate_gain1: {
+    id: 'mediaConglomerate_gain1',
+    name: '📡 Réseau Satellitaire Mondial',
+    description: 'Satellites broadcasting couvrant 98% de la planète. TV, radio, internet via constellation géostationnaire.',
+    reputationCost: 1200,
+    multiplier: 1.5,
+    tier: 'diamond',
+    affectedBusinesses: ['mediaConglomerate'],
+  },
+  mediaConglomerate_gain2: {
+    id: 'mediaConglomerate_gain2',
+    name: '🎬 Méga-Studios + Streaming',
+    description: 'Fusion Netflix + Disney + Warner. Catalogue 100K heures, 200 films/an, 500M abonnés mondiaux.',
+    reputationCost: 2600,
+    multiplier: 2.2,
+    tier: 'master',
+    affectedBusinesses: ['mediaConglomerate'],
+  },
+
+  // 💎 LUXURY BRAND
+  luxuryBrand_gain1: {
+    id: 'luxuryBrand_gain1',
+    name: '💎 Maisons de Haute Couture',
+    description: 'Acquisition niveau Hermès, Chanel, Louis Vuitton. Collections exclusives, défilés Paris/Milan, marges +400%.',
+    reputationCost: 1300,
+    multiplier: 1.6,
+    tier: 'diamond',
+    affectedBusinesses: ['luxuryBrand'],
+  },
+  luxuryBrand_gain2: {
+    id: 'luxuryBrand_gain2',
+    name: '👑 Empire Luxe Multi-Segments',
+    description: 'Joaillerie, parfumerie, maroquinerie, horlogerie. LVMH-killer absolu. Clientèle ultra-fortunée captive.',
+    reputationCost: 2800,
+    multiplier: 2.3,
+    tier: 'master',
+    affectedBusinesses: ['luxuryBrand'],
+  },
+
+  // 📱 SOCIAL NETWORK
+  socialNetwork_gain1: {
+    id: 'socialNetwork_gain1',
+    name: '📱 Algorithme Addictif IA',
+    description: 'Machine learning maximisant le temps d\'écran. 5 milliards d\'utilisateurs actifs/jour, publicité ciblée parfaite.',
+    reputationCost: 1400,
+    multiplier: 1.65,
+    tier: 'diamond',
+    affectedBusinesses: ['socialNetwork'],
+  },
+  socialNetwork_gain2: {
+    id: 'socialNetwork_gain2',
+    name: '🌐 Métaverse Social Immersif',
+    description: 'Plateforme VR/AR révolutionnaire. Travail, loisirs, commerce en réalité virtuelle. Meta-concurrent ultra-sérieux.',
+    reputationCost: 3000,
+    multiplier: 2.4,
+    tier: 'master',
+    affectedBusinesses: ['socialNetwork'],
+  },
+
+  // 🤖 AI RESEARCH
+  aiResearch_gain1: {
+    id: 'aiResearch_gain1',
+    name: '🤖 Modèles LLM Propriétaires',
+    description: 'IA générative surpassant GPT-6. Licences vendues aux GAFAM, contrats militaires et gouvernementaux confidentiels.',
+    reputationCost: 1500,
+    multiplier: 1.7,
+    tier: 'diamond',
+    affectedBusinesses: ['aiResearch'],
+  },
+  aiResearch_gain2: {
+    id: 'aiResearch_gain2',
+    name: '🧠 Conscience Artificielle',
+    description: 'Première IA véritablement consciente. Révolution civilisationnelle, débats éthiques mondiaux, valorisation inestimable.',
+    reputationCost: 3200,
+    multiplier: 2.5,
+    tier: 'master',
+    affectedBusinesses: ['aiResearch'],
+  },
+
+  // ⚛️ QUANTUM COMPUTING
+  quantumComputing_gain1: {
+    id: 'quantumComputing_gain1',
+    name: '⚛️ Processeur 10,000 Qubits',
+    description: 'Calculs impossibles résolus en secondes. Cassage cryptographique RSA, simulations moléculaires parfaites.',
+    reputationCost: 1600,
+    multiplier: 1.75,
+    tier: 'diamond',
+    affectedBusinesses: ['quantumComputing'],
+  },
+  quantumComputing_gain2: {
+    id: 'quantumComputing_gain2',
+    name: '🔮 Suprématie Quantique Absolue',
+    description: 'Monopole calcul quantique mondial. Contrats défense, finance, pharma. Technologie 20 ans d\'avance.',
+    reputationCost: 3400,
+    multiplier: 2.6,
+    tier: 'master',
+    affectedBusinesses: ['quantumComputing'],
+  },
+
+  // 🛰️ SATELLITE NETWORK
+  satelliteNetwork_gain1: {
+    id: 'satelliteNetwork_gain1',
+    name: '🛰️ Constellation 50,000 Satellites',
+    description: 'Internet planétaire débit gigabit. Couverture 100% Terre, océans, pôles. Starlink-killer absolu.',
+    reputationCost: 1700,
+    multiplier: 1.8,
+    tier: 'diamond',
+    affectedBusinesses: ['satelliteNetwork'],
+  },
+  satelliteNetwork_gain2: {
+    id: 'satelliteNetwork_gain2',
+    name: '🌍 Surveillance Temps Réel',
+    description: 'Imagerie satellite résolution centimétrique. Contrats renseignement, cartographie, surveillance stratégique mondiale.',
+    reputationCost: 3600,
+    multiplier: 2.7,
+    tier: 'master',
+    affectedBusinesses: ['satelliteNetwork'],
+  },
+
+  // ☢️ NUCLEAR PLANT
+  nuclearPlant_gain1: {
+    id: 'nuclearPlant_gain1',
+    name: '☢️ Réacteurs Génération IV',
+    description: 'Technologie SMR (Small Modular Reactors). Sécurité maximale, déchets réduits 90%, efficacité énergétique record.',
+    reputationCost: 1800,
+    multiplier: 1.85,
+    tier: 'diamond',
+    affectedBusinesses: ['nuclearPlant'],
+  },
+  nuclearPlant_gain2: {
+    id: 'nuclearPlant_gain2',
+    name: '⚡ Réseau Nucléaire Continental',
+    description: '200 centrales interconnectées alimentant 3 continents. Stabilité réseau parfaite, revenus récurrents garantis.',
+    reputationCost: 3800,
+    multiplier: 2.8,
+    tier: 'master',
+    affectedBusinesses: ['nuclearPlant'],
+  },
+
+  // 🌊 UNDERWATER CITY
+  underwaterCity_gain1: {
+    id: 'underwaterCity_gain1',
+    name: '🌊 Biodômes Habitables',
+    description: 'Cités sous-marines 50,000 habitants. Tourisme extrême, recherche océanographique, exploitation ressources abyssales.',
+    reputationCost: 1900,
+    multiplier: 1.9,
+    tier: 'diamond',
+    affectedBusinesses: ['underwaterCity'],
+  },
+  underwaterCity_gain2: {
+    id: 'underwaterCity_gain2',
+    name: '🐠 Fermes Aquacoles Géantes',
+    description: 'Production alimentaire sous-marine massive. Aquaculture high-tech, protéines marines infinies, exportation mondiale.',
+    reputationCost: 4000,
+    multiplier: 2.9,
+    tier: 'master',
+    affectedBusinesses: ['underwaterCity'],
+  },
+
+  // ========================================
+  // 👑 TIER 4 : CIVILIZATION SCALE (31-40)
+  // ========================================
+
+  // 🌙 MOON BASE
+  moonBase_gain1: {
+    id: 'moonBase_gain1',
+    name: '🌙 Mines Hélium-3',
+    description: 'Extraction Hélium-3 lunaire pour fusion nucléaire terrestre. Ressource stratégique valant des trillions.',
+    reputationCost: 2000,
+    multiplier: 1.8,
+    tier: 'diamond',
+    affectedBusinesses: ['moonBase'],
+  },
+  moonBase_gain2: {
+    id: 'moonBase_gain2',
+    name: '🏨 Tourisme Spatial Premium',
+    description: 'Hôtels lunaires 5 étoiles vue Terre. 1M$/nuit, waitlist 10 ans. Billionnaires et célébrités font la queue.',
+    reputationCost: 4200,
+    multiplier: 2.8,
+    tier: 'master',
+    affectedBusinesses: ['moonBase'],
+  },
+
+  // 🔴 MARS COLONY
+  marsColony_gain1: {
+    id: 'marsColony_gain1',
+    name: '🔴 Terraformation Phase 1',
+    description: 'Réchauffement atmosphère martienne. Dômes habitables, serres hydroponiques, eau liquide extraite du sol.',
+    reputationCost: 2200,
+    multiplier: 1.85,
+    tier: 'diamond',
+    affectedBusinesses: ['marsColony'],
+  },
+  marsColony_gain2: {
+    id: 'marsColony_gain2',
+    name: '🚀 Ville Autonome 100k Habitants',
+    description: 'Première cité martienne indépendante. Gouvernance propre, économie locale, début civilisation interplanétaire.',
+    reputationCost: 4500,
+    multiplier: 3.0,
+    tier: 'master',
+    affectedBusinesses: ['marsColony'],
+  },
+
+  // ☄️ ASTEROID MINING
+  asteroidMining_gain1: {
+    id: 'asteroidMining_gain1',
+    name: '☄️ Flotte Robotique Autonome',
+    description: '500 vaisseaux exploitant astéroïdes. Métaux rares (platine, or) valeur planétaire, crash marché terrestre.',
+    reputationCost: 2400,
+    multiplier: 1.9,
+    tier: 'diamond',
+    affectedBusinesses: ['asteroidMining'],
+  },
+  asteroidMining_gain2: {
+    id: 'asteroidMining_gain2',
+    name: '💎 Raffinerie Orbitale Géante',
+    description: 'Station spatiale transformant minerais en lingots purifiés. Export Terre/Mars/Lune, monopole ressources spatiales.',
+    reputationCost: 4800,
+    multiplier: 3.2,
+    tier: 'master',
+    affectedBusinesses: ['asteroidMining'],
+  },
+
+  // ⚡ FUSION REACTOR
+  fusionReactor_gain1: {
+    id: 'fusionReactor_gain1',
+    name: '⚡ Tokamak Confinement Parfait',
+    description: 'Réacteur fusion stable 10GW continu. Énergie illimitée propre, fin dépendance fossile.',
+    reputationCost: 2600,
+    multiplier: 2.0,
+    tier: 'diamond',
+    affectedBusinesses: ['fusionReactor'],
+  },
+  fusionReactor_gain2: {
+    id: 'fusionReactor_gain2',
+    name: '🌟 Réseau Fusion Mondiale',
+    description: '1000 réacteurs alimentant la planète. Électricité quasi-gratuite, révolution énergétique civilisationnelle.',
+    reputationCost: 5000,
+    multiplier: 3.5,
+    tier: 'master',
+    affectedBusinesses: ['fusionReactor'],
+  },
+
+  // 🏗️ SPACE ELEVATOR
+  spaceElevator_gain1: {
+    id: 'spaceElevator_gain1',
+    name: '🏗️ Câble Nanotube Carbone',
+    description: 'Ascenseur spatial 100,000 km ultra-résistant. Transport orbital 100× moins cher que fusées.',
+    reputationCost: 2800,
+    multiplier: 2.1,
+    tier: 'diamond',
+    affectedBusinesses: ['spaceElevator'],
+  },
+  spaceElevator_gain2: {
+    id: 'spaceElevator_gain2',
+    name: '🌌 Hub Orbital Multi-Destinations',
+    description: 'Station terminale Lune/Mars/stations orbitales. Aéroport spatial, flux 10,000 passagers/jour.',
+    reputationCost: 5500,
+    multiplier: 3.8,
+    tier: 'master',
+    affectedBusinesses: ['spaceElevator'],
+  },
+
+  // ☀️ DYSON SPHERE
+  dysonSphere_gain1: {
+    id: 'dysonSphere_gain1',
+    name: '☀️ Essaim Dyson Prototype',
+    description: 'Millions de panneaux orbitaux autour du Soleil. Capture 1% énergie stellaire = civilisation Type II.',
+    reputationCost: 3000,
+    multiplier: 2.2,
+    tier: 'diamond',
+    affectedBusinesses: ['dysonSphere'],
+  },
+  dysonSphere_gain2: {
+    id: 'dysonSphere_gain2',
+    name: '🌟 Sphère Complète 100%',
+    description: 'Envelopper intégralement le Soleil. Énergie illimitée 1 million d\'années. Civilisation Kardashev Type II.',
+    reputationCost: 6000,
+    multiplier: 4.0,
+    tier: 'master',
+    affectedBusinesses: ['dysonSphere'],
+  },
+
+  // 🌀 WORMHOLE GATE
+  wormholeGate_gain1: {
+    id: 'wormholeGate_gain1',
+    name: '🌀 Portail Quantique Stabilisé',
+    description: 'Trou de ver artificiel permettant voyages instantanés. Système solaire traversé en secondes.',
+    reputationCost: 3500,
+    multiplier: 2.4,
+    tier: 'diamond',
+    affectedBusinesses: ['wormholeGate'],
+  },
+  wormholeGate_gain2: {
+    id: 'wormholeGate_gain2',
+    name: '🚪 Réseau Interstellaire',
+    description: 'Portails connectés à 100 systèmes stellaires. Commerce galactique, expansion civilisation humaine.',
+    reputationCost: 7000,
+    multiplier: 4.5,
+    tier: 'master',
+    affectedBusinesses: ['wormholeGate'],
+  },
+
+  // ⏳ TIME LABYRINTH
+  timeLabyrinth_gain1: {
+    id: 'timeLabyrinth_gain1',
+    name: '⏳ Manipulation Temporelle',
+    description: 'Technologie ralentissant/accélérant le temps localement. Recherche 100× plus rapide, vieillissement contrôlé.',
+    reputationCost: 4000,
+    multiplier: 2.6,
+    tier: 'diamond',
+    affectedBusinesses: ['timeLabyrinth'],
+  },
+  timeLabyrinth_gain2: {
+    id: 'timeLabyrinth_gain2',
+    name: '🔮 Voyages Temporels Limités',
+    description: 'Déplacements temporels ±100 ans. Correction paradoxes, informations du futur, avantage stratégique absolu.',
+    reputationCost: 8000,
+    multiplier: 5.0,
+    tier: 'master',
+    affectedBusinesses: ['timeLabyrinth'],
+  },
+
+  // 🌌 MULTIVERSE HUB
+  multiverseHub_gain1: {
+    id: 'multiverseHub_gain1',
+    name: '🌌 Portails Inter-Dimensionnels',
+    description: 'Accès à univers parallèles. Exploitation ressources infinies, technologies alternatives, commerce multiversel.',
+    reputationCost: 4500,
+    multiplier: 2.8,
+    tier: 'diamond',
+    affectedBusinesses: ['multiverseHub'],
+  },
+  multiverseHub_gain2: {
+    id: 'multiverseHub_gain2',
+    name: '♾️ Fédération Multiverselle',
+    description: 'Alliance avec 1000 univers parallèles. Économie trans-dimensionnelle, puissance illimitée.',
+    reputationCost: 9000,
+    multiplier: 5.5,
+    tier: 'master',
+    affectedBusinesses: ['multiverseHub'],
+  },
+
+  // ♾️ REALITY ENGINE
+  realityEngine_gain1: {
+    id: 'realityEngine_gain1',
+    name: '♾️ Contrôle Lois Physiques',
+    description: 'Modification locale constantes universelles. Gravité, vitesse lumière, entropie ajustables à volonté.',
+    reputationCost: 5000,
+    multiplier: 3.0,
+    tier: 'diamond',
+    affectedBusinesses: ['realityEngine'],
+  },
+  realityEngine_gain2: {
+    id: 'realityEngine_gain2',
+    name: '🎛️ Simulation Réalité Parfaite',
+    description: 'Créer univers simulés indiscernables du réel. Tu es devenu Dieu. GG.',
+    reputationCost: 10000,
+    multiplier: 6.0,
+    tier: 'master',
+    affectedBusinesses: ['realityEngine'],
+  },
+
 
 } as const;
 
