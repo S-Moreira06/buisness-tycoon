@@ -110,7 +110,22 @@ export const GameHeader = () => {
               <Text style={styles.statValue}>{money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
             </View>
           </Pressable>
-
+           <Pressable
+            style={styles.statCard}
+            onPress={() =>
+              showTooltip({
+                title: '⭐ Réputation',
+                description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
+                value: `${reputation}`,
+              })
+            }
+          >
+            <Text style={styles.statEmoji}>⭐</Text>
+            <View style={styles.statContent}>
+              <Text style={styles.statLabel}>Rép.</Text>
+              <Text style={styles.statValue}>{reputation.toFixed()}</Text>
+            </View>
+          </Pressable>
           {/* Revenu Passif */}
           <Pressable
             style={styles.statCard}
@@ -271,7 +286,7 @@ const styles = StyleSheet.create({
     borderColor: '#374151',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-     shadowOpacity: 0.3,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   statEmoji: {

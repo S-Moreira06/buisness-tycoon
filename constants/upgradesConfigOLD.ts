@@ -2,9 +2,7 @@
  * Configuration de tous les upgrades du jeu
  * Système de progression par tiers avec coûts exponentiels
  * Multiplicateurs variés pour plus de stratégie
- * ORGANISÉ PAR BUSINESS
  */
-
 import type { TierType } from './tierConfig';
 
 export interface UpgradeConfig {
@@ -18,9 +16,9 @@ export interface UpgradeConfig {
 }
 
 export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
-  // ==========================================
+  // ========== TIER BRONZE (Débuts) ==========
+  
   // ☕ MACHINE À CAFÉ
-  // ==========================================
   coffeeMachine_gain1: {
     id: 'coffeeMachine_gain1',
     name: '☕ Grains Arabica Premium',
@@ -30,6 +28,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'bronze',
     affectedBusinesses: ['coffeeMachine'],
   },
+
   coffeeMachine_gain2: {
     id: 'coffeeMachine_gain2',
     name: '🌟 Formation Barista Pro',
@@ -40,40 +39,38 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['coffeeMachine'],
   },
 
-  // ==========================================
   // 🍕 FOOD TRUCK
-  // ==========================================
   foodTruck_gain1: {
     id: 'foodTruck_gain1',
     name: '🍕 Recettes Artisanales',
     description: 'Pâtes fraîches maison et ingrédients bio locaux. Votre food truck devient une référence gastronomique sur roues.',
-    reputationCost: 40,
+    reputationCost: 50,
     multiplier: 1.2,
     tier: 'bronze',
     affectedBusinesses: ['foodTruck'],
   },
+
   foodTruck_gain2: {
     id: 'foodTruck_gain2',
     name: '⭐ Four à Pierre Mobile',
     description: 'Installation d\'un four traditionnel à 450°C. Cuisson parfaite en 90 secondes, files d\'attente multipliées par 3.',
-    reputationCost: 100,
+    reputationCost: 150,
     multiplier: 1.35,
     tier: 'silver',
     affectedBusinesses: ['foodTruck'],
   },
 
-  // ==========================================
   // 🏪 PETIT MAGASIN
-  // ==========================================
   smallShop_gain1: {
     id: 'smallShop_gain1',
     name: '🏪 Gamme Bio Exclusive',
     description: 'Partenariat avec producteurs locaux. 80% de produits bio certifiés qui attirent une clientèle premium soucieuse de qualité.',
-    reputationCost: 50,
+    reputationCost: 40,
     multiplier: 1.15,
     tier: 'bronze',
     affectedBusinesses: ['smallShop'],
   },
+
   smallShop_gain2: {
     id: 'smallShop_gain2',
     name: '🌐 E-commerce + Click & Collect',
@@ -84,119 +81,116 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['smallShop'],
   },
 
-  // ==========================================
+  // ========== TIER SILVER (Développement) ==========
+
   // 🏠 AIRBNB
-  // ==========================================
   airbnb_gain1: {
     id: 'airbnb_gain1',
     name: '🏠 Design d\'Intérieur Luxe',
     description: 'Collaboration avec architectes d\'intérieur renommés. Mobilier designer et décoration Instagram-worthy qui font grimper les avis 5 étoiles.',
-    reputationCost: 80,
+    reputationCost: 100,
     multiplier: 1.25,
     tier: 'silver',
     affectedBusinesses: ['airbnb'],
   },
+
   airbnb_gain2: {
     id: 'airbnb_gain2',
     name: '🌍 Conciergerie Premium 24/7',
     description: 'Service concierge multilingue, check-in automatique et expériences VIP personnalisées. Taux d\'occupation à 95%.',
-    reputationCost: 140,
+    reputationCost: 250,
     multiplier: 1.4,
     tier: 'gold',
     affectedBusinesses: ['airbnb'],
   },
 
-  // ==========================================
   // 📚 LIBRAIRIE
-  // ==========================================
   library_gain1: {
     id: 'library_gain1',
     name: '📚 Section Premières Éditions',
     description: 'Collection de livres rares et dédicacés. Attire collectionneurs et bibliophiles prêts à payer le prix fort.',
-    reputationCost: 110,
+    reputationCost: 60,
     multiplier: 1.2,
     tier: 'bronze',
     affectedBusinesses: ['library'],
   },
+
   library_gain2: {
     id: 'library_gain2',
     name: '🎭 Club de Lecture Exclusif',
     description: 'Rencontres mensuelles avec auteurs bestsellers et espaces coworking premium. Abonnements récurrents garantis.',
-    reputationCost: 235,
+    reputationCost: 180,
     multiplier: 1.35,
     tier: 'silver',
     affectedBusinesses: ['library'],
   },
 
-  // ==========================================
   // 🏋️ SALLE DE GYM
-  // ==========================================
   gym_gain1: {
     id: 'gym_gain1',
     name: '🏋️ Équipement Technogym',
     description: 'Machines connectées avec programmes personnalisés par IA. Chaque membre a son app dédiée avec suivi en temps réel.',
-    reputationCost: 145,
+    reputationCost: 120,
     multiplier: 1.25,
     tier: 'silver',
     affectedBusinesses: ['gym'],
   },
+
   gym_gain2: {
     id: 'gym_gain2',
     name: '💪 Coaches Olympiques',
     description: 'Recrutement d\'anciens athlètes olympiques comme coachs premium. Files d\'attente pour les sessions privées.',
-    reputationCost: 295,
+    reputationCost: 280,
     multiplier: 1.45,
     tier: 'gold',
     affectedBusinesses: ['gym'],
   },
 
-  // ==========================================
+  // ========== TIER GOLD (Expansion) ==========
+
   // 🎬 CINÉMA
-  // ==========================================
   cinema_gain1: {
     id: 'cinema_gain1',
     name: '🎬 Salles IMAX & 4DX',
     description: 'Écrans géants 21m et sièges dynamiques avec effets eau, vent et odeurs. L\'expérience ultime qui justifie des tarifs premium +50%.',
-    reputationCost: 190,
+    reputationCost: 200,
     multiplier: 1.3,
     tier: 'gold',
     affectedBusinesses: ['cinema'],
   },
+
   cinema_gain2: {
     id: 'cinema_gain2',
     name: '🍿 Loges VIP & Gastronomie',
     description: 'Salles privées 20 places avec canapés cuir, service champagne et menu gastronomique. Tarif 100€/place avec réservations 3 mois à l\'avance.',
-    reputationCost: 420,
+    reputationCost: 450,
     multiplier: 1.5,
     tier: 'platinum',
     affectedBusinesses: ['cinema'],
   },
 
-  // ==========================================
   // 🍽️ RESTAURANT
-  // ==========================================
   restaurant_gain1: {
     id: 'restaurant_gain1',
     name: '🍽️ Chef Étoilé Michelin',
     description: 'Recrutement d\'un chef 2 étoiles Michelin. Menu gastronomique qui attire les critiques culinaires et influence les réservations pendant 6 mois.',
-    reputationCost: 250,
+    reputationCost: 300,
     multiplier: 1.4,
     tier: 'gold',
     affectedBusinesses: ['restaurant'],
   },
+
   restaurant_gain2: {
     id: 'restaurant_gain2',
     name: '⭐ Table du Chef & Menu Dégustation',
     description: '12 services avec accords mets-vins sélectionnés. Expérience immersive 4h qui se réserve 8 mois à l\'avance à 500€/personne.',
-    reputationCost: 600,
+    reputationCost: 700,
     multiplier: 1.6,
     tier: 'platinum',
     affectedBusinesses: ['restaurant'],
   },
 
-  // ==========================================
   // 🏨 HÔTEL
-  // ==========================================
   hotel_gain1: {
     id: 'hotel_gain1',
     name: '🏨 Suites Panoramiques',
@@ -206,6 +200,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'gold',
     affectedBusinesses: ['hotel'],
   },
+
   hotel_gain2: {
     id: 'hotel_gain2',
     name: '🌟 Spa Thermal & Wellness',
@@ -216,9 +211,9 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['hotel'],
   },
 
-  // ==========================================
+  // ========== TIER PLATINUM (Empire) ==========
+
   // 🎮 GAMING STUDIO
-  // ==========================================
   gamingStudio_gain1: {
     id: 'gamingStudio_gain1',
     name: '🎮 Moteur Propriétaire NextGen',
@@ -228,19 +223,18 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'platinum',
     affectedBusinesses: ['gamingStudio'],
   },
+
   gamingStudio_gain2: {
     id: 'gamingStudio_gain2',
     name: '🏆 Franchise AAA Mondiale',
     description: 'Lancement saga multi-plateforme avec lore expansif. 20M de copies vendues en pre-order, contrats e-sport et merchandising.',
-    reputationCost: 1100,
+    reputationCost: 1200,
     multiplier: 1.8,
     tier: 'diamond',
     affectedBusinesses: ['gamingStudio'],
   },
 
-  // ==========================================
   // 🏭 USINE
-  // ==========================================
   factory_gain1: {
     id: 'factory_gain1',
     name: '🤖 Ligne Robotisée Complète',
@@ -250,6 +244,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'platinum',
     affectedBusinesses: ['factory'],
   },
+
   factory_gain2: {
     id: 'factory_gain2',
     name: '⚙️ Intelligence Prédictive IA',
@@ -260,9 +255,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['factory'],
   },
 
-  // ==========================================
   // 🏥 HÔPITAL
-  // ==========================================
   hospital_gain1: {
     id: 'hospital_gain1',
     name: '🏥 Plateau Technique de Pointe',
@@ -272,6 +265,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'platinum',
     affectedBusinesses: ['hospital'],
   },
+
   hospital_gain2: {
     id: 'hospital_gain2',
     name: '⚕️ Pôle Excellence Mondiale',
@@ -282,31 +276,30 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['hospital'],
   },
 
-  // ==========================================
   // 💻 TECH STARTUP
-  // ==========================================
   techStartup_gain1: {
     id: 'techStartup_gain1',
     name: '💻 Dream Team Silicon Valley',
     description: 'Recrutement top 1% ingénieurs ex-GAFAM. Stack technique de pointe, culture startup d\'élite, vélocité de développement x5.',
-    reputationCost: 750,
+    reputationCost: 550,
     multiplier: 1.4,
     tier: 'platinum',
     affectedBusinesses: ['techStartup'],
   },
+
   techStartup_gain2: {
     id: 'techStartup_gain2',
     name: '🚀 Licorne Valorisation 10Mds',
     description: 'Série D à 10 milliards $, expansion 50 pays, acquisitions stratégiques et cotation en bourse. Deviens la prochaine licorne tech.',
-    reputationCost: 1800,
+    reputationCost: 1300,
     multiplier: 1.85,
     tier: 'diamond',
     affectedBusinesses: ['techStartup'],
   },
 
-  // ==========================================
+  // ========== TIER DIAMOND (Domination) ==========
+
   // 🎢 PARC À THÈME
-  // ==========================================
   themePark_gain1: {
     id: 'themePark_gain1',
     name: '🎢 Méga-Coasters Records',
@@ -316,41 +309,39 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'diamond',
     affectedBusinesses: ['themePark'],
   },
+
   themePark_gain2: {
     id: 'themePark_gain2',
     name: '🌟 Franchise Internationale',
     description: 'Ouverture simultanée dans 12 pays avec thématiques adaptées. 50M de visiteurs/an, merchandising et licences générant revenus massifs.',
-    reputationCost: 1990,
+    reputationCost: 1800,
     multiplier: 2.0,
     tier: 'diamond',
     affectedBusinesses: ['themePark'],
   },
 
-  // ==========================================
   // 🏎️ CONCESSIONNAIRE AUTO
-  // ==========================================
   autoDealer_gain1: {
     id: 'autoDealer_gain1',
     name: '🏎️ Showroom Hypercars',
     description: 'Exclusivité Bugatti, Koenigsegg, Pagani. Clientèle ultra-fortunée, ventes moyennes 2M€/unité, marge 30%.',
-    reputationCost: 850,
+    reputationCost: 650,
     multiplier: 1.45,
     tier: 'platinum',
     affectedBusinesses: ['autoDealer'],
   },
+
   autoDealer_gain2: {
     id: 'autoDealer_gain2',
     name: '⚡ Réseau Électrique Premium',
     description: 'Concessions officielles Tesla, Porsche Taycan, Lucid. Superchargeurs gratuits, expérience digitale révolutionnaire.',
-    reputationCost: 2000,
+    reputationCost: 1400,
     multiplier: 1.8,
     tier: 'diamond',
     affectedBusinesses: ['autoDealer'],
   },
 
-  // ==========================================
   // 🪙 CRYPTO FARM
-  // ==========================================
   cryptoFarm_gain1: {
     id: 'cryptoFarm_gain1',
     name: '🪙 Datacenter 50 MW',
@@ -360,19 +351,20 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'diamond',
     affectedBusinesses: ['cryptoFarm'],
   },
+
   cryptoFarm_gain2: {
     id: 'cryptoFarm_gain2',
     name: '⚡ Centrale Solaire Dédiée',
     description: 'Ferme solaire 100 hectares alimentant le mining 24/7. Coûts électricité -80%, minage écologique certifié, profits explosifs.',
-    reputationCost: 2200,
+    reputationCost: 2000,
     multiplier: 2.2,
     tier: 'diamond',
     affectedBusinesses: ['cryptoFarm'],
   },
 
-  // ==========================================
+  // ========== TIER MASTER (Conquête Mondiale) ==========
+
   // 🏢 TECH CORP
-  // ==========================================
   techCorp_gain1: {
     id: 'techCorp_gain1',
     name: '🤖 IA Générale AGI',
@@ -382,6 +374,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     tier: 'diamond',
     affectedBusinesses: ['techCorp'],
   },
+
   techCorp_gain2: {
     id: 'techCorp_gain2',
     name: '🌐 Monopole Cloud Mondial',
@@ -392,80 +385,197 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['techCorp'],
   },
 
-  // ==========================================
   // 🚀 SPACEX
-  // ==========================================
   spaceX_gain1: {
     id: 'spaceX_gain1',
     name: '🚀 Starship Full Reusable',
     description: 'Fusée 100% réutilisable avec 150 tonnes en orbite. Révolution spatiale, coût lancement divisé par 100, NASA et militaire sous contrat.',
-    reputationCost: 1900,
+    reputationCost: 1200,
     multiplier: 1.6,
     tier: 'diamond',
     affectedBusinesses: ['spaceX'],
   },
+
   spaceX_gain2: {
     id: 'spaceX_gain2',
     name: '🌌 Cité Martienne Autonome',
     description: 'Colonie 10,000 habitants sur Mars avec infrastructure complète. Tourisme spatial, minage astéroïdes, nouvelle économie interplanétaire.',
-    reputationCost: 4999,
+    reputationCost: 4000,
     multiplier: 3.0,
     tier: 'master',
     affectedBusinesses: ['spaceX'],
   },
 
-  // ==========================================
   // 🏦 BANQUE
-  // ==========================================
   bank_gain1: {
     id: 'bank_gain1',
     name: '🏦 Trading IA Quantum',
     description: 'Algorithmes quantiques prédisant les marchés avec 95% précision. Hedge fund propriétaire générant milliards en arbitrage.',
-    reputationCost: 2500,
+    reputationCost: 1000,
     multiplier: 1.6,
     tier: 'diamond',
     affectedBusinesses: ['bank'],
   },
+
   bank_gain2: {
     id: 'bank_gain2',
     name: '💰 Banque Centrale Privée',
     description: 'Licence bancaire mondiale, émission de stablecoin globale, services financiers dans 180 pays. Trop systémique pour réguler.',
-    reputationCost: 6999,
+    reputationCost: 2500,
     multiplier: 2.3,
     tier: 'master',
     affectedBusinesses: ['bank'],
   },
 
-  // ==========================================
   // 🌍 GLOBAL CORP
-  // ==========================================
   globalCorp_gain1: {
     id: 'globalCorp_gain1',
     name: '🌍 Conglomérat Multi-Secteurs',
     description: 'Holdings dans 500+ entreprises : tech, énergie, santé, retail. Portefeuille diversifié ultra-résilient, cash-flow garanti.',
-    reputationCost: 3500,
+    reputationCost: 1500,
     multiplier: 1.65,
     tier: 'diamond',
     affectedBusinesses: ['globalCorp'],
   },
+
   globalCorp_gain2: {
     id: 'globalCorp_gain2',
     name: '👑 Empire Économique Planétaire',
     description: 'Contrôle 40% PIB mondial. Influence gouvernements, dicte régulations, monopole de fait. Tu es devenu trop puissant pour être stoppé.',
-    reputationCost: 8000,
+    reputationCost: 5000,
     multiplier: 4.0,
     tier: 'master',
     affectedBusinesses: ['globalCorp'],
   },
 
-  // ==========================================
+  // ========== UPGRADES COMBO (Plusieurs businesses) ==========
+
+  // 🆕 COMBO FOOD & BEVERAGE
+  foodBeverage_combo: {
+    id: 'foodBeverage_combo',
+    name: '🍽️ Synergie Gastronomique',
+    description: 'Partenariats croisés entre tes établissements food & beverage. Menu café dans le restaurant, plats restaurant dans le food truck.',
+    reputationCost: 200,
+    multiplier: 1.2,
+    tier: 'gold',
+    affectedBusinesses: ['coffeeMachine', 'foodTruck', 'restaurant'],
+  },
+
+  // 🆕 COMBO HOSPITALITY
+  hospitality_combo: {
+    id: 'hospitality_combo',
+    name: '🏨 Réseau Hôtellerie Luxe',
+    description: 'Programme fidélité unifié entre hôtel et Airbnb. Guests bénéficient d\'upgrades, expériences VIP croisées, occupation maximale.',
+    reputationCost: 400,
+    multiplier: 1.25,
+    tier: 'platinum',
+    affectedBusinesses: ['hotel', 'airbnb'],
+  },
+
+  // 🆕 COMBO ENTERTAINMENT
+  entertainment_combo: {
+    id: 'entertainment_combo',
+    name: '🎬 Empire Divertissement',
+    description: 'Packages combinés ciné + parc à thème, gaming studio développe jeux vidéo des franchises de tes parcs. Cross-marketing viral.',
+    reputationCost: 800,
+    multiplier: 1.3,
+    tier: 'diamond',
+    affectedBusinesses: ['cinema', 'themePark', 'gamingStudio'],
+  },
+
+  // 🆕 COMBO TECH DOMINANCE
+  tech_combo: {
+    id: 'tech_combo',
+    name: '💻 Écosystème Tech Intégré',
+    description: 'Startup licencie tech à la TechCorp, crypto farm mine pour ton stablecoin bancaire, IA unifiée. Monopole technologique absolu.',
+    reputationCost: 2000,
+    multiplier: 1.5,
+    tier: 'master',
+    affectedBusinesses: ['techStartup', 'techCorp', 'cryptoFarm', 'bank'],
+  },
+
+  // 🆕 COMBO GLOBAL DOMINATION
+ ultimate_combo: {
+    id: 'ultimate_combo',
+    name: '👑 Domination Totale',
+    description: 'Synergies ultimes entre TOUS tes empires. Chaque business booste les autres exponentiellement. Tu contrôles l\'économie multiverselle. GG WP.',
+    reputationCost: 15000, // ⬆️ Augmenté de 10k → 15k (cohérent avec difficulté)
+    multiplier: 2.5,       // ⬆️ Augmenté de 2.0 → 2.5 (récompense proportionnelle)
+    tier: 'master',
+    affectedBusinesses: [
+      // ✅ TOUS LES 40 BUSINESSES (via helper dynamique)
+      'coffeeMachine', 'foodTruck', 'smallShop', 'airbnb', 'library',
+      'gym', 'cinema', 'restaurant', 'hotel', 'gamingStudio',
+      'factory', 'hospital', 'techStartup', 'themePark', 'autoDealer',
+      'cryptoFarm', 'techCorp', 'spaceX', 'bank', 'globalCorp',
+      // 🆕 TIER 3 MEGA-CORPS
+      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
+      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
+      'nuclearPlant', 'underwaterCity',
+      // 🆕 TIER 4 CIVILIZATION
+      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
+      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
+      'multiverseHub', 'realityEngine'
+    ],
+  },
+    // ========================================
+  // 🆕 NOUVEAUX COMBOS - TIER 3 & 4
+  // ========================================
+
+  // 💎 COMBO TIER 3 : MEGA-CORPORATIONS SYNERGY
+  megaCorp_combo: {
+    id: 'megaCorp_combo',
+    name: '💎 Synergie Mega-Corporations',
+    description: 'Alliances stratégiques entre géants pharmaceutiques, pétroliers, médias et tech. Lobbying coordonné, monopoles légaux, influence politique maximale.',
+    reputationCost: 5000,
+    multiplier: 1.4,
+    tier: 'diamond',
+    affectedBusinesses: [
+      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
+      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
+      'nuclearPlant', 'underwaterCity'
+    ], // 10 businesses tier 3
+  },
+
+  // 🌌 COMBO TIER 4 : CIVILIZATION SCALE
+  civilization_combo: {
+    id: 'civilization_combo',
+    name: '🌌 Civilisation Interplanétaire',
+    description: 'Infrastructure unifiée Terre/Lune/Mars/astéroïdes. Économie spatiale intégrée, portails inter-systèmes, manipulation réalité. Tu transcendes l\'humanité.',
+    reputationCost: 8000,
+    multiplier: 1.6,
+    tier: 'master',
+    affectedBusinesses: [
+      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
+      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
+      'multiverseHub', 'realityEngine'
+    ], // 10 businesses tier 4
+  },
+
+  // 🌟 COMBO INTERMÉDIAIRE : INNOVATION LEADERS
+  innovation_combo: {
+    id: 'innovation_combo',
+    name: '🚀 Leaders Innovation Mondiale',
+    description: 'Écosystème R&D intégré entre startup tech, IA, quantum, crypto et spatial. Brevets croisés, talents partagés, time-to-market divisé par 10.',
+    reputationCost: 3500,
+    multiplier: 1.35,
+    tier: 'diamond',
+    affectedBusinesses: [
+      'techStartup', 'aiResearch', 'quantumComputing', 
+      'cryptoFarm', 'spaceX', 'satelliteNetwork'
+    ], // 6 businesses tech-focused
+  },
+
+    // ========================================
+  // 💎 TIER 3 : MEGA CORPORATIONS (21-30)
+  // ========================================
+
   // 💊 PHARMA GIANT
-  // ==========================================
   pharmaGiant_gain1: {
     id: 'pharmaGiant_gain1',
     name: '💊 Brevets Blockbusters',
     description: 'Portfolio de 50 médicaments brevetés générant royalties mondiales. Monopole pharmaceutique légal avec exclusivité 20 ans.',
-    reputationCost: 3500,
+    reputationCost: 1000,
     multiplier: 1.5,
     tier: 'diamond',
     affectedBusinesses: ['pharmaGiant'],
@@ -480,14 +590,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['pharmaGiant'],
   },
 
-  // ==========================================
   // 🛢️ OIL EMPIRE
-  // ==========================================
   oilEmpire_gain1: {
     id: 'oilEmpire_gain1',
     name: '🛢️ Méga-Gisements Offshore',
     description: 'Extraction deepwater à 3000m de profondeur. Réserves prouvées 50 ans, production 10M barils/jour.',
-    reputationCost: 3500,
+    reputationCost: 1100,
     multiplier: 1.55,
     tier: 'diamond',
     affectedBusinesses: ['oilEmpire'],
@@ -502,14 +610,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['oilEmpire'],
   },
 
-  // ==========================================
   // 📡 MEDIA CONGLOMERATE
-  // ==========================================
   mediaConglomerate_gain1: {
     id: 'mediaConglomerate_gain1',
     name: '📡 Réseau Satellitaire Mondial',
     description: 'Satellites broadcasting couvrant 98% de la planète. TV, radio, internet via constellation géostationnaire.',
-    reputationCost: 3500,
+    reputationCost: 1200,
     multiplier: 1.5,
     tier: 'diamond',
     affectedBusinesses: ['mediaConglomerate'],
@@ -524,14 +630,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['mediaConglomerate'],
   },
 
-  // ==========================================
   // 💎 LUXURY BRAND
-  // ==========================================
   luxuryBrand_gain1: {
     id: 'luxuryBrand_gain1',
     name: '💎 Maisons de Haute Couture',
     description: 'Acquisition niveau Hermès, Chanel, Louis Vuitton. Collections exclusives, défilés Paris/Milan, marges +400%.',
-    reputationCost: 3500,
+    reputationCost: 1300,
     multiplier: 1.6,
     tier: 'diamond',
     affectedBusinesses: ['luxuryBrand'],
@@ -546,14 +650,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['luxuryBrand'],
   },
 
-  // ==========================================
   // 📱 SOCIAL NETWORK
-  // ==========================================
   socialNetwork_gain1: {
     id: 'socialNetwork_gain1',
     name: '📱 Algorithme Addictif IA',
     description: 'Machine learning maximisant le temps d\'écran. 5 milliards d\'utilisateurs actifs/jour, publicité ciblée parfaite.',
-    reputationCost: 3500,
+    reputationCost: 1400,
     multiplier: 1.65,
     tier: 'diamond',
     affectedBusinesses: ['socialNetwork'],
@@ -568,14 +670,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['socialNetwork'],
   },
 
-  // ==========================================
   // 🤖 AI RESEARCH
-  // ==========================================
   aiResearch_gain1: {
     id: 'aiResearch_gain1',
     name: '🤖 Modèles LLM Propriétaires',
     description: 'IA générative surpassant GPT-6. Licences vendues aux GAFAM, contrats militaires et gouvernementaux confidentiels.',
-    reputationCost: 3500,
+    reputationCost: 1500,
     multiplier: 1.7,
     tier: 'diamond',
     affectedBusinesses: ['aiResearch'],
@@ -590,14 +690,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['aiResearch'],
   },
 
-  // ==========================================
   // ⚛️ QUANTUM COMPUTING
-  // ==========================================
   quantumComputing_gain1: {
     id: 'quantumComputing_gain1',
     name: '⚛️ Processeur 10,000 Qubits',
     description: 'Calculs impossibles résolus en secondes. Cassage cryptographique RSA, simulations moléculaires parfaites.',
-    reputationCost: 3500,
+    reputationCost: 1600,
     multiplier: 1.75,
     tier: 'diamond',
     affectedBusinesses: ['quantumComputing'],
@@ -612,14 +710,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['quantumComputing'],
   },
 
-  // ==========================================
   // 🛰️ SATELLITE NETWORK
-  // ==========================================
   satelliteNetwork_gain1: {
     id: 'satelliteNetwork_gain1',
     name: '🛰️ Constellation 50,000 Satellites',
     description: 'Internet planétaire débit gigabit. Couverture 100% Terre, océans, pôles. Starlink-killer absolu.',
-    reputationCost: 3500,
+    reputationCost: 1700,
     multiplier: 1.8,
     tier: 'diamond',
     affectedBusinesses: ['satelliteNetwork'],
@@ -634,14 +730,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['satelliteNetwork'],
   },
 
-  // ==========================================
   // ☢️ NUCLEAR PLANT
-  // ==========================================
   nuclearPlant_gain1: {
     id: 'nuclearPlant_gain1',
     name: '☢️ Réacteurs Génération IV',
     description: 'Technologie SMR (Small Modular Reactors). Sécurité maximale, déchets réduits 90%, efficacité énergétique record.',
-    reputationCost: 3500,
+    reputationCost: 1800,
     multiplier: 1.85,
     tier: 'diamond',
     affectedBusinesses: ['nuclearPlant'],
@@ -656,14 +750,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['nuclearPlant'],
   },
 
-  // ==========================================
   // 🌊 UNDERWATER CITY
-  // ==========================================
   underwaterCity_gain1: {
     id: 'underwaterCity_gain1',
     name: '🌊 Biodômes Habitables',
     description: 'Cités sous-marines 50,000 habitants. Tourisme extrême, recherche océanographique, exploitation ressources abyssales.',
-    reputationCost: 3500,
+    reputationCost: 1900,
     multiplier: 1.9,
     tier: 'diamond',
     affectedBusinesses: ['underwaterCity'],
@@ -678,14 +770,16 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['underwaterCity'],
   },
 
-  // ==========================================
+  // ========================================
+  // 👑 TIER 4 : CIVILIZATION SCALE (31-40)
+  // ========================================
+
   // 🌙 MOON BASE
-  // ==========================================
   moonBase_gain1: {
     id: 'moonBase_gain1',
     name: '🌙 Mines Hélium-3',
     description: 'Extraction Hélium-3 lunaire pour fusion nucléaire terrestre. Ressource stratégique valant des trillions.',
-    reputationCost: 3500,
+    reputationCost: 2000,
     multiplier: 1.8,
     tier: 'diamond',
     affectedBusinesses: ['moonBase'],
@@ -700,14 +794,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['moonBase'],
   },
 
-  // ==========================================
   // 🔴 MARS COLONY
-  // ==========================================
   marsColony_gain1: {
     id: 'marsColony_gain1',
     name: '🔴 Terraformation Phase 1',
     description: 'Réchauffement atmosphère martienne. Dômes habitables, serres hydroponiques, eau liquide extraite du sol.',
-    reputationCost: 3500,
+    reputationCost: 2200,
     multiplier: 1.85,
     tier: 'diamond',
     affectedBusinesses: ['marsColony'],
@@ -722,14 +814,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['marsColony'],
   },
 
-  // ==========================================
   // ☄️ ASTEROID MINING
-  // ==========================================
   asteroidMining_gain1: {
     id: 'asteroidMining_gain1',
     name: '☄️ Flotte Robotique Autonome',
     description: '500 vaisseaux exploitant astéroïdes. Métaux rares (platine, or) valeur planétaire, crash marché terrestre.',
-    reputationCost: 3500,
+    reputationCost: 2400,
     multiplier: 1.9,
     tier: 'diamond',
     affectedBusinesses: ['asteroidMining'],
@@ -744,14 +834,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['asteroidMining'],
   },
 
-  // ==========================================
   // ⚡ FUSION REACTOR
-  // ==========================================
   fusionReactor_gain1: {
     id: 'fusionReactor_gain1',
     name: '⚡ Tokamak Confinement Parfait',
     description: 'Réacteur fusion stable 10GW continu. Énergie illimitée propre, fin dépendance fossile.',
-    reputationCost: 3500,
+    reputationCost: 2600,
     multiplier: 2.0,
     tier: 'diamond',
     affectedBusinesses: ['fusionReactor'],
@@ -766,14 +854,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['fusionReactor'],
   },
 
-  // ==========================================
   // 🏗️ SPACE ELEVATOR
-  // ==========================================
   spaceElevator_gain1: {
     id: 'spaceElevator_gain1',
     name: '🏗️ Câble Nanotube Carbone',
     description: 'Ascenseur spatial 100,000 km ultra-résistant. Transport orbital 100× moins cher que fusées.',
-    reputationCost: 3500,
+    reputationCost: 2800,
     multiplier: 2.1,
     tier: 'diamond',
     affectedBusinesses: ['spaceElevator'],
@@ -788,14 +874,12 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['spaceElevator'],
   },
 
-  // ==========================================
   // ☀️ DYSON SPHERE
-  // ==========================================
   dysonSphere_gain1: {
     id: 'dysonSphere_gain1',
     name: '☀️ Essaim Dyson Prototype',
     description: 'Millions de panneaux orbitaux autour du Soleil. Capture 1% énergie stellaire = civilisation Type II.',
-    reputationCost: 3500,
+    reputationCost: 3000,
     multiplier: 2.2,
     tier: 'diamond',
     affectedBusinesses: ['dysonSphere'],
@@ -810,9 +894,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['dysonSphere'],
   },
 
-  // ==========================================
   // 🌀 WORMHOLE GATE
-  // ==========================================
   wormholeGate_gain1: {
     id: 'wormholeGate_gain1',
     name: '🌀 Portail Quantique Stabilisé',
@@ -832,9 +914,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['wormholeGate'],
   },
 
-  // ==========================================
   // ⏳ TIME LABYRINTH
-  // ==========================================
   timeLabyrinth_gain1: {
     id: 'timeLabyrinth_gain1',
     name: '⏳ Manipulation Temporelle',
@@ -854,9 +934,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['timeLabyrinth'],
   },
 
-  // ==========================================
   // 🌌 MULTIVERSE HUB
-  // ==========================================
   multiverseHub_gain1: {
     id: 'multiverseHub_gain1',
     name: '🌌 Portails Inter-Dimensionnels',
@@ -876,9 +954,7 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['multiverseHub'],
   },
 
-  // ==========================================
   // ♾️ REALITY ENGINE
-  // ==========================================
   realityEngine_gain1: {
     id: 'realityEngine_gain1',
     name: '♾️ Contrôle Lois Physiques',
@@ -898,110 +974,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     affectedBusinesses: ['realityEngine'],
   },
 
-  // ==========================================
-  // 🔥 UPGRADES COMBO (Synergies Multi-Business)
-  // ==========================================
-  foodBeverage_combo: {
-    id: 'foodBeverage_combo',
-    name: '🍽️ Synergie Gastronomique',
-    description: 'Partenariats croisés entre tes établissements food & beverage. Menu café dans le restaurant, plats restaurant dans le food truck.',
-    reputationCost: 200,
-    multiplier: 1.2,
-    tier: 'gold',
-    affectedBusinesses: ['coffeeMachine', 'foodTruck', 'restaurant'],
-  },
-  hospitality_combo: {
-    id: 'hospitality_combo',
-    name: '🏨 Réseau Hôtellerie Luxe',
-    description: 'Programme fidélité unifié entre hôtel et Airbnb. Guests bénéficient d\'upgrades, expériences VIP croisées, occupation maximale.',
-    reputationCost: 400,
-    multiplier: 1.25,
-    tier: 'platinum',
-    affectedBusinesses: ['hotel', 'airbnb'],
-  },
-  entertainment_combo: {
-    id: 'entertainment_combo',
-    name: '🎬 Empire Divertissement',
-    description: 'Packages combinés ciné + parc à thème, gaming studio développe jeux vidéo des franchises de tes parcs. Cross-marketing viral.',
-    reputationCost: 800,
-    multiplier: 1.3,
-    tier: 'diamond',
-    affectedBusinesses: ['cinema', 'themePark', 'gamingStudio'],
-  },
-  tech_combo: {
-    id: 'tech_combo',
-    name: '💻 Écosystème Tech Intégré',
-    description: 'Startup licencie tech à la TechCorp, crypto farm mine pour ton stablecoin bancaire, IA unifiée. Monopole technologique absolu.',
-    reputationCost: 2000,
-    multiplier: 1.5,
-    tier: 'master',
-    affectedBusinesses: ['techStartup', 'techCorp', 'cryptoFarm', 'bank'],
-  },
-  megaCorp_combo: {
-    id: 'megaCorp_combo',
-    name: '💎 Synergie Mega-Corporations',
-    description: 'Alliances stratégiques entre géants pharmaceutiques, pétroliers, médias et tech. Lobbying coordonné, monopoles légaux, influence politique maximale.',
-    reputationCost: 5000,
-    multiplier: 1.4,
-    tier: 'diamond',
-    affectedBusinesses: [
-      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
-      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
-      'nuclearPlant', 'underwaterCity'
-    ],
-  },
-  civilization_combo: {
-    id: 'civilization_combo',
-    name: '🌌 Civilisation Interplanétaire',
-    description: 'Infrastructure unifiée Terre/Lune/Mars/astéroïdes. Économie spatiale intégrée, portails inter-systèmes, manipulation réalité. Tu transcendes l\'humanité.',
-    reputationCost: 8000,
-    multiplier: 1.6,
-    tier: 'master',
-    affectedBusinesses: [
-      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
-      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
-      'multiverseHub', 'realityEngine'
-    ],
-  },
-  innovation_combo: {
-    id: 'innovation_combo',
-    name: '🚀 Leaders Innovation Mondiale',
-    description: 'Écosystème R&D intégré entre startup tech, IA, quantum, crypto et spatial. Brevets croisés, talents partagés, time-to-market divisé par 10.',
-    reputationCost: 3500,
-    multiplier: 1.35,
-    tier: 'diamond',
-    affectedBusinesses: [
-      'techStartup', 'aiResearch', 'quantumComputing',
-      'cryptoFarm', 'spaceX', 'satelliteNetwork'
-    ],
-  },
-  ultimate_combo: {
-    id: 'ultimate_combo',
-    name: '👑 Domination Totale',
-    description: 'Synergies ultimes entre TOUS tes empires. Chaque business booste les autres exponentiellement. Tu contrôles l\'économie multiverselle. GG WP.',
-    reputationCost: 15000,
-    multiplier: 2.5,
-    tier: 'master',
-    affectedBusinesses: [
-      'coffeeMachine', 'foodTruck', 'smallShop', 'airbnb', 'library',
-      'gym', 'cinema', 'restaurant', 'hotel', 'gamingStudio',
-      'factory', 'hospital', 'techStartup', 'themePark', 'autoDealer',
-      'cryptoFarm', 'techCorp', 'spaceX', 'bank', 'globalCorp',
-      'pharmaGiant', 'oilEmpire', 'mediaConglomerate', 'luxuryBrand',
-      'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
-      'nuclearPlant', 'underwaterCity',
-      'moonBase', 'marsColony', 'asteroidMining', 'fusionReactor',
-      'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
-      'multiverseHub', 'realityEngine'
-    ],
-  },
+
 } as const;
 
 // Helper pour obtenir la liste ordonnée
 export const UPGRADES_LIST = Object.values(UPGRADES_CONFIG);
 
 // Helpers pour filtrer par tier
-export const getUpgradesByTier = (tier: UpgradeConfig['tier']) =>
+export const getUpgradesByTier = (tier: UpgradeConfig['tier']) => 
   UPGRADES_LIST.filter(u => u.tier === tier);
 
 // Type helper
