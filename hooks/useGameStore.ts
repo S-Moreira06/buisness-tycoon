@@ -77,6 +77,7 @@ const initialState: GameState = {
     notificationsEnabled: true,
   },
   unlockedAchievements: [],
+  combo: { currentStreak: 0 },
 };
 
 export const useGameStore = create<ExtendedGameState>()(

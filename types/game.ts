@@ -156,4 +156,5 @@ export interface GameState {
     soundEnabled: boolean;
     notificationsEnabled: boolean;
   };
+  combo?: { currentStreak: number };
 }

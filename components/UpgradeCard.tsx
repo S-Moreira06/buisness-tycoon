@@ -33,7 +33,8 @@ interface UpgradeCardProps {
 export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' }: UpgradeCardProps) => {
   const isClickUpgrade = type === 'click';
   const { businesses, stats, totalPassiveIncome, playerLevel, combo } = useGameStore();
-
+  
+  
   // ✅ CORRECTION : Passer un objet structuré correctement
   const { isUnlocked, progress, missingConditions } = useUpgradeUnlock(
     upgrade.unlockConditions,
@@ -42,7 +43,7 @@ export const UpgradeCard = ({ upgrade, canAfford, onPurchase, type = 'business' 
       stats,
       totalPassiveIncome,
       playerLevel,
-      combo,
+      combo: combo ? { currentStreak: combo.currentStreak } : { currentStreak: 0 },
     }
   );
 

@@ -39,7 +39,12 @@ export const useUpgradeUnlock = (
           const business = gameState.businesses[condition.businessId!];
           current = business?.quantity || 0;
           const config = BUSINESSES_CONFIG[condition.businessId!];
-          label = label || `Posséder ${required}x ${config?.name || condition.businessId}`;
+          if (!config) {
+            console.warn(`⚠️ Business config manquant pour: ${condition.businessId}`);
+            label = `Posséder ${required}x ${condition.businessId}`;
+          } else {
+            label = label || `Posséder ${required}x ${config.name}`;
+          }          
           break;
         }
 
