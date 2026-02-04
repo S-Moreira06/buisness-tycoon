@@ -11,7 +11,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'Premiers Pas',
   description: 'Effectuer 10 clics manuels',
   icon: '👆',
-  rewards: { reputation: 5, xp: 10 }, // Trivial
+  rewards: { reputation: 50, money: 100 }, // Trivial
   condition: (state: GameState) => state.stats.totalClicks >= 10,
 },
 
