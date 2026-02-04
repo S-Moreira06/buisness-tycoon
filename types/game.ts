@@ -1,4 +1,5 @@
 import { TierType } from "@/constants/tierConfig";
+import { UnlockCondition } from './unlockConditions';
 
 // ==========================================
 // 🆕 NOUVEAUX TYPES POUR UPGRADES HYBRIDES
@@ -18,7 +19,6 @@ export interface ClickUpgradeState {
   name: string;
   description: string;
   reputationCost: number;
-  
   // 🔧 MODIFIÉ : Ajout des nouveaux types d'effets
   effectType: 
     | 'base_money' 
@@ -35,6 +35,8 @@ export interface ClickUpgradeState {
   // 🆕 PROPRIÉTÉS POUR LES UPGRADES DYNAMIQUES
   scalingType?: ScalingType;     // Comment l'upgrade scale (optionnel)
   scalingFactor?: number;         // Multiplicateur du scaling (optionnel)
+  unlockConditions?: UnlockCondition[];
+  showWhenLocked?: boolean;
 }
 
 // ==========================================
@@ -70,6 +72,8 @@ export interface Upgrade {
   affectedBusinesses: string[]; // IDs des businesses concernées
   purchased: boolean; // Si déjà acheté
   tier: TierType;
+  unlockConditions?: UnlockCondition[];
+  showWhenLocked?: boolean; // true = afficher "???", false = masquer complètement
 }
 
 // ==========================================

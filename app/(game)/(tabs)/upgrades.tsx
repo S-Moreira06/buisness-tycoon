@@ -153,25 +153,24 @@ const availableClickUpgrades = useMemo(() =>
             {displayedList.map((upgrade: any) => (
               <View
                 key={upgrade.id}
-                ref={(ref) => {upgradeRefs.current[upgrade.id] = ref}}
+                ref={(ref) => { upgradeRefs.current[upgrade.id] = ref }}
                 collapsable={false}
               >
                 <UpgradeCard
                   upgrade={upgrade}
-                  // 5. PASSER LE TYPE 'CLICK' SI NECESSAIRE
-                  type={category} 
                   canAfford={reputation >= upgrade.reputationCost && !upgrade.purchased}
                   onPurchase={() => {
-                    // 6. APPELER LA BONNE FONCTION D'ACHAT
                     if (category === 'business') {
                       purchaseUpgrade(upgrade.id);
                     } else {
                       purchaseClickUpgrade(upgrade.id);
                     }
                   }}
+                  type={category}
                 />
               </View>
             ))}
+
             <View style={{ height: 100 }} />
           </ScrollView>
         )}

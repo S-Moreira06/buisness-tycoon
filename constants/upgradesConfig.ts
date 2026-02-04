@@ -15,6 +15,9 @@ export interface UpgradeConfig {
   multiplier: number;
   tier: TierType;
   affectedBusinesses: string[];
+  unlockConditions?: any;
+  showWhenLocked?: boolean;
+
 }
 
 export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
@@ -38,6 +41,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.25,
     tier: 'silver',
     affectedBusinesses: ['coffeeMachine'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'coffeeMachine',
+        value: 5,
+      },
+    ],
+    showWhenLocked: true, // Afficher "???"
   },
 
   // ==========================================

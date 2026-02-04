@@ -110,6 +110,7 @@ export const BusinessCard = ({
         totalUpgrades={businessUpgrades.length}
         onClose={() => setModalVisible(false)}
         onUpgradePress={handleUpgradePress}
+        lockedUpgrades={availableUpgrades}
       />
     </>
   );
