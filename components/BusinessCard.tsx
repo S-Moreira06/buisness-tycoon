@@ -40,6 +40,7 @@ export const BusinessCard = ({
     businessUpgrades,
     purchasedUpgrades,
     availableUpgrades,
+    lockedUpgrades,
     hasUpgrades,
   } = useBusinessData(businessId, business, upgrades);
 
@@ -110,7 +111,7 @@ export const BusinessCard = ({
         totalUpgrades={businessUpgrades.length}
         onClose={() => setModalVisible(false)}
         onUpgradePress={handleUpgradePress}
-        lockedUpgrades={availableUpgrades}
+        lockedUpgrades={lockedUpgrades}
       />
     </>
   );
