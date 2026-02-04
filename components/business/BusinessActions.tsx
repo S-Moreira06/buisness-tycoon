@@ -38,7 +38,7 @@ export const BusinessActions = ({
       ) : (
         <>
           <Button
-            mode="contained"
+            mode="elevated"
             onPress={onBuy}
             disabled={!canBuy}
             style={[styles.actionButton, styles.buyMoreButton]}
@@ -46,7 +46,7 @@ export const BusinessActions = ({
             textColor="#ffffff"
             compact
           >
-            +1
+            +1 || {buyPrice.toLocaleString()}€
           </Button>
           <Button
             mode="contained"
@@ -57,7 +57,7 @@ export const BusinessActions = ({
             textColor="#ffffff"
             compact
           >
-            ⬆ Upgrade
+            ⬆ Upgrade || {upgradeCost.toLocaleString()}€
           </Button>
         </>
       )}

@@ -4,8 +4,8 @@
  */
 export const GAME_CONFIG = {
   // 💰 Valeurs de départ
-  INITIAL_MONEY: 1000000000000000,
-  INITIAL_REPUTATION: 0,
+  INITIAL_MONEY: 5000,
+  INITIAL_REPUTATION: 200,
   INITIAL_PASSIVE_INCOME: 0,
 
     // 🎮 Gameplay - Clic manuel
@@ -23,8 +23,8 @@ export const GAME_CONFIG = {
   SAVE_INTERVAL: 5000, //Sauvegarde automatique toutes les 5 secondes
   
   // 🔧 Upgrades de business
-  BUSINESS_UPGRADE_COST_MULTIPLIER: 1.9, // Coût x1.9 à chaque niveau
-  BUSINESS_LEVEL_INCOME_BOOST: 0.2, // +20% de revenu par niveau
+  BUSINESS_UPGRADE_COST_MULTIPLIER: 0.1, // Coût x1.9 à chaque niveau
+  BUSINESS_LEVEL_INCOME_BOOST: 0.1, // +20% de revenu par niveau
   
   // ⭐ Progression
   UPGRADE_MULTIPLIER: 1.1, // +10% de revenu par upgrade acheté (défini aussi dans chaque upgrade)
@@ -33,7 +33,7 @@ export const GAME_CONFIG = {
   MONEY_PROGRESS_MAX: 1_000_000, // Montant max pour la barre de progression
 
   // 🎯 Système d'expérience et de niveau
-  XP_PER_CLICK: 10,              // XP gagnée par clic
+  XP_PER_CLICK: 1,              // XP gagnée par clic
   XP_PER_NEW_BUSINESS: 30,       // XP pour l'achat d'un nouveau business
   BASE_XP_REQUIRED: 100,         // XP nécessaire pour passer du niveau 1 au niveau 2
   XP_MULTIPLIER_PER_LEVEL: 2.2,    // Doublement de l'XP requise à chaque niveau

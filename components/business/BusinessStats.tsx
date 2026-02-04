@@ -5,12 +5,14 @@ interface BusinessStatsProps {
   incomePerSecond: number;
   incomeLabel: string;
   upgradeCost: number;
+  upgradeBoost: number;
 }
 
 export const BusinessStats = ({
   incomePerSecond,
   incomeLabel,
   upgradeCost,
+  upgradeBoost,
 }: BusinessStatsProps) => {
   return (
     <View style={styles.statsRow}>
@@ -22,7 +24,7 @@ export const BusinessStats = ({
       </View>
       <View style={styles.statItem}>
         <Text style={styles.statLabel}>🔼 Upgrade</Text>
-        <Text style={styles.statValue}>{upgradeCost.toLocaleString()}€</Text>
+        <Text style={styles.statValue}>{upgradeCost.toLocaleString()}€ // +{upgradeBoost.toFixed(2)}€/sec</Text>
       </View>
     </View>
   );
