@@ -71,6 +71,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.35,
     tier: 'silver',
     affectedBusinesses: ['foodTruck'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'foodTruck',
+        value: 10,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -93,6 +101,15 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.3,
     tier: 'silver',
     affectedBusinesses: ['smallShop'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'smallShop',
+        value: 15,
+      },
+    ],
+    showWhenLocked: true,
+    
   },
 
   // ==========================================
@@ -115,6 +132,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.4,
     tier: 'gold',
     affectedBusinesses: ['airbnb'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'airbnb',
+        value: 20,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -137,6 +162,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.35,
     tier: 'silver',
     affectedBusinesses: ['library'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'library',
+        value: 25,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -159,6 +192,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.45,
     tier: 'gold',
     affectedBusinesses: ['gym'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'gym',
+        value: 30,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -181,6 +222,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.5,
     tier: 'platinum',
     affectedBusinesses: ['cinema'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'cinema',
+        value: 35,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -203,6 +252,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.6,
     tier: 'platinum',
     affectedBusinesses: ['restaurant'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'restaurant',
+        value: 40,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -225,6 +282,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.65,
     tier: 'platinum',
     affectedBusinesses: ['hotel'],
+     unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'hotel',
+        value: 40,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -247,6 +312,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.8,
     tier: 'diamond',
     affectedBusinesses: ['gamingStudio'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'gamingStudio',
+        value: 45,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -269,6 +342,14 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.9,
     tier: 'diamond',
     affectedBusinesses: ['factory'],
+    unlockConditions: [
+      {
+        type: 'business_quantity',
+        businessId: 'factory',
+        value: 30,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -920,6 +1001,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.2,
     tier: 'gold',
     affectedBusinesses: ['coffeeMachine', 'foodTruck', 'restaurant'],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 10,
+      },
+    ],
+    showWhenLocked: true,
   },
   hospitality_combo: {
     id: 'hospitality_combo',
@@ -929,6 +1017,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.25,
     tier: 'platinum',
     affectedBusinesses: ['hotel', 'airbnb'],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 20,
+      },
+    ],
+    showWhenLocked: true,
   },
   entertainment_combo: {
     id: 'entertainment_combo',
@@ -938,6 +1033,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.3,
     tier: 'diamond',
     affectedBusinesses: ['cinema', 'themePark', 'gamingStudio'],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 30,
+      },
+    ],
+    showWhenLocked: true,
   },
   tech_combo: {
     id: 'tech_combo',
@@ -947,6 +1049,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
     multiplier: 1.5,
     tier: 'master',
     affectedBusinesses: ['techStartup', 'techCorp', 'cryptoFarm', 'bank'],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 40,
+      },
+    ],
+    showWhenLocked: true,
   },
   megaCorp_combo: {
     id: 'megaCorp_combo',
@@ -960,6 +1069,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
       'socialNetwork', 'aiResearch', 'quantumComputing', 'satelliteNetwork',
       'nuclearPlant', 'underwaterCity'
     ],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 50,
+      },
+    ],
+    showWhenLocked: true,
   },
   civilization_combo: {
     id: 'civilization_combo',
@@ -973,6 +1089,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
       'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
       'multiverseHub', 'realityEngine'
     ],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 60,
+      },
+    ],
+    showWhenLocked: true,
   },
   innovation_combo: {
     id: 'innovation_combo',
@@ -985,6 +1108,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
       'techStartup', 'aiResearch', 'quantumComputing',
       'cryptoFarm', 'spaceX', 'satelliteNetwork'
     ],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 80,
+      },
+    ],
+    showWhenLocked: true,
   },
   ultimate_combo: {
     id: 'ultimate_combo',
@@ -1005,6 +1135,13 @@ export const UPGRADES_CONFIG: Record<string, UpgradeConfig> = {
       'spaceElevator', 'dysonSphere', 'wormholeGate', 'timeLabyrinth',
       'multiverseHub', 'realityEngine'
     ],
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 100,
+      },
+    ],
+    showWhenLocked: true,
   },
 } as const;
 
