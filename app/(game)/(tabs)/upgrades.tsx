@@ -1,6 +1,5 @@
 import { UpgradeCard } from '@/components/UpgradeCard';
 import { CategoryTabs } from '@/components/upgrades/CategoryTabs';
-import { TierFilters } from '@/components/upgrades/TierFilters';
 import { UpgradesHeader } from '@/components/upgrades/UpgradesHeader';
 import { UpgradesTabs } from '@/components/upgrades/UpgradesTabs';
 import { TierFilter } from '@/constants/tierConfig';
@@ -19,7 +18,7 @@ export default function UpgradesScreen() {
   const [category, setCategory] = useState<'business' | 'click'>('business');
   const [clickActiveTier, setClickActiveTier] = useState<TierFilter>('all'); 
   const [clickActiveTab, setClickActiveTab] = useState<'all' | 'available' | 'purchased'>('all');
-  const { upgrades, reputation, purchaseUpgrade, businesses, clickUpgrades, purchaseClickUpgrade} = useGameStore();
+  const { upgrades, reputation, purchaseUpgrade, businesses, clickUpgrades, purchaseClickUpgrade, playerLevel} = useGameStore();
   const {
     activeTab,
     setActiveTab,
@@ -92,7 +91,42 @@ const availableClickUpgrades = useMemo(() =>
       }, 300);
     }
   }, [scrollToUpgradeId, displayedBusinessUpgrades, router]);
+// 🆕 Fonction de vérification des conditions
+const checkUnlockConditions = (upgrade: any): boolean => {
+  if (!upgrade.unlockConditions || upgrade.unlockConditions.length === 0) {
+    return true;
+  }
 
+  return upgrade.unlockConditions.every((condition: any) => {
+    switch (condition.type) {
+      case 'business_quantity':
+        const business = businesses[condition.businessId];
+        return business && business.quantity >= condition.value;
+      
+      case 'player_level':
+        return playerLevel >= condition.value;
+      
+      default:
+        return true;
+    }
+  });
+};
+
+// 🆕 Tri de displayedList : débloqués d'abord, verrouillés ensuite
+const sortedDisplayedList = useMemo(() => {
+  const list = category === 'business' ? displayedBusinessUpgrades : displayedClickUpgrades;
+  
+  return [...list].sort((a: any, b: any) => {
+    const aUnlocked = checkUnlockConditions(a);
+    const bUnlocked = checkUnlockConditions(b);
+
+    if (aUnlocked === bUnlocked) {
+      return a.reputationCost - b.reputationCost;
+    }
+
+    return aUnlocked ? -1 : 1;
+  });
+}, [category, displayedBusinessUpgrades, displayedClickUpgrades, businesses, playerLevel]);
  return (
     <LinearGradient colors={['#0a0a0a', '#1a1a2e', '#0a0a0a']} style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
@@ -120,7 +154,7 @@ const availableClickUpgrades = useMemo(() =>
                 purchased: purchasedUpgrades.length,
               }}
             />
-            <TierFilters activeTier={activeTier} onTierChange={setActiveTier} />
+            {/* <TierFilters activeTier={activeTier} onTierChange={setActiveTier} /> */}
           </>
         ):(
           <>
@@ -133,7 +167,7 @@ const availableClickUpgrades = useMemo(() =>
                 purchased: purchasedClickUpgrades.length,
               }}
             />
-            <TierFilters activeTier={clickActiveTier} onTierChange={setClickActiveTier} />
+            {/* <TierFilters activeTier={clickActiveTier} onTierChange={setClickActiveTier} /> */}
           </>
           )}
 
@@ -150,7 +184,7 @@ const availableClickUpgrades = useMemo(() =>
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {displayedList.map((upgrade: any) => (
+            {sortedDisplayedList.map((upgrade: any) => (
               <View
                 key={upgrade.id}
                 ref={(ref) => { upgradeRefs.current[upgrade.id] = ref }}
