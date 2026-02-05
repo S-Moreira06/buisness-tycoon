@@ -33,7 +33,7 @@ export const UpgradesHeader = ({
         <Text style={styles.reputationIcon}>⭐</Text>
         <View style={styles.reputationContent}>
           <Text style={styles.reputationLabel}>Réputation</Text>
-          <Text style={styles.reputationValue}>{reputation.toFixed(0)}</Text>
+          <Text style={styles.reputationValue}>{reputation?.toFixed(0)}</Text>
         </View>
       </LinearGradient>
     </View>
