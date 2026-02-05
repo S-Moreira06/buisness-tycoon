@@ -11,6 +11,7 @@ export async function saveGame(uid: string, state: GameState) {
       playerName: state.playerName, 
       profileEmoji: state.profileEmoji,
       money: state.money,
+      passiveIncome: state.totalPassiveIncome,
       reputation: state.reputation,
       businesses: state.businesses,
       upgrades: state.upgrades,

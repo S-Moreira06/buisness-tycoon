@@ -95,7 +95,7 @@ export const GameHeader = () => {
         <View style={styles.bottomRow}>
           {/* Argent */}
           <Pressable
-            style={styles.statCard}
+            style={[styles.statCard, styles.statCardBig]}
             onPress={() =>
               showTooltip({
                 title: '💰 Argent',
@@ -110,10 +110,24 @@ export const GameHeader = () => {
               <Text style={styles.statValue}>{money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
             </View>
           </Pressable>
-
+           <Pressable
+            style={styles.statCard}
+            onPress={() =>
+              showTooltip({
+                title: '⭐ Réputation',
+                description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
+                value: `${reputation}`,
+              })
+            }
+          >
+            <View style={[styles.statContent,styles.statContentCenter]}>
+              <Text style={styles.statLabel}>⭐</Text>
+              <Text style={styles.statValue}>{reputation.toFixed()}</Text>
+            </View>
+          </Pressable>
           {/* Revenu Passif */}
           <Pressable
-            style={styles.statCard}
+            style={[styles.statCard, styles.statCardMed]}
             onPress={() =>
               showTooltip({
                 title: '📈 Revenu Passif',
@@ -271,8 +285,14 @@ const styles = StyleSheet.create({
     borderColor: '#374151',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-     shadowOpacity: 0.3,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  statCardMed: {
+    flex: 2,
+  },
+  statCardBig: {
+    flex: 3,
   },
   statEmoji: {
     fontSize: 20,
@@ -280,6 +300,8 @@ const styles = StyleSheet.create({
   },
   statContent: {
     flex: 1,
+  },statContentCenter: {
+    alignItems: 'center',
   },
   statLabel: {
     fontSize: 10,

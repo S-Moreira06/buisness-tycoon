@@ -15,12 +15,14 @@ interface BusinessCardProps {
   name: string;
   baseIncome: number;
   buyPrice: number;
+  baseCost: number,
 }
 
 export const BusinessCard = ({
   businessId,
   name,
   buyPrice,
+  baseCost,
 }: BusinessCardProps) => {
   const router = useRouter();
   const { businesses, money, buyBusiness, upgradeBusiness, upgrades } = useGameStore();
@@ -31,13 +33,15 @@ export const BusinessCard = ({
   // FIX: passer businessId en paramètre
   const {
     upgradeCost,
+    upgradeBoost,
     incomePerSecond,
     incomeLabel,
     businessUpgrades,
     purchasedUpgrades,
     availableUpgrades,
+    lockedUpgrades,
     hasUpgrades,
-  } = useBusinessData(businessId, business, buyPrice, upgrades);
+  } = useBusinessData(businessId, business, upgrades);
 
   const canUpgrade = business?.owned && money >= upgradeCost;
   const canBuy = money >= buyPrice;
@@ -81,6 +85,7 @@ export const BusinessCard = ({
             incomePerSecond={incomePerSecond}
             incomeLabel={incomeLabel}
             upgradeCost={upgradeCost}
+            upgradeBoost={upgradeBoost}
           />
         )}
 
@@ -105,6 +110,7 @@ export const BusinessCard = ({
         totalUpgrades={businessUpgrades.length}
         onClose={() => setModalVisible(false)}
         onUpgradePress={handleUpgradePress}
+        lockedUpgrades={lockedUpgrades}
       />
     </>
   );

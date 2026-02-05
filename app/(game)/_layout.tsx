@@ -1,11 +1,20 @@
 import { GameHeader } from '@/components/GameHeader';
 import { GameTimer } from '@/components/GameTimer';
+import * as NavigationBar from 'expo-navigation-bar';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
 export default function GameLayout() {
   const router = useRouter();
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setVisibilityAsync('hidden');
+      NavigationBar.setBehaviorAsync('overlay-swipe');
+    }
+  }, []);
   return (
     <>
       <StatusBar hidden={true} />

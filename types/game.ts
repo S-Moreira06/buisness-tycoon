@@ -1,20 +1,56 @@
 import { TierType } from "@/constants/tierConfig";
+import { UnlockCondition } from './unlockConditions';
+
+// ==========================================
+// 🆕 NOUVEAUX TYPES POUR UPGRADES HYBRIDES
+// ==========================================
+
+export type ScalingType = 
+  | 'reputation' 
+  | 'businesses_owned' 
+  | 'total_income';
+
+// ==========================================
+// CLICK UPGRADES
+// ==========================================
 
 export interface ClickUpgradeState {
   id: string;
   name: string;
   description: string;
   reputationCost: number;
-  effectType: 'base_money' | 'crit_chance' | 'crit_multiplier';
+  // 🔧 MODIFIÉ : Ajout des nouveaux types d'effets
+  effectType: 
+    | 'base_money' 
+    | 'crit_chance' 
+    | 'crit_multiplier'
+    | 'business_synergy'  // 🆕 Synergie avec businesses possédés
+    | 'passive_boost'     // 🆕 Boost basé sur revenu passif
+    | 'scaling';          // 🆕 Scaling dynamique
+  
   effectValue: number;
   tier: TierType;
   purchased: boolean;
+  
+  // 🆕 PROPRIÉTÉS POUR LES UPGRADES DYNAMIQUES
+  scalingType?: ScalingType;     // Comment l'upgrade scale (optionnel)
+  scalingFactor?: number;         // Multiplicateur du scaling (optionnel)
+  unlockConditions?: UnlockCondition[];
+  showWhenLocked?: boolean;
 }
+
+// ==========================================
+// STOCKS
+// ==========================================
 
 export interface Stock {
   quantity: number;
   buyPrice: number;
 }
+
+// ==========================================
+// BUSINESSES
+// ==========================================
 
 export interface Business {
   level: number;
@@ -23,16 +59,26 @@ export interface Business {
   owned: boolean;
 }
 
+// ==========================================
+// UPGRADES (Business upgrades)
+// ==========================================
+
 export interface Upgrade {
   id: string;
   name: string;
   description: string;
   reputationCost: number;
-  multiplier: number;  // ex: 1.2 = +20%
-  affectedBusinesses: string[];  // IDs des businesses concernées
-  purchased: boolean;  // Si déjà acheté
-  tier: TierType,
+  multiplier: number; // ex: 1.2 = +20%
+  affectedBusinesses: string[]; // IDs des businesses concernées
+  purchased: boolean; // Si déjà acheté
+  tier: TierType;
+  unlockConditions?: UnlockCondition[];
+  showWhenLocked?: boolean; // true = afficher "???", false = masquer complètement
 }
+
+// ==========================================
+// STATS
+// ==========================================
 
 export interface GameStats {
   // Clics
@@ -50,6 +96,10 @@ export interface GameStats {
   upgradesPurchased: number;
 }
 
+// ==========================================
+// ACHIEVEMENTS
+// ==========================================
+
 export interface Achievement {
   id: string;
   title: string;
@@ -63,13 +113,37 @@ export interface Achievement {
   };
 }
 
+// ==========================================
+// SYSTÈME DE COMBOS
+// ==========================================
+
+export interface ActiveBonus {
+  id: string;
+  type: 'COMBO_MULTIPLIER' | 'FRENZY_MODE' | 'PERFECT_CLICK';
+  multiplier: number;
+  expiresAt: number; // Timestamp en millisecondes
+  label: string; // Pour l'affichage UI
+}
+
+export interface ComboState {
+  currentStreak: number; // Nombre de clics consécutifs
+  lastClickTimestamp: number; // Timestamp du dernier clic
+  activeBonuses: ActiveBonus[]; // Bonus actifs (x1.5, Frenzy, etc.)
+  perfectClickWindowActive: boolean; // Fenêtre Perfect Click ouverte
+  perfectClickWindowStart: number; // Début de la fenêtre (timestamp)
+}
+
+// ==========================================
+// GAME STATE (global)
+// ==========================================
+
 export interface GameState {
-  playerName: string; 
-  profileEmoji: string; 
+  playerName: string;
+  profileEmoji: string;
   money: number;
   reputation: number;
   totalPassiveIncome: number;
-  playerLevel: number; 
+  playerLevel: number;
   experience: number;
   ownedStocks: Record<string, Stock>;
   businesses: Record<string, Business>;
@@ -82,4 +156,5 @@ export interface GameState {
     soundEnabled: boolean;
     notificationsEnabled: boolean;
   };
+  combo?: { currentStreak: number };
 }

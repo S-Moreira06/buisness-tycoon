@@ -77,6 +77,7 @@ const initialState: GameState = {
     notificationsEnabled: true,
   },
   unlockedAchievements: [],
+  combo: { currentStreak: 0 },
 };
 
 export const useGameStore = create<ExtendedGameState>()(
@@ -127,19 +128,64 @@ export const useGameStore = create<ExtendedGameState>()(
 
       getClickPower: () => {
         const state = get();
+        
+        // ========== BASE VALUES ==========
         let moneyPerClick = GAME_CONFIG.CLICK_REWARD_MONEY;
         let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
         let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
-
+        
+        // ========== CALCULS DYNAMIQUES ==========
+        const totalBusinesses = Object.values(state.businesses).reduce(
+          (sum, b) => sum + (b.quantity || 0), 
+          0
+        );
+        const totalIncome = state.totalPassiveIncome;
+        
+        // ========== APPLICATION DES UPGRADES ==========
         Object.values(state.clickUpgrades).forEach((upg) => {
-          if (upg.purchased) {
-            if (upg.effectType === 'base_money') moneyPerClick += upg.effectValue;
-            if (upg.effectType === 'crit_chance') critChance += upg.effectValue;
-            if (upg.effectType === 'crit_multiplier') critMult += upg.effectValue;
+          if (!upg.purchased) return;
+          
+          switch (upg.effectType) {
+            // 🔹 TYPES EXISTANTS (inchangés)
+            case 'base_money':
+              moneyPerClick += upg.effectValue;
+              break;
+            case 'crit_chance':
+              critChance += upg.effectValue;
+              break;
+            case 'crit_multiplier':
+              critMult += upg.effectValue;
+              break;
+            
+            // 🆕 NOUVEAUX TYPES HYBRIDES
+            case 'business_synergy':
+              if (upg.scalingType === 'businesses_owned') {
+                // Ex: +5% par business possédé
+                moneyPerClick *= (1 + totalBusinesses * upg.effectValue);
+              }
+              break;
+            
+            case 'scaling':
+              if (upg.scalingType === 'reputation') {
+                // Ex: +0.1% par point de réputation
+                moneyPerClick *= (1 + state.reputation * (upg.scalingFactor || 0));
+              }
+              if (upg.scalingType === 'total_income') {
+                // Ex: Clic = 1% du revenu passif total
+                moneyPerClick += totalIncome * (upg.scalingFactor || 0);
+              }
+              break;
+            
+            case 'passive_boost':
+              // Ex: +0.05% du revenu passif par clic
+              moneyPerClick += totalIncome * (upg.scalingFactor || 0);
+              break;
           }
         });
+        
         return { moneyPerClick, critChance, critMult };
       },
+
 
       clickGame: (overrides) =>
         set((state) => {
@@ -181,23 +227,11 @@ export const useGameStore = create<ExtendedGameState>()(
           // ---------------------------------------------------------
           // CAS 2 : Clic Manuel du Joueur
           // ---------------------------------------------------------
-          let baseMoney = GAME_CONFIG.CLICK_REWARD_MONEY;
-          let critChance = GAME_CONFIG.BASE_CRIT_CHANCE;
-          let critMult = GAME_CONFIG.BASE_CRIT_MULTIPLIER;
-
-          Object.values(state.clickUpgrades).forEach((upg) => {
-            if (upg.purchased) {
-              if (upg.effectType === 'base_money') baseMoney += upg.effectValue;
-              if (upg.effectType === 'crit_chance') critChance += upg.effectValue;
-              if (upg.effectType === 'crit_multiplier') critMult += upg.effectValue;
-            }
-          });
-
+          const { moneyPerClick, critChance, critMult } = get().getClickPower();
+    
           const isCrit = Math.random() < critChance;
-          const gain = isCrit ? baseMoney * critMult : baseMoney;
+          const gain = isCrit ? moneyPerClick * critMult : moneyPerClick;
           const xp = GAME_CONFIG.XP_PER_CLICK;
-          
-          const newTotalMoney = currentStats.totalMoneyEarned + gain;
           const newMoney = state.money + gain;
 
           return {
@@ -205,15 +239,15 @@ export const useGameStore = create<ExtendedGameState>()(
             reputation: state.reputation + GAME_CONFIG.CLICK_REWARD_REPUTATION,
             experience: state.experience + xp,
             playerLevel: calculateLevelFromXP(state.experience + xp),
-            
-            // ✅ MISE À JOUR DES STATS DE CLIC
             stats: {
               ...currentStats,
               totalClicks: currentStats.totalClicks + 1,
-              totalCriticalClicks: isCrit ? currentStats.totalCriticalClicks + 1 : currentStats.totalCriticalClicks,
-              totalMoneyEarned: newTotalMoney,
+              totalCriticalClicks: isCrit 
+                ? currentStats.totalCriticalClicks + 1 
+                : currentStats.totalCriticalClicks,
+              totalMoneyEarned: currentStats.totalMoneyEarned + gain,
               maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
-            }
+            },
           };
         }),
 

@@ -2,15 +2,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-export type TabType = 'all' | 'available' | 'purchased';
+export type TabType = 'purchased' | 'available' | 'locked';
 
 interface UpgradesTabsProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   counts: {
-    all: number;
-    available: number;
     purchased: number;
+    available: number;
+    locked: number;
   };
 }
 
@@ -20,9 +20,9 @@ export const UpgradesTabs = ({
   counts,
 }: UpgradesTabsProps) => {
   const tabs: Array<{ key: TabType; icon: string; label: string }> = [
-    { key: 'all', icon: '📋', label: 'Tous' },
-    { key: 'available', icon: '🛒', label: 'Disponibles' },
     { key: 'purchased', icon: '✅', label: 'Possédées' },
+    { key: 'available', icon: '🛒', label: 'Disponibles' },
+    { key: 'locked', icon: '🔒', label: 'Verrouillés' },
   ];
 
   return (
