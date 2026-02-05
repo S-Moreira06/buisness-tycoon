@@ -7,6 +7,7 @@ export type UnlockConditionType =
   | 'passive_income'       // Revenu passif supérieur à X
   | 'player_level'         // Niveau du joueur
   | 'total_clicks'         // Nombre de clics total
+  | 'total_businesses_count'
   | 'combo_reached';       // Combo atteint au moins X
 
 export interface UnlockCondition {
