@@ -10,6 +10,9 @@ export interface ClickUpgradeConfig {
   tier: TierType;
   scalingType?: 'reputation' | 'businesses_owned' | 'total_income'; // 🆕 NOUVEAU
   scalingFactor?: number; // 🆕 NOUVEAU
+    unlockConditions?: any;
+  showWhenLocked?: boolean;
+
 }
 
 export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
@@ -33,6 +36,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 2, // +2€
     tier: 'bronze',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 3,
+      },
+    ],
+    showWhenLocked: true,
   },
   double_click: {
     id: 'double_click',
@@ -42,6 +52,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 10, // +10€
     tier: 'silver',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 10,
+      },
+    ],
+    showWhenLocked: true,
   },
   mechanical_switch: {
     id: 'mechanical_switch',
@@ -51,6 +68,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 25, // +25€
     tier: 'silver',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 15,
+      },
+    ],
+    showWhenLocked: true,
   },
   golden_cursor: {
     id: 'golden_cursor',
@@ -60,6 +84,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 100, // +100€
     tier: 'gold',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 25,
+      },
+    ],
+    showWhenLocked: true,
   },
   diamond_finger: {
     id: 'diamond_finger',
@@ -69,6 +100,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 500, // +500€
     tier: 'gold',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 31,
+      },
+    ],
+    showWhenLocked: true,
   },
   infinity_gauntlet: {
     id: 'infinity_gauntlet',
@@ -78,6 +116,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 5000, // +5000€
     tier: 'platinum',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 40,
+      },
+    ],
+    showWhenLocked: true,
   },
   autoclicker_basic: {
     id: 'autoclicker_basic',
@@ -87,6 +132,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'base_money',
     effectValue: 1, // 1 auto-clic/sec
     tier: 'diamond',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 55,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -109,6 +161,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_chance',
     effectValue: 0.05, // +5% chance
     tier: 'bronze',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 5,
+      },
+    ],
+    showWhenLocked: true,
   },
   loaded_dice: {
     id: 'loaded_dice',
@@ -118,6 +177,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_chance',
     effectValue: 0.07, // +7% chance
     tier: 'silver',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 7,
+      },
+    ],
+    showWhenLocked: true,
   },
   sniper_instinct: {
     id: 'sniper_instinct',
@@ -127,6 +193,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_chance',
     effectValue: 0.10, // +10% chance
     tier: 'gold',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 13,
+      },
+    ],
+    showWhenLocked: true,
   },
   matrix_code: {
     id: 'matrix_code',
@@ -136,6 +209,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_chance',
     effectValue: 0.15, // +15% chance
     tier: 'platinum',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 17,
+      },
+    ],
+    showWhenLocked: true,
   },
   click_cascade: {
     id: 'click_cascade',
@@ -145,6 +225,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_chance',
     effectValue: 0.20, // 20% chance de x5 clics
     tier: 'diamond',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 25,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -158,6 +245,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_multiplier',
     effectValue: 0.5, // +0.5x Multi
     tier: 'silver',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 3,
+      },
+    ],
+    showWhenLocked: true,
   },
   gaming_chair: {
     id: 'gaming_chair',
@@ -167,6 +261,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_multiplier',
     effectValue: 0.5, // +0.5x Multi
     tier: 'silver',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 10,
+      },
+    ],
+    showWhenLocked: true,
   },
   vital_point: {
     id: 'vital_point',
@@ -176,6 +277,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_multiplier',
     effectValue: 1.0, // +1.0x Multi
     tier: 'gold',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 15,
+      },
+    ],
+    showWhenLocked: true,
   },
   quantum_click: {
     id: 'quantum_click',
@@ -185,6 +293,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     effectType: 'crit_multiplier',
     effectValue: 3.0, // +3.0x Multi (ÉNORME)
     tier: 'platinum',
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 30,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -200,6 +315,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'gold',
     scalingType: 'businesses_owned',
     scalingFactor: 0.05,
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 999,
+      },
+    ],
+    showWhenLocked: true,
   },
   executive_touch: { // VERIFIER SI CA A ETE INTEGRER MAIS JE NE PENSE PAS : SUPER IDEE!
     id: 'executive_touch',
@@ -211,6 +333,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'platinum',
     scalingType: 'businesses_owned',
     scalingFactor: 0.01,
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 999,
+      },
+    ],
+    showWhenLocked: true,
   },
   reality_clicker: { // VERIFIER SI CA A ETE INTEGRER MAIS JE NE PENSE PAS : SUPER IDEE!
     id: 'reality_clicker',
@@ -222,6 +351,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'master',
     scalingType: 'businesses_owned',
     scalingFactor: 1.001,
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 999,
+      },
+    ],
+    showWhenLocked: true,
   },
   transcendence: {// VERIFIER SI CA A ETE INTEGRER MAIS JE NE PENSE PAS : SUPER IDEE!
     id: 'transcendence',
@@ -233,6 +369,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'master',
     scalingType: 'businesses_owned',
     scalingFactor: 0.00001,
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 999,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -248,6 +391,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'gold',
     scalingType: 'reputation',
     scalingFactor: 0.001, // +0.1% par réputation
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value:999,
+      },
+    ],
+    showWhenLocked: true,
   },
   prestige_multiplier: {
     id: 'prestige_multiplier',
@@ -259,6 +409,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'platinum',
     scalingType: 'reputation',
     scalingFactor: 0.0001, // +10% par 1000 rép
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value:999,
+      },
+    ],
+    showWhenLocked: true,
   },
 
   // ==========================================
@@ -274,6 +431,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'gold',
     scalingType: 'total_income',
     scalingFactor: 0.0005,
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 300,
+      },
+    ],
+    showWhenLocked: true,
   },
   empire_synergy: {
     id: 'empire_synergy',
@@ -285,6 +449,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'platinum',
     scalingType: 'total_income',
     scalingFactor: 0.01, // 1% du revenu/s
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 300,
+      },
+    ],
+    showWhenLocked: true,
   },
   cosmic_clicker: {
     id: 'cosmic_clicker',
@@ -296,6 +467,13 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'diamond',
     scalingType: 'total_income',
     scalingFactor: 0.05, // 5% des top 5 businesses
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 300,
+      },
+    ],
+    showWhenLocked: true,
   },
   omnipotent_touch: {
     id: 'omnipotent_touch',
@@ -307,5 +485,12 @@ export const CLICK_UPGRADES_CONFIG: Record<string, ClickUpgradeConfig> = {
     tier: 'master',
     scalingType: 'total_income',
     scalingFactor: 0.10, // 10% du total revenu/s
+    unlockConditions: [
+      {
+        type: 'player_level',
+        value: 300,
+      },
+    ],
+    showWhenLocked: true,
   },
 };
