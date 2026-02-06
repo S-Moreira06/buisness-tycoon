@@ -151,10 +151,5 @@ export interface GameState {
   clickUpgrades: Record<string, ClickUpgradeState>;
   stats: GameStats;
   unlockedAchievements: string[];
-  settings: {
-    hapticsEnabled: boolean;
-    soundEnabled: boolean;
-    notificationsEnabled: boolean;
-  };
   combo?: { currentStreak: number };
 }

@@ -1,13 +1,20 @@
 // hooks/useAchievementSystem.ts
 import { ACHIEVEMENTS } from '@/constants/achievementsConfig';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Toast from 'react-native-toast-message';
 import { useGameStore } from './useGameStore';
+import { useSyncGame } from './useSyncGame';
 
 export const useAchievementSystem = () => {
   const unlockAchievement = useGameStore((state) => state.unlockAchievement);
+  const { isHydrated } = useSyncGame();
+  const notifiedAchievements = useRef<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!isHydrated) {
+      console.log('⏳ Waiting for Firebase hydration...');
+      return;
+    }
     const checkAchievements = (state: any) => {
       const lockedAchievements = ACHIEVEMENTS.filter(
         (ach) => !state.unlockedAchievements.includes(ach.id)
@@ -39,7 +46,7 @@ export const useAchievementSystem = () => {
     const unsubscribe = useGameStore.subscribe(checkAchievements);
 
     return () => unsubscribe();
-  }, [unlockAchievement]);
+  }, [unlockAchievement, isHydrated]);
 };
 
 // ✅ NOUVELLE FONCTION : Affichage intelligent (1 ou plusieurs)

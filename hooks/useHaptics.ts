@@ -1,10 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { Platform, Vibration } from 'react-native'; // 👈 Import Vibration
-import { useGameStore } from './useGameStore';
+import { useSettingsStore } from './useSettingsStore';
 
 export const useHaptics = () => {
-  const isHapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
-
+const isHapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
   const triggerLight = async () => {
     if (isHapticsEnabled) {
       // Clic normal : sec et précis
