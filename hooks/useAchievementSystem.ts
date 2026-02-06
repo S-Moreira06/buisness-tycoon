@@ -62,8 +62,8 @@ function showAchievementToast(achievements: typeof ACHIEVEMENTS) {
 
     Toast.show({
       type: 'achievement',
-      text1: 'Succès Débloqué !',
-      text2: `${ach.title}\n${rewardText}`,
+      text1: `Succès Débloqué: ${ach.title} !`,
+      text2: `${ach.description}\n${rewardText}`,
       props: { icon: ach.icon },
       visibilityTime: 4000,
     });

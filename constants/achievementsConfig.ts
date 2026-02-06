@@ -261,7 +261,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_coffeeMachine_gain2',
-    title: '🌟 Formation Barista Pro',
+    title: '🌟 Les cocktails dans l\'âme',
     description: 'Débloquer l\'upgrade "🌟 Formation Barista Pro"',
     icon: '🌟',
     rewards: { xp: 50, reputation: 10 },
@@ -270,7 +270,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_foodTruck_gain1',
-    title: '🍕 Recettes Artisanales',
+    title: '🍕 Chef nomade',
     description: 'Débloquer l\'upgrade "🍕 Recettes Artisanales"',
     icon: '🍕',
     rewards: { xp: 50, reputation: 10 },
@@ -279,7 +279,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_foodTruck_gain2',
-    title: '⭐ Four à Pierre Mobile',
+    title: '⭐ Maître Pizzaïolo',
     description: 'Débloquer l\'upgrade "⭐ Four à Pierre Mobile"',
     icon: '⭐',
     rewards: { xp: 50, reputation: 10 },
@@ -288,7 +288,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_smallShop_gain1',
-    title: '🏪 Gamme Bio Exclusive',
+    title: '🏪 Un monde meilleur',
     description: 'Débloquer l\'upgrade "🏪 Gamme Bio Exclusive"',
     icon: '🏪',
     rewards: { xp: 50, reputation: 10 },
@@ -297,7 +297,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_smallShop_gain2',
-    title: '🌐 E-commerce + Click & Collect',
+    title: '🌐 E-commerce Pioneer',
     description: 'Débloquer l\'upgrade "🌐 E-commerce + Click & Collect"',
     icon: '🌐',
     rewards: { xp: 50, reputation: 10 },
@@ -306,7 +306,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_airbnb_gain1',
-    title: '🏠 Design d\'interieur',
+    title: '🏠 Architecte d\'interieur',
     description: 'Débloquer l\'upgrade "🏠 Design d\'interieur"',
     icon: '🏠',
     rewards: { xp: 50, reputation: 10 },
@@ -315,7 +315,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_airbnb_gain2',
-    title: '🌍 Conciergerie Premium 24/7',
+    title: '🌍 Hôte 5 étoiles',
     description: 'Débloquer l\'upgrade "🌍 Conciergerie Premium 24/7"',
     icon: '🌍',
     rewards: { xp: 50, reputation: 10 },
@@ -324,7 +324,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_library_gain1',
-    title: '📚 Section Premières Éditions',
+    title: '📚 Collectionneur de manuscrits',
     description: 'Débloquer l\'upgrade "📚 Section Premières Éditions"',
     icon: '📚',
     rewards: { xp: 50, reputation: 10 },
@@ -333,7 +333,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_library_gain2',
-    title: '🎭 Club de Lecture Exclusif',
+    title: '🎭 Club de Littéraire',
     description: 'Débloquer l\'upgrade "🎭 Club de Lecture Exclusif"',
     icon: '🎭',
     rewards: { xp: 50, reputation: 10 },
@@ -342,7 +342,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_gym_gain1',
-    title: '🏋️ Équipement Technogym',
+    title: '🏋️ Fitness 2.0',
     description: 'Débloquer l\'upgrade "🏋️ Équipement Technogym"',
     icon: '🏋️',
     rewards: { xp: 50, reputation: 10 },
@@ -351,7 +351,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_gym_gain2',
-    title: '💪 Coaches Olympiques',
+    title: '💪 Coach Olympique',
     description: 'Débloquer l\'upgrade "💪 Coaches Olympiques"',
     icon: '💪',
     rewards: { xp: 50, reputation: 10 },
@@ -360,7 +360,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_cinema_gain1',
-    title: '🎬 Salles IMAX & 4DX',
+    title: '🎬 Experience 4DX',
     description: 'Débloquer l\'upgrade "🎬 Salles IMAX & 4DX"',
     icon: '🎬',
     rewards: { xp: 50, reputation: 10 },
@@ -369,7 +369,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_cinema_gain2',
-    title: '🍿 Loges VIP & Gastronomie',
+    title: '🍿 Vive les influenceurs',
     description: 'Débloquer l\'upgrade "🍿 Loges VIP & Gastronomie"',
     icon: '🍿',
     rewards: { xp: 63, reputation: 12 },
@@ -378,7 +378,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_restaurant_gain1',
-    title: '🍽️ Chef Étoilé Michelin',
+    title: '🍽️ La premiere étoile',
     description: 'Débloquer l\'upgrade "🍽️ Chef Étoilé Michelin"',
     icon: '🍽️',
     rewards: { xp: 50, reputation: 10 },
@@ -396,7 +396,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_hotel_gain1',
-    title: '🏨 Suites Panoramiques',
+    title: '🏨 Suites Royales',
     description: 'Débloquer l\'upgrade "🏨 Suites Panoramiques"',
     icon: '🏨',
     rewards: { xp: 52, reputation: 10 },
@@ -405,7 +405,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_hotel_gain2',
-    title: '🌟 Spa Thermal & Wellness',
+    title: '🌟 Jaccuzzi Gang',
     description: 'Débloquer l\'upgrade "🌟 Spa Thermal & Wellness"',
     icon: '🌟',
     rewards: { xp: 120, reputation: 24 },
@@ -414,7 +414,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_gamingStudio_gain1',
-    title: '🎮 Moteur Propriétaire NextGen',
+    title: '🎮 Moteur NextGen',
     description: 'Débloquer l\'upgrade "🎮 Moteur Propriétaire NextGen"',
     icon: '🎮',
     rewards: { xp: 75, reputation: 15 },
@@ -423,7 +423,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_gamingStudio_gain2',
-    title: '🏆 Franchise AAA Mondiale',
+    title: '🏆 Triple A',
     description: 'Débloquer l\'upgrade "🏆 Franchise AAA Mondiale"',
     icon: '🏆',
     rewards: { xp: 165, reputation: 33, money: 550 },
@@ -432,7 +432,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_factory_gain1',
-    title: '🤖 Ligne Robotisée Complète',
+    title: '🤖 Automate sans tomate',
     description: 'Débloquer l\'upgrade "🤖 Ligne Robotisée Complète"',
     icon: '🤖',
     rewards: { xp: 90, reputation: 18 },
@@ -441,7 +441,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_factory_gain2',
-    title: '⚙️ Intelligence Prédictive IA',
+    title: '⚙️ IA supperieur',
     description: 'Débloquer l\'upgrade "⚙️ Intelligence Prédictive IA"',
     icon: '⚙️',
     rewards: { xp: 210, reputation: 42, money: 700 },
@@ -450,7 +450,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_realityEngine_gain2',
-    title: '🎛️ Simulation Réalité Parfaite',
+    title: '🎛️ RealityEngine2.0',
     description: 'Débloquer l\'upgrade "🎛️ Simulation Réalité Parfaite"',
     icon: '🎛️',
     rewards: { xp: 1500, reputation: 300, money: 5000 },
@@ -468,7 +468,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_hospitality_combo',
-    title: '🏨 Réseau Hôtellerie Luxe',
+    title: '🏨 Expension mondiale',
     description: 'Débloquer l\'upgrade "🏨 Réseau Hôtellerie Luxe"',
     icon: '🏨',
     rewards: { xp: 60, reputation: 12 },
@@ -477,7 +477,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_entertainment_combo',
-    title: '🎬 Empire Divertissement',
+    title: '🎬 Entertainement Combo',
     description: 'Débloquer l\'upgrade "🎬 Empire Divertissement"',
     icon: '🎬',
     rewards: { xp: 120, reputation: 24 },
@@ -522,7 +522,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_business_ultimate_combo',
-    title: '👑 Domination Totale',
+    title: '👑 World Is Mine',
     description: 'Débloquer l\'upgrade "👑 Domination Totale"',
     icon: '👑',
     rewards: { xp: 2250, reputation: 450, money: 7500 },
@@ -531,7 +531,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_click_training_gloves',
-    title: '🥊 Gants d\'entrainement',
+    title: '🥊 Tyson Junior',
     description: 'Débloquer l\'upgrade "🥊 Gants d\'entrainement"',
     icon: '🥊',
     rewards: { xp: 50, reputation: 10 },
@@ -540,7 +540,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_click_better_mouse',
-    title: '🖱️ Souris Ergonomique',
+    title: '🖱️ Souris Gaming',
     description: 'Débloquer l\'upgrade "🖱️ Souris Ergonomique"',
     icon: '🖱️',
     rewards: { xp: 50, reputation: 10 },
@@ -567,7 +567,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   {
     id: 'ach_unlock_click_golden_cursor',
-    title: '✨ Curseur Doré',
+    title: '✨ Golden Boy',
     description: 'Débloquer l\'upgrade "✨ Curseur Doré"',
     icon: '✨',
     rewards: { xp: 262, reputation: 52, money: 875 },
