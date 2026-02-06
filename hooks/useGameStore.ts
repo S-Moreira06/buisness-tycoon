@@ -339,13 +339,13 @@ export const useGameStore = create<ExtendedGameState>()(
           let incomeGain = 0;
 
           upgrade.affectedBusinesses.forEach(id => {
-             const bus = newBusinesses[id];
-             if (bus && bus.owned) {
+              const bus = newBusinesses[id];
+              if (bus && bus.owned) {
                 const oldInc = bus.income;
                 const newInc = oldInc * upgrade.multiplier;
                 newBusinesses[id] = { ...bus, income: newInc };
                 incomeGain += (newInc - oldInc) * bus.quantity;
-             }
+              }
           });
            const currentStats = state.stats || {
             totalClicks: 0,
@@ -357,6 +357,7 @@ export const useGameStore = create<ExtendedGameState>()(
             businessesBought: 0,
             upgradesPurchased: 0,
           };
+          
 
           return {
              reputation: state.reputation - upgrade.reputationCost,

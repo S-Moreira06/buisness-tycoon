@@ -13,7 +13,7 @@ export async function saveGame(uid: string, state: GameState) {
       money: state.money,
       totalPassiveIncome: state.totalPassiveIncome,
       reputation: state.reputation,
-      experience: state.experience,           // ✅ AJOUT
+      experience: state.experience,
       playerLevel: state.playerLevel, 
       businesses: state.businesses,
       upgrades: state.upgrades,
