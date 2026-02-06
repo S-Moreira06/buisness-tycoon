@@ -1,3 +1,4 @@
+import { formatIncomePerSecond } from '@/utils/formatNumber';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -10,7 +11,6 @@ interface BusinessStatsProps {
 
 export const BusinessStats = ({
   incomePerSecond,
-  incomeLabel,
   upgradeCost,
   upgradeBoost,
 }: BusinessStatsProps) => {
@@ -19,12 +19,12 @@ export const BusinessStats = ({
       <View style={styles.statItem}>
         <Text style={styles.statLabel}>💰 Revenu</Text>
         <Text style={styles.statValue}>
-          {incomePerSecond.toFixed(2)}€{incomeLabel}
+          {formatIncomePerSecond(incomePerSecond)}
         </Text>
       </View>
       <View style={styles.statItem}>
         <Text style={styles.statLabel}>🔼 Upgrade</Text>
-        <Text style={styles.statValue}>{upgradeCost.toLocaleString()}€ // +{upgradeBoost.toFixed(2)}€/sec</Text>
+        <Text style={styles.statValue}>+{formatIncomePerSecond(upgradeBoost)}</Text>
       </View>
     </View>
   );

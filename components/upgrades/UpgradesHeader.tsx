@@ -1,3 +1,4 @@
+import { formatReputation } from '@/utils/formatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -16,7 +17,7 @@ export const UpgradesHeader = ({
   return (
     <View style={styles.header}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>⭐Boosts</Text>
+        <Text style={styles.title}>⭐  Boosts</Text>
         {allUpgradesCount > 0 && (
           <Text style={styles.subtitle}>
             {purchasedCount} / {allUpgradesCount} débloquées
@@ -33,7 +34,7 @@ export const UpgradesHeader = ({
         <Text style={styles.reputationIcon}>⭐</Text>
         <View style={styles.reputationContent}>
           <Text style={styles.reputationLabel}>Réputation</Text>
-          <Text style={styles.reputationValue}>{reputation?.toFixed(0)}</Text>
+          <Text style={styles.reputationValue}>{formatReputation(reputation)}</Text>
         </View>
       </LinearGradient>
     </View>
@@ -46,7 +47,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 8,
     gap: 10,
   },
   titleContainer: {
@@ -54,8 +54,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-
-
   },
   title: {
     fontSize: 20,

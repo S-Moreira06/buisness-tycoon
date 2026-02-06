@@ -37,7 +37,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
-          marginBottom: 8,
+          marginBottom: 4,
         },
         
       }}
@@ -54,7 +54,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="upgrades"
         options={{
-          title: 'Améliorations',
+          title: 'Boosts',
           tabBarIcon: ({ color, focused }) => (
             <TabIcon emoji="⭐" color={color} focused={focused} />
           ),

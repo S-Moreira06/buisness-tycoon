@@ -1,6 +1,7 @@
 import { AchievementsModal } from '@/components/AchievementsModal';
 import { CustomModal } from '@/components/CustomModal';
 import { StatsModal } from '@/components/StatsModal';
+import { useSettingsStore } from '@/hooks/useSettingsStore';
 import { getLeaderboard, LeaderboardEntry, LeaderboardSortType } from '@/services/leaderboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -82,8 +83,7 @@ export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const hapticsEnabled = useGameStore((s) => s.settings?.hapticsEnabled ?? true);
-  const toggleHaptics = useGameStore((s) => s.toggleHaptics);
+  const { hapticsEnabled, toggleHaptics } = useSettingsStore();
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isStatsVisible, setIsStatsVisible] = useState(false);
    const [isAchievementsVisible, setIsAchievementsVisible] = useState(false);
@@ -290,7 +290,7 @@ export default function SettingsScreen() {
               rightElement={
                 <Switch
                   value={hapticsEnabled}
-                  onValueChange={() => toggleHaptics()}
+                  onValueChange={toggleHaptics}
                   trackColor={{ false: '#374151', true: '#a855f7' }}
                   thumbColor={hapticsEnabled ? '#ffffff' : '#9ca3af'}
                 />
@@ -425,7 +425,7 @@ export default function SettingsScreen() {
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Version</Text>
-                  <Text style={styles.aboutValue}>1.0.0</Text>
+                  <Text style={styles.aboutValue}>0.0.1</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>

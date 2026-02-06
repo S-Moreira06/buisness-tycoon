@@ -216,7 +216,7 @@ export const ClickButton = () => {
                     <Text style={styles.statsLabel}>CRIT %/ CRIT X</Text>
                     {/* Affichage dynamique de la chance de crit */}
                     <Text style={[styles.statsValue, { color: '#fbbf24' }]}>
-                        {Math.round(stats.critChance * 100)}% Crit / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER}
+                        {Math.round(stats.critChance * 100)}% Crit / x{GAME_CONFIG.BASE_CRIT_MULTIPLIER.toFixed(1)}
                     </Text>
                 </View>
             </View>

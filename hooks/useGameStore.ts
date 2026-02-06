@@ -1,6 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { BUSINESSES_CONFIG } from '@/constants/businessesConfig';
 import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
@@ -9,7 +7,6 @@ import { UPGRADES_CONFIG } from '@/constants/upgradesConfig';
 import { ClickUpgradeState, GameState, GameStats } from '@/types/game';
 
 interface GameActions {
-  toggleHaptics: () => void;
   setPlayerName: (name: string) => void;
   setProfileEmoji: (emoji: string) => void;
   clickGame: (overrides?: {
@@ -71,27 +68,15 @@ const initialState: GameState = {
       { ...upg, purchased: false } as ClickUpgradeState,
     ])
   ),
-  settings: {
-    hapticsEnabled: true,
-    soundEnabled: true,
-    notificationsEnabled: true,
-  },
   unlockedAchievements: [],
   combo: { currentStreak: 0 },
 };
 
 export const useGameStore = create<ExtendedGameState>()(
-  persist(
     (set, get) => ({
       ...initialState,
 
-      toggleHaptics: () =>
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            hapticsEnabled: !state.settings.hapticsEnabled,
-          },
-        })),
+
 
       setPlayerName: (name) => set({ playerName: name }),
       setProfileEmoji: (emoji) => set({ profileEmoji: emoji }),
@@ -354,13 +339,13 @@ export const useGameStore = create<ExtendedGameState>()(
           let incomeGain = 0;
 
           upgrade.affectedBusinesses.forEach(id => {
-             const bus = newBusinesses[id];
-             if (bus && bus.owned) {
+              const bus = newBusinesses[id];
+              if (bus && bus.owned) {
                 const oldInc = bus.income;
                 const newInc = oldInc * upgrade.multiplier;
                 newBusinesses[id] = { ...bus, income: newInc };
                 incomeGain += (newInc - oldInc) * bus.quantity;
-             }
+              }
           });
            const currentStats = state.stats || {
             totalClicks: 0,
@@ -372,6 +357,7 @@ export const useGameStore = create<ExtendedGameState>()(
             businessesBought: 0,
             upgradesPurchased: 0,
           };
+          
 
           return {
              reputation: state.reputation - upgrade.reputationCost,
@@ -455,15 +441,5 @@ export const useGameStore = create<ExtendedGameState>()(
       }),      
       resetGame: () => set(initialState),
     }),
-    {
-      name: 'game-store',
-      storage: createJSONStorage(() => AsyncStorage),
-      merge: (persisted: any, current) => ({
-        ...current,
-        ...persisted,
-        stats: { ...current.stats, ...(persisted.stats || {}) },
-        settings: { ...current.settings, ...(persisted.settings || {}) },
-      }),
-    }
-  )
+  
 );

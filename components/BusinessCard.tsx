@@ -15,7 +15,7 @@ interface BusinessCardProps {
   name: string;
   baseIncome: number;
   buyPrice: number;
-  baseCost: number,
+  baseCost?: number,
 }
 
 export const BusinessCard = ({

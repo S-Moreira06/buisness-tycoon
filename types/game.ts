@@ -36,6 +36,7 @@ export interface ClickUpgradeState {
   scalingType?: ScalingType;     // Comment l'upgrade scale (optionnel)
   scalingFactor?: number;         // Multiplicateur du scaling (optionnel)
   unlockConditions?: UnlockCondition[];
+  isUnlocked?: boolean;
   showWhenLocked?: boolean;
 }
 
@@ -73,6 +74,7 @@ export interface Upgrade {
   purchased: boolean; // Si déjà acheté
   tier: TierType;
   unlockConditions?: UnlockCondition[];
+  isUnlocked?: boolean;
   showWhenLocked?: boolean; // true = afficher "???", false = masquer complètement
 }
 
@@ -151,10 +153,5 @@ export interface GameState {
   clickUpgrades: Record<string, ClickUpgradeState>;
   stats: GameStats;
   unlockedAchievements: string[];
-  settings: {
-    hapticsEnabled: boolean;
-    soundEnabled: boolean;
-    notificationsEnabled: boolean;
-  };
   combo?: { currentStreak: number };
 }

@@ -1,46 +1,87 @@
 import { GAME_CONFIG } from '@/constants/gameConfig';
-import { useEffect, useRef } from 'react';
+import { clearLegacyStorage } from '@/utils/migrateStorage';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { loadGame, saveGame } from '../services/gameSync';
 import { useAuth } from './useAuth';
 import { useGameStore } from './useGameStore';
+
+// 🆕 Configuration du retry
+const RETRY_CONFIG = {
+  maxAttempts: 3,
+  delayMs: 1000,
+};
 
 export function useSyncGame() {
   const { user } = useAuth();
   const lastSaveRef = useRef<string | null>(null);
   const isSavingRef = useRef(false);
   const appStateRef = useRef(AppState.currentState);
+  const [isHydrated, setIsHydrated] = useState(false); // ✅ Déjà présent
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 🔥 Load initial du serveur au premier render
+  // 🆕 Fonction de sauvegarde avec retry
+  const saveWithRetry = useCallback(async (uid: string, attempt = 1) => {
+    try {
+      const gameState = useGameStore.getState();
+      await saveGame(uid, gameState);
+      
+      lastSaveRef.current = JSON.stringify({
+        money: gameState.money,
+        reputation: gameState.reputation,
+        businesses: gameState.businesses,
+      });
+      
+      console.log(`💾 Save successful (attempt ${attempt})`);
+      return true;
+    } catch (error) {
+      console.error(`❌ Save failed (attempt ${attempt}):`, error);
+      
+      if (attempt < RETRY_CONFIG.maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_CONFIG.delayMs * attempt));
+        return saveWithRetry(uid, attempt + 1);
+      }
+      
+      return false;
+    }
+  }, []);
+
+  // 🔥 Load initial du serveur
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setIsHydrated(false); // ✅ Reset si déconnexion
+      return;
+    }
 
     (async () => {
       try {
         const remote = await loadGame(user.uid);
         if (remote) {
-          // 🔥 Accède directement au store sans hook
           useGameStore.getState().hydrateFromServer(remote);
           lastSaveRef.current = JSON.stringify(remote);
           console.log('✅ Game loaded from server');
+          
+          // 🆕 Nettoyage one-time
+          await clearLegacyStorage();
         }
+        
+        // ✅ IMPORTANT : Marquer comme hydraté (même si remote === null)
+        setIsHydrated(true);
       } catch (error) {
         console.error('❌ Failed to load game:', error);
+        setIsHydrated(true); // ✅ Marquer quand même pour éviter le blocage
       }
     })();
   }, [user]);
 
-  // 🔥 Auto-save périodique (toutes les X secondes)
+  // 🆕 Auto-save avec debouncing (toutes les X secondes SI changements)
   useEffect(() => {
     if (!user) return;
 
     const intervalId = setInterval(async () => {
-      // 🔥 CRUCIAL : Récupère le state FRAIS à chaque tick
       const gameState = useGameStore.getState();
 
       const currentStateString = JSON.stringify({
-        playerName: gameState.playerName,
-        profileEmoji: gameState.profileEmoji,
         money: gameState.money,
         reputation: gameState.reputation,
         businesses: gameState.businesses,
@@ -48,27 +89,19 @@ export function useSyncGame() {
         clickUpgrades: gameState.clickUpgrades,
         stats: gameState.stats,
         unlockedAchievements: gameState.unlockedAchievements,
-        settings: gameState.settings,
       });
 
       if (currentStateString !== lastSaveRef.current && !isSavingRef.current) {
         isSavingRef.current = true;
-        try {
-          await saveGame(user.uid, gameState);
-          lastSaveRef.current = currentStateString;
-          console.log('💾 Auto-save completed');
-        } catch (error) {
-          console.error('❌ Auto-save failed:', error);
-        } finally {
-          isSavingRef.current = false;
-        }
+        await saveWithRetry(user.uid);
+        isSavingRef.current = false;
       }
     }, GAME_CONFIG.SAVE_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [user]); // ⚠️ PAS gameState en dépendance !
+  }, [user, saveWithRetry]);
 
-  // 🔥 Save quand l'app passe en background
+  // 🔥 Save quand l'app passe en background (avec retry)
   useEffect(() => {
     if (!user) return;
 
@@ -79,16 +112,8 @@ export function useSyncGame() {
       ) {
         if (!isSavingRef.current) {
           isSavingRef.current = true;
-          try {
-            // 🔥 CRUCIAL : Récupère le state FRAIS
-            const gameState = useGameStore.getState();
-            await saveGame(user.uid, gameState);
-            console.log('💾 Save on app background');
-          } catch (error) {
-            console.error('❌ Save on background failed:', error);
-          } finally {
-            isSavingRef.current = false;
-          }
+          await saveWithRetry(user.uid);
+          isSavingRef.current = false;
         }
       }
 
@@ -100,5 +125,20 @@ export function useSyncGame() {
     return () => {
       subscription.remove();
     };
-  }, [user]); // ⚠️ PAS gameState en dépendance !
+  }, [user, saveWithRetry]);
+
+  // ✅ MODIFIÉ : Retourner isHydrated + forceSave
+  return {
+    isHydrated, // ✅ AJOUT
+    forceSave: useCallback(async () => {
+      if (!user) return false;
+      if (isSavingRef.current) return false;
+      
+      isSavingRef.current = true;
+      const success = await saveWithRetry(user.uid);
+      isSavingRef.current = false;
+      
+      return success;
+    }, [user, saveWithRetry]),
+  };
 }
