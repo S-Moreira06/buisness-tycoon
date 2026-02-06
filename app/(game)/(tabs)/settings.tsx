@@ -425,7 +425,7 @@ export default function SettingsScreen() {
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>
                   <Text style={styles.aboutLabel}>Version</Text>
-                  <Text style={styles.aboutValue}>1.0.0</Text>
+                  <Text style={styles.aboutValue}>0.0.1</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.aboutRow}>

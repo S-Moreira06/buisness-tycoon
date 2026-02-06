@@ -1,3 +1,4 @@
+import { formatMoney } from '@/utils/formatNumber';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
@@ -33,7 +34,7 @@ export const BusinessActions = ({
           textColor="#ffffff"
           icon="cash"
         >
-          Acheter {buyPrice.toLocaleString()}€
+          Acheter {formatMoney(buyPrice,{compact:true})}
         </Button>
       ) : (
         <>
@@ -46,7 +47,7 @@ export const BusinessActions = ({
             textColor="#ffffff"
             compact
           >
-            +1 || {buyPrice.toLocaleString()}€
+            +1 || {formatMoney(buyPrice,{compact:true})}
           </Button>
           <Button
             mode="contained"
@@ -57,7 +58,7 @@ export const BusinessActions = ({
             textColor="#ffffff"
             compact
           >
-            ⬆ Upgrade || {upgradeCost.toLocaleString()}€
+            ⬆ Upgrade || {formatMoney(upgradeCost,{compact:true})}
           </Button>
         </>
       )}

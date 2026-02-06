@@ -11,10 +11,13 @@ export async function saveGame(uid: string, state: GameState) {
       playerName: state.playerName, 
       profileEmoji: state.profileEmoji,
       money: state.money,
-      passiveIncome: state.totalPassiveIncome,
+      totalPassiveIncome: state.totalPassiveIncome,
       reputation: state.reputation,
+      experience: state.experience,           // ✅ AJOUT
+      playerLevel: state.playerLevel, 
       businesses: state.businesses,
       upgrades: state.upgrades,
+      clickUpgrades: state.clickUpgrades,
       stats: state.stats,
       unlockedAchievements: state.unlockedAchievements || [],
       lastSavedAt: serverTimestamp(),
@@ -24,6 +27,7 @@ export async function saveGame(uid: string, state: GameState) {
     // console.log('✅ Game saved');
   } catch (error) {
     console.error('❌ Save failed:', error);
+    throw error; // Propager l'erreur pour le retry
   }
 }
 

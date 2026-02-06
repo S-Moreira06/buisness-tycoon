@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 6,
-    paddingHorizontal: 12,
     borderRadius: 10,
     backgroundColor: '#1a1a2e',
     borderWidth: 1,
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     color: '#9ca3af',
   },

@@ -47,16 +47,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    marginTop: 4,
+    marginTop: 6,
     marginBottom: 6,
-    gap: 12,
+    gap: 20,
   },
   tab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#374151',
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f2937', 
   },
   emoji: {
-    fontSize: 20,
+    fontSize:16,
   },
   text: {
     color: '#9ca3af',

@@ -1,3 +1,4 @@
+import { formatMoney, formatNumber, formatPrice, formatReputation, formatXP } from '@/utils/formatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -56,7 +57,7 @@ export const GameHeader = () => {
             <View style={styles.xpHeader}>
               <Text style={styles.xpLabel}>⚡ LVL {playerLevel}</Text>
               <Text style={styles.xpValue}>
-                {currentLevelXP.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP
+                {formatXP(currentLevelXP)} / {formatXP(xpForNextLevel)} XP
               </Text>
             </View>
             <View style={styles.progressBarContainer}>
@@ -95,19 +96,19 @@ export const GameHeader = () => {
         <View style={styles.bottomRow}>
           {/* Argent */}
           <Pressable
-            style={[styles.statCard, styles.statCardBig]}
+            style={[styles.statCard, styles.statCardMed]}
             onPress={() =>
               showTooltip({
                 title: '💰 Argent',
                 description: 'Ton capital total pour acheter des businesses et faire des upgrades.',
-                value: `${money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`,
+                value: `${formatNumber(money,2)} €`,
               })
             }
           >
             <Text style={styles.statEmoji}>💰</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Argent</Text>
-              <Text style={styles.statValue}>{money.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
+              <Text style={styles.statValue}>{formatPrice(money)}</Text>
             </View>
           </Pressable>
            <Pressable
@@ -116,13 +117,13 @@ export const GameHeader = () => {
               showTooltip({
                 title: '⭐ Réputation',
                 description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
-                value: `${reputation}`,
+                value: formatNumber(reputation),
               })
             }
           >
             <View style={[styles.statContent,styles.statContentCenter]}>
               <Text style={styles.statLabel}>⭐</Text>
-              <Text style={styles.statValue}>{reputation.toFixed()}</Text>
+              <Text style={styles.statValue}>{formatReputation(reputation)}</Text>
             </View>
           </Pressable>
           {/* Revenu Passif */}
@@ -132,14 +133,14 @@ export const GameHeader = () => {
               showTooltip({
                 title: '📈 Revenu Passif',
                 description: `Argent gagné automatiquement toutes les ${intervalSeconds} secondes grâce à tes businesses.`,
-                value: `${totalPassiveIncome.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€/${intervalSeconds}s`,
+                value: `${formatMoney(totalPassiveIncome)}`,
               })
             }
           >
             <Text style={styles.statEmoji}>📈</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Passif/{intervalSeconds}s</Text>
-              <Text style={styles.statValue}>{totalPassiveIncome.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
+              <Text style={styles.statValue}>{formatMoney(totalPassiveIncome)}</Text>
             </View>
           </Pressable>
         </View>
@@ -183,7 +184,7 @@ export const GameHeader = () => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    paddingTop: 6,
+    paddingTop: 16,
     paddingBottom: 10,
     paddingHorizontal: 16,
     borderBottomWidth: 2,

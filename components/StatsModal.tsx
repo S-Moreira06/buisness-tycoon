@@ -1,6 +1,6 @@
 import { useGameStore } from '@/hooks/useGameStore';
+import { formatCompact, formatMoney, formatTime } from '@/utils/formatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
-import numeral from 'numeral';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
@@ -66,14 +66,14 @@ export const StatsModal = ({ visible, onClose }: StatsModalProps) => {
             contentContainerStyle={{ paddingBottom: 20 }}
         >
           <SectionTitle title="Activité" color="#fbbf24" />
-          <StatRow label="Clics Totaux" value={numeral(stats.totalClicks).format('0,0')} />
-          <StatRow label="Clics Critiques" value={numeral(stats.totalCriticalClicks).format('0,0')} />
-          <StatRow label="Temps de jeu" value={`${Math.floor(stats.totalPlayTime / 60)} min`} />
+          <StatRow label="Clics Totaux" value={formatCompact(stats.totalClicks,0)} />
+          <StatRow label="Clics Critiques" value={formatCompact(stats.totalCriticalClicks,0)} />
+          <StatRow label="Temps de jeu" value={formatTime(stats.totalPlayTime)} />
 
           <SectionTitle title="Économie" color="#4ade80" />
-          <StatRow label="Argent Généré" value={numeral(stats.totalMoneyEarned).format('$0.00a')} color="#4ade80" />
-          <StatRow label="Argent Dépensé" value={numeral(stats.totalMoneySpent).format('$0.00a')} />
-          <StatRow label="Fortune Max" value={numeral(stats.maxMoneyReached).format('$0.00a')} color="#fcd34d" />
+          <StatRow label="Argent Généré" value={formatMoney(stats.totalMoneyEarned)} color="#4ade80" />
+          <StatRow label="Argent Dépensé" value={formatMoney(stats.totalMoneySpent)} />
+          <StatRow label="Fortune Max" value={formatMoney(stats.maxMoneyReached)} color="#fcd34d" />
           
           <SectionTitle title="Progression" color="#60a5fa" />
           <StatRow label="Affaires achetées" value={stats.businessesBought} />
