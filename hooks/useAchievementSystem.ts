@@ -62,10 +62,10 @@ function showAchievementToast(achievements: typeof ACHIEVEMENTS) {
 
     Toast.show({
       type: 'achievement',
-      text1: `Succès Débloqué: ${ach.title} !`,
+      text1: `Succès Débloqué:\n${ach.title} !`,
       text2: `${ach.description}\n${rewardText}`,
       props: { icon: ach.icon },
-      visibilityTime: 4000,
+      visibilityTime: 5000,
     });
   } else {
     // PLUSIEURS SUCCÈS : Toast groupé
@@ -88,7 +88,7 @@ function showAchievementToast(achievements: typeof ACHIEVEMENTS) {
       text1: `${achievements.length} Succès Débloqués ! ${icons}`,
       text2: `${titles}\n\n${totalRewards}`,
       props: { icon: '🎉' },
-      visibilityTime: 6000, // Plus long car plus d'infos
+      visibilityTime: 7000, // Plus long car plus d'infos
     });
   }
 }

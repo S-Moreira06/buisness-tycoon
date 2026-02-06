@@ -41,90 +41,152 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'Premiers Pas',
   description: 'Effectuer 10 clics manuels',
   icon: '👆',
-  rewards: { reputation: 50, money: 100 }, // Trivial
+  rewards: { reputation: 20, money: 300, xp: 20 }, // Trivial
   condition: (state: GameState) => state.stats.totalClicks >= 10,
 },
 
 {
-  id: 'click_novice',
+  id: 'clicker1',
   title: 'Échauffement',
   description: 'Effectuer 100 clics manuels',
   icon: '👆',
-  rewards: { reputation: 20, xp: 40 }, // Facile
+  rewards: { reputation: 30, money: 1000, xp: 40 }, // Facile
   condition: (s: GameState) => s.stats.totalClicks >= 100,
 },
 
 {
-  id: 'click_master',
+  id: 'clicker2',
   title: 'Doigts de Fée',
   description: 'Effectuer 1 000 clics manuels',
   icon: '🖐️',
-  rewards: { reputation: 75, xp: 150 }, // Moyen
+  rewards: { reputation: 75, money: 2500, xp: 150 }, // Moyen
   condition: (s: GameState) => s.stats.totalClicks >= 1000,
 },
 
 {
-  id: 'click_robot',
+  id: 'clicker3',
   title: 'Est-ce un bot ?',
   description: 'Atteindre 10 000 clics manuels',
   icon: '🤖',
-  rewards: { reputation: 300, xp: 600 }, // Difficile
+  rewards: { reputation: 150, money: 9500, xp: 500 }, // Difficile
   condition: (s: GameState) => s.stats.totalClicks >= 10000,
 },
 
 {
-  id: 'crit_luck',
-  title: 'Coup de Chance',
+  id: 'crit_luck1',
+  title: 'Coup de Chance 1',
+  description: 'Réaliser 10 clics critiques',
+  icon: '⚡',
+  rewards: { reputation: 20, xp: 100, money: 200 }, // Moyen (dépend de la chance)
+  condition: (s: GameState) => s.stats.totalCriticalClicks >= 10,
+},
+{
+  id: 'crit_luck2',
+  title: 'Coup de Chance 2',
   description: 'Réaliser 50 clics critiques',
   icon: '⚡',
   rewards: { reputation: 50, xp: 100 }, // Moyen (dépend de la chance)
   condition: (s: GameState) => s.stats.totalCriticalClicks >= 50,
 },
+{
+  id: 'crit_luck3',
+  title: 'Coup de Chance 3',
+  description: 'Réaliser 500 clics critiques',
+  icon: '⚡',
+  rewards: { reputation: 150, xp: 1000, money: 10000 }, // Moyen (dépend de la chance)
+  condition: (s: GameState) => s.stats.totalCriticalClicks >= 500,
+},
+{
+  id: 'crit_luck4',
+  title: 'Coup de Chance MAX',
+  description: 'Réaliser 5000 clics critiques',
+  icon: '⚡',
+  rewards: { reputation: 255, xp: 5555, money: 100000 }, // Moyen (dépend de la chance)
+  condition: (s: GameState) => s.stats.totalCriticalClicks >= 5000,
+},
 
 // --- 💰 CATÉGORIE : FORTUNE (Accumulation) ---
 
 {
-  id: 'small_saver',
+  id: 'money_saver1',
   title: 'Petit Économe',
   description: 'Avoir 1 000 $ en banque',
   icon: '💰',
-  rewards: { reputation: 10, xp: 20 }, // Trivial
+  rewards: { reputation: 20, xp: 20 }, // Trivial
   condition: (state: GameState) => state.money >= 1000,
 },
-
 {
-  id: 'money_saver',
+  id: 'money_saver2',
   title: 'Tirelire Pleine',
   description: 'Avoir 10 000 $ en banque',
   icon: '🐷',
   rewards: { reputation: 30, xp: 60 }, // Facile
   condition: (s: GameState) => s.money >= 10000,
 },
-
 {
-  id: 'money_rich',
-  title: 'Nouveau Riche',
-  description: 'Accumuler un total de 1 Million $ (Carrière)',
-  icon: '💵',
-  rewards: { reputation: 250, xp: 500 }, // Difficile
-  condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000000,
+  id: 'money_saver3',
+  title: 'Les premiers retours sur investissements',
+  description: 'Avoir 100 000 $ en banque',
+  icon: '🐷',
+  rewards: { reputation: 50, xp: 200 }, // Moyen
+  condition: (s: GameState) => s.money >= 100000,
+},
+{
+  id: 'money_saver4',
+  title: 'Millionaire!',
+  description: 'Avoir 1 000 000 $ en banque',
+  icon: '🐷',
+  rewards: { reputation: 80, xp: 600 }, // Hard
+  condition: (s: GameState) => s.money >= 1000000,
 },
 
 {
-  id: 'money_tycoon',
-  title: 'Multimillionnaire',
+  id: 'money_saver5',
+  title: 'Multimillionnaire!',
   description: 'Posséder 10 Millions $ sur le compte',
   icon: '🏦',
-  rewards: { reputation: 1500, xp: 3000 }, // Extrême
+  rewards: { reputation: 150, xp: 999 }, // Extrême
   condition: (s: GameState) => s.money >= 10000000,
+},
+{
+  id: 'money_saver6',
+  title: 'Milliardaire!',
+  description: 'Posséder 1 Milliard $ sur le compte',
+  icon: '🏦',
+  rewards: { reputation: 300, xp: 3000 }, // Extrême
+  condition: (s: GameState) => s.money >= 1000000000,
 },
 
 {
-  id: 'money_billionaire',
+  id: 'money_earner1',
+  title: 'Premiers bénéfices',
+  description: 'Accumuler un total de 1000 $ de gains',
+  icon: '💵',
+  rewards: { reputation: 10, xp: 50 }, // Easy
+  condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000,
+},
+{
+  id: 'money_earner2',
+  title: '100 Patates',
+  description: 'Accumuler un total de 100 000 $ de gains',
+  icon: '💵',
+  rewards: { reputation: 25, xp: 100 }, // Medium
+  condition: (s: GameState) => s.stats.totalMoneyEarned >= 100000,
+},
+{
+  id: 'money_earner3',
+  title: 'Nouveau Riche',
+  description: 'Accumuler un total de 1 Million $ de gains)',
+  icon: '💵',
+  rewards: { reputation: 50, xp: 500 }, // Difficile
+  condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000000,
+},
+{
+  id: 'money_earner4',
   title: 'Club des 3 Virgules',
   description: 'Gagner 1 Milliard $ au total',
   icon: '🚀',
-  rewards: { reputation: 5000, xp: 10000 }, // Légendaire
+  rewards: { reputation: 100, xp: 1000 }, // Légendaire
   condition: (s: GameState) => s.stats.totalMoneyEarned >= 1000000000,
 },
 
@@ -135,10 +197,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'Premier Investissement',
   description: 'Acheter votre premier business',
   icon: '🍋',
-  rewards: { reputation: 10, xp: 20 }, // Trivial
+  rewards: { reputation: 10, xp: 20, money: 500 }, // Trivial
   condition: (s: GameState) => s.stats.businessesBought >= 1,
 },
-
 {
   id: 'manager',
   title: 'Manager',
@@ -148,9 +209,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   condition: (state: GameState) =>
     Object.values(state.businesses).filter(b => b.owned).length >= 5,
 },
-
-// SUPPRIMÉ : duplicate 'gestionnaire' (inutile)
-
 {
   id: 'biz_expander',
   title: 'Expansion Rapide',
@@ -197,7 +255,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'R&D Débutant',
   description: 'Acheter 5 améliorations',
   icon: '🧪',
-  rewards: { reputation: 25, xp: 50 }, // Facile
+  rewards: { reputation: 25, xp: 50, money: 500 }, // Facile
   condition: (s: GameState) => s.stats.upgradesPurchased >= 5,
 },
 
@@ -210,23 +268,31 @@ export const ACHIEVEMENTS: Achievement[] = [
   condition: (s: GameState) => s.stats.upgradesPurchased >= 20,
 },
 
+
 // --- ⏳ CATÉGORIE : DÉVOUEMENT (Temps de jeu) ---
 
 {
-  id: 'time_addict',
+  id: 'time_addict1',
+  title: 'Le grind commence',
+  description: 'Jouer pendant 10 minutes (temps actif)',
+  icon: '⏳',
+  rewards: { reputation: 5, xp: 100, money: 500 }, // facile
+  condition: (s: GameState) => s.stats.totalPlayTime >= 600,
+},
+{
+  id: 'time_addict2',
   title: 'Accro',
   description: 'Jouer pendant 1 heure (temps actif)',
   icon: '⏳',
-  rewards: { reputation: 50, xp: 100 }, // Moyen
+  rewards: { reputation: 10, xp: 1000 }, // Moyen
   condition: (s: GameState) => s.stats.totalPlayTime >= 3600,
 },
-
 {
-  id: 'time_nolife',
+  id: 'time_addict3',
   title: 'PDG à plein temps',
   description: 'Jouer pendant 24 heures cumulées',
   icon: '🌙',
-  rewards: { reputation: 1000, xp: 2000 }, // Extrême
+  rewards: { reputation: 100, xp: 2000 }, // Extrême
   condition: (s: GameState) => s.stats.totalPlayTime >= 86400,
 },
 
@@ -237,7 +303,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'Influenceur Local',
   description: 'Atteindre 1 000 de Réputation',
   icon: '✨',
-  rewards: { reputation: 100, xp: 200 }, // Moyen (récompense en réputation pour achievement de réputation)
+  rewards: { money: 100000, xp: 200 }, // Moyen (récompense en réputation pour achievement de réputation)
   condition: (s: GameState) => s.reputation >= 1000,
 },
 
@@ -246,10 +312,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   title: 'Le Parrain',
   description: 'Atteindre 100 000 de Réputation',
   icon: '🕶️',
-  rewards: { reputation: 10000, xp: 20000 }, // Légendaire
+  rewards: { money: 500000, xp: 2000 }, // Légendaire
   condition: (s: GameState) => s.reputation >= 100000,
 },
 
+// --- CATEGORIE : OBTENSION DE BOOST
 {
     id: 'ach_unlock_business_coffeeMachine_gain1',
     title: '☕ Grains Arabica Premium',

@@ -4,8 +4,8 @@
  */
 export const GAME_CONFIG = {
   // 💰 Valeurs de départ
-  INITIAL_MONEY: 111111,
-  INITIAL_REPUTATION: 999,
+  INITIAL_MONEY: 0,
+  INITIAL_REPUTATION: 0,
   INITIAL_PASSIVE_INCOME: 0,
 
     // 🎮 Gameplay - Clic manuel
@@ -36,7 +36,7 @@ export const GAME_CONFIG = {
   XP_PER_CLICK: 1,              // XP gagnée par clic
   XP_PER_NEW_BUSINESS: 30,       // XP pour l'achat d'un nouveau business
   BASE_XP_REQUIRED: 100,         // XP nécessaire pour passer du niveau 1 au niveau 2
-  XP_MULTIPLIER_PER_LEVEL: 2.2,    // Doublement de l'XP requise à chaque niveau
+  XP_MULTIPLIER_PER_LEVEL: 1.9,    // Doublement de l'XP requise à chaque niveau
   INITIAL_PLAYER_LEVEL: 1,              // Niveau de départ
   INITIAL_EXPERIENCE: 0,         // XP de départ
 
