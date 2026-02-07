@@ -79,24 +79,81 @@ export interface Upgrade {
 }
 
 // ==========================================
-// STATS
+// STATS - VERSION 2.0 (Approche Hybride)
 // ==========================================
 
 export interface GameStats {
-  // Clics
+  // ========== ACTIVITÉ (Données Brutes) ==========
   totalClicks: number;
   totalCriticalClicks: number;
+  totalPlayTime: number; // En secondes
+  sessionsPlayed: number; // 🆕
+  longestSession: number; // 🆕 En secondes
+  currentSessionStart: number; // 🆕 Timestamp pour calcul session active
+  lastLoginDate: string; // 🆕 Format ISO
+  daysPlayedStreak: number; // 🆕
   
-  // Économie
-  totalMoneyEarned: number; // Cumulatif (ne baisse jamais)
+  // ========== ÉCONOMIE (Données Brutes) ==========
+  totalMoneyEarned: number; // Cumulatif total
   totalMoneySpent: number;
-  maxMoneyReached: number; // Le record de solde max
+  maxMoneyReached: number; // Record
+  moneyFromClicks: number; // 🆕 Argent gagné via clics manuels
+  moneyFromPassive: number; // 🆕 Argent gagné via businesses
+  moneyFromAchievements: number; // 🆕 Argent gagné via récompenses
   
-  // Progression
-  totalPlayTime: number; // En secondes (à implémenter plus tard avec un timer)
-  businessesBought: number; // Quantité totale de business achetés (via $)
-  upgradesPurchased: number;
+  // ========== RÉPUTATION (Données Brutes) ==========
+  totalReputationEarned: number; // 🆕 Ne baisse jamais
+  totalReputationSpent: number; // 🆕
+  maxReputationReached: number; // 🆕
+  
+  // ========== REVENU PASSIF (Données Brutes) ==========
+  bestPassiveIncomeReached: number; // 🆕 Plus haut revenu/sec atteint
+  
+  // ========== PROGRESSION (Données Brutes) ==========
+  businessesBought: number; // Quantité totale achetée
+  uniqueBusinessesOwned: number; // 🆕 Nombre de types différents
+  totalBusinessLevels: number; // 🆕 Somme des niveaux
+  upgradesPurchased: number; // Total (click + business)
+  clickUpgradesPurchased: number; // 🆕 Séparation
+  businessUpgradesPurchased: number; // 🆕 Séparation
+  
+  // ========== ACHIEVEMENTS (Données Brutes) ==========
+  achievementsUnlocked: number; // 🆕 Nombre de succès débloqués
+  
+  // ========== MILESTONES (Timestamps) ==========
+  firstBusinessPurchaseTime: number; // 🆕 Timestamp
+  firstUpgradePurchaseTime: number; // 🆕 Timestamp
+  firstAchievementUnlockTime: number; // 🆕 Timestamp
+  
+  // ========== SYSTÈME (Données Brutes) ==========
+  totalResets: number; // 🆕 Nombre de resets
 }
+
+// ==========================================
+// STATS CALCULÉES (Non stockées)
+// ==========================================
+// Ces stats sont calculées à la volée via useComputedStats()
+export interface ComputedStats {
+  // Performance
+  criticalHitRate: number; // % (totalCriticalClicks / totalClicks * 100)
+  averageMoneyPerClick: number; // $ (moneyFromClicks / totalClicks)
+  clicksPerMinute: number; // clics/min (totalClicks / totalPlayTime * 60)
+  moneyPerSecondAverage: number; // $/sec (totalMoneyEarned / totalPlayTime)
+  
+  // Efficacité
+  efficiencyRatio: number; // Ratio (totalMoneyEarned / totalMoneySpent)
+  
+  // Répartition
+  clickIncomePercentage: number; // % du revenu via clics
+  passiveIncomePercentage: number; // % du revenu via passif
+  
+  // Achievements
+  achievementCompletionRate: number; // % de succès complétés
+  
+  // Session
+  currentSessionDuration: number; // Durée de la session en cours (secondes)
+}
+
 
 // ==========================================
 // ACHIEVEMENTS
