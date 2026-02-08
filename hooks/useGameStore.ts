@@ -28,6 +28,7 @@ interface GameActions {
   startSession: () => void; // 🆕
   endSession: () => void; // 🆕
   updateDailyStreak: () => void; // 🆕
+  clearSessionAchievements: () => void; 
 };
 
 type ExtendedGameState = GameState & GameActions;
@@ -108,6 +109,7 @@ const initialState: GameState = {
     ])
   ),
   unlockedAchievements: [],
+  sessionNewAchievements: [],
   combo: { currentStreak: 0 },
 };
 
@@ -115,11 +117,9 @@ export const useGameStore = create<ExtendedGameState>()(
     (set, get) => ({
       ...initialState,
 
-
-
       setPlayerName: (name) => set({ playerName: name }),
       setProfileEmoji: (emoji) => set({ profileEmoji: emoji }),
-
+      clearSessionAchievements: () => set({ sessionNewAchievements: [] }),
       purchaseClickUpgrade: (upgradeId) =>
         set((state) => {
           const upgrade = state.clickUpgrades[upgradeId];
@@ -149,7 +149,6 @@ export const useGameStore = create<ExtendedGameState>()(
             }
           };
         }),
-
 
       getClickPower: () => {
         const state = get();
@@ -210,7 +209,6 @@ export const useGameStore = create<ExtendedGameState>()(
         
         return { moneyPerClick, critChance, critMult };
       },
-
 
       clickGame: (overrides) =>
         set((state) => {
@@ -277,8 +275,6 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }),
 
-
-
       buyStock: (stockId, price) =>
         set((state) => {
           if (state.money < price) return state;
@@ -337,7 +333,6 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }),
 
-
       upgradeBusiness: (businessId, cost) =>
         set((state) => {
           const business = state.businesses[businessId];
@@ -365,7 +360,6 @@ export const useGameStore = create<ExtendedGameState>()(
             }
           };
         }),
-
 
       addPassiveIncome: () =>
         set((state) => {
@@ -427,7 +421,6 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }),
 
-
       tickPlayTime: () =>
         set((state) => {
           // Sécurité anti-crash
@@ -468,6 +461,7 @@ export const useGameStore = create<ExtendedGameState>()(
           
           return {
             unlockedAchievements: [...state.unlockedAchievements, id],
+            sessionNewAchievements: [...state.sessionNewAchievements, id],
             reputation: newReputation,
             experience: newXp,
             playerLevel: newLevel,
@@ -490,8 +484,6 @@ export const useGameStore = create<ExtendedGameState>()(
           };
         }),
       
-      
-
       hydrateFromServer: (payload: any) => set((state) => {
         // ========================================
         // 🛡️ MIGRATION V2.0 : STATS COMPLÈTES
@@ -617,6 +609,7 @@ export const useGameStore = create<ExtendedGameState>()(
           // Si daysDiff === 0 (même jour), on garde le streak actuel
           
           return {
+            sessionNewAchievements: [],
             stats: {
               ...state.stats,
               sessionsPlayed: state.stats.sessionsPlayed + 1,

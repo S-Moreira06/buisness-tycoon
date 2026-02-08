@@ -1,11 +1,12 @@
-import { formatMoney, formatNumber, formatPrice, formatReputation, formatXP } from '@/utils/formatNumber';
+import { formatMoney, formatNumber, formatReputation, formatXP } from '@/utils/formatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, ProgressBar } from 'react-native-paper';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ProgressBar } from 'react-native-paper';
 import { calculateXPForLevel, GAME_CONFIG, getXPForNextLevel } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
+import { AvatarModal } from './AvatarModal'; // 🆕
 import { CustomModal } from './CustomModal';
 
 interface TooltipData {
@@ -17,9 +18,26 @@ interface TooltipData {
 
 export const GameHeader = () => {
   const router = useRouter();
-  const { money, reputation, totalPassiveIncome, playerLevel, experience, profileEmoji, playerName} = useGameStore();
+  const { 
+    money, 
+    reputation, 
+    totalPassiveIncome, 
+    playerLevel, 
+    experience, 
+    profileEmoji, 
+    playerName,
+    sessionNewAchievements // 🆕 Récupérer les nouveaux succès
+  } = useGameStore();
+  const previousLevelRef = useRef(playerLevel);
+
+  // Animations
+  const levelScale = useRef(new Animated.Value(1)).current;
+  const xpGlowOpacity = useRef(new Animated.Value(0)).current;
+  const levelUpLabelOpacity = useRef(new Animated.Value(0)).current;
+  const levelUpLabelTranslateY = useRef(new Animated.Value(0)).current;
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false); // 🆕
 
   // Calcul XP
   const xpForCurrentLevel = calculateXPForLevel(playerLevel);
@@ -37,10 +55,67 @@ export const GameHeader = () => {
     setTooltipVisible(false);
     setTooltipData(null);
   };
-  const goToSettings = () => {
-    hideTooltip();
-    router.push('/(game)/(tabs)/settings');
-  };
+  useEffect(() => {
+    const previousLevel = previousLevelRef.current;
+
+    if (playerLevel > previousLevel) {
+      // PULSE DU TEXTE DE NIVEAU
+      Animated.sequence([
+        Animated.timing(levelScale, {
+          toValue: 1.5,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(levelScale, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // GLOW SUR LA BARRE D'XP
+      xpGlowOpacity.setValue(0);
+      Animated.sequence([
+        Animated.timing(xpGlowOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(xpGlowOpacity, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // LABEL "LEVEL UP!"
+      levelUpLabelOpacity.setValue(0);
+      levelUpLabelTranslateY.setValue(8); // part un peu plus bas
+
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(levelUpLabelOpacity, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(levelUpLabelOpacity, {
+            toValue: 0,
+            duration: 400,
+            delay: 400, // reste visible un peu puis disparaît
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.timing(levelUpLabelTranslateY, {
+          toValue: -4,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+
+    previousLevelRef.current = playerLevel;
+  }, [playerLevel, levelScale, xpGlowOpacity, levelUpLabelOpacity, levelUpLabelTranslateY]);
 
   return (
     <>
@@ -55,41 +130,84 @@ export const GameHeader = () => {
           {/* XP Bar à gauche */}
           <View style={styles.xpContainer}>
             <View style={styles.xpHeader}>
-              <Text style={styles.xpLabel}>⚡ LVL {playerLevel}</Text>
+              <Animated.Text
+                style={[
+                  styles.xpLabel,
+                  {
+                    transform: [{ scale: levelScale }],
+                  },
+                ]}
+              >
+                ⚡ LVL {playerLevel}
+              </Animated.Text>
+
               <Text style={styles.xpValue}>
                 {formatXP(currentLevelXP)} / {formatXP(xpForNextLevel)} XP
               </Text>
             </View>
+
             <View style={styles.progressBarContainer}>
+              {/* Barre XP normale */}
               <ProgressBar
                 progress={xpProgress}
                 color="#a855f7"
                 style={styles.progressBar}
               />
-              <View style={[styles.progressGlow, { width: `${xpProgress * 100}%` }]} />
+
+              {/* Glow par-dessus la barre */}
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.progressGlow,
+                  {
+                    opacity: xpGlowOpacity,
+                    // Optionnel : tu peux aussi faire varier scaleX pour un effet de "flash"
+                    transform: [{ scaleX: 1.05 }, { scaleY: 1.4 }],
+                  },
+                ]}
+              />
+
+              {/* Label LEVEL UP au-dessus de la barre */}
+              <Animated.View
+                pointerEvents="none"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: -18,
+                  alignItems: 'center',
+                  opacity: levelUpLabelOpacity,
+                  transform: [{ translateY: levelUpLabelTranslateY }],
+                }}
+              >
+                <Text style={styles.levelUpLabel}>LEVEL UP!</Text>
+              </Animated.View>
             </View>
+
           </View>
 
-          {/* Avatar (Dynamique) */}
+          {/* Avatar (Dynamique) avec Badge 🆕 */}
           <Pressable 
             style={styles.avatarContainer}
-            onPress={() => showTooltip({
-              title: `${profileEmoji || '👤'} Profil`, // Affiche l'emoji dans le titre
-              description: `PDG : ${playerName || 'Non défini'}`, // Affiche le nom du joueur
-              value: `Niveau ${playerLevel}`,
-              isAvatar: true
-            })}
+            onPress={() => setAvatarModalVisible(true)} // 🆕 Ouvre la modal au lieu du tooltip
           >
             <LinearGradient
               colors={['rgba(168, 85, 247, 0.2)', 'rgba(124, 58, 237, 0.1)']}
               style={styles.avatar}
             >
-              {/* Affiche l'emoji du store, ou un fallback */}
               <Text style={styles.avatarEmoji}>{profileEmoji || '👤'}</Text>
             </LinearGradient>
             <View style={styles.avatarGlow} />
+            
+            {/* 🆕 BADGE DE NOTIFICATION */}
+            {sessionNewAchievements.length > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {sessionNewAchievements.length}
+                </Text>
+              </View>
+            )}
           </Pressable>
-
         </View>
 
         {/* LIGNE 2 : Ressources (Money, Reputation, Passif) */}
@@ -101,31 +219,33 @@ export const GameHeader = () => {
               showTooltip({
                 title: '💰 Argent',
                 description: 'Ton capital total pour acheter des businesses et faire des upgrades.',
-                value: `${formatNumber(money,2)} €`,
+                value: `${formatNumber(money, 2)} €`,
               })
             }
           >
             <Text style={styles.statEmoji}>💰</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Argent</Text>
-              <Text style={styles.statValue}>{formatPrice(money)}</Text>
+              <Text style={styles.statValue}>{formatMoney(money)}</Text>
             </View>
           </Pressable>
-           <Pressable
+
+          <Pressable
             style={styles.statCard}
             onPress={() =>
               showTooltip({
                 title: '⭐ Réputation',
-                description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
+                description: "Ta réputation te permet d'acheter des upgrades puissants.",
                 value: formatNumber(reputation),
               })
             }
           >
-            <View style={[styles.statContent,styles.statContentCenter]}>
+            <View style={[styles.statContent, styles.statContentCenter]}>
               <Text style={styles.statLabel}>⭐</Text>
               <Text style={styles.statValue}>{formatReputation(reputation)}</Text>
             </View>
           </Pressable>
+
           {/* Revenu Passif */}
           <Pressable
             style={[styles.statCard, styles.statCardMed]}
@@ -146,11 +266,8 @@ export const GameHeader = () => {
         </View>
       </LinearGradient>
 
-     {/* CUSTOM MODAL POUR LES TOOLTIPS */}
-      <CustomModal
-        visible={tooltipVisible}
-        onDismiss={hideTooltip}
-      >
+      {/* CUSTOM MODAL POUR LES TOOLTIPS (ressources Money/Rep/Passif) */}
+      <CustomModal visible={tooltipVisible} onDismiss={hideTooltip}>
         <View style={styles.tooltipCard}>
           <LinearGradient
             colors={['#1a1a2e', '#0f0f1e']}
@@ -161,23 +278,15 @@ export const GameHeader = () => {
             <View style={styles.tooltipValueContainer}>
               <Text style={styles.tooltipValue}>{tooltipData?.value}</Text>
             </View>
-
-            {/* 🆕 Bouton Paramètres si c'est le tooltip avatar */}
-            {tooltipData?.isAvatar && (
-              <Button
-                mode="contained"
-                icon="cog"
-                onPress={goToSettings}
-                style={styles.settingsButton}
-                buttonColor="#a855f7"
-                textColor="#ffffff"
-              >
-                Paramètres
-              </Button>
-            )}
           </LinearGradient>
         </View>
       </CustomModal>
+
+      {/* 🆕 AVATAR MODAL (Profil + Nouveautés) */}
+      <AvatarModal
+        visible={avatarModalVisible}
+        onClose={() => setAvatarModalVisible(false)}
+      />
     </>
   );
 };
@@ -242,6 +351,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 8,
   },
+  levelUpLabel: {
+  fontSize: 25,
+  fontWeight: 'bold',
+  color: '#fdb90e', // jaune/or pour contraster avec le violet
+  textShadowColor: '#fbbf24',
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 8,
+},
+
   avatarContainer: {
     position: 'relative',
   },
@@ -259,7 +377,7 @@ const styles = StyleSheet.create({
   },
   avatarGlow: {
     position: 'absolute',
-        width: 50,
+    width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: '#a855f7',
@@ -268,6 +386,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 15,
+  },
+  // 🆕 STYLES BADGE NOTIFICATION
+  notificationBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    borderWidth: 2,
+    borderColor: '#0a0a0a',
+  },
+  notificationBadgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   bottomRow: {
     flexDirection: 'row',
@@ -301,7 +439,8 @@ const styles = StyleSheet.create({
   },
   statContent: {
     flex: 1,
-  },statContentCenter: {
+  },
+  statContentCenter: {
     alignItems: 'center',
   },
   statLabel: {
@@ -315,15 +454,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  // Tooltip Styles simplifiés (plus besoin de l'overlay modal ici)
   tooltipCard: {
-    // La CustomModal a déjà un container avec overflow hidden et border radius
     width: '100%',
   },
   tooltipGradient: {
     padding: 20,
     minWidth: 280,
-    alignItems: 'center', // Centrer le contenu
+    alignItems: 'center',
   },
   tooltipTitle: {
     fontSize: 20,
@@ -352,10 +489,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#a855f7',
     textAlign: 'center',
-  },
-   settingsButton: {
-    marginTop: 16,
-    borderRadius: 8,
-    width: '100%', 
   },
 });
