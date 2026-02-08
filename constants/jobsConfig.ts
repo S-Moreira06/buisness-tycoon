@@ -18,7 +18,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 500,
     },
     unlockLevel: 1,
-    cooldown: 0,
+    cooldown: 60,
   },
 
   dev_reputation_boost: {

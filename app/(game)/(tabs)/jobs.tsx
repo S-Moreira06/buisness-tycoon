@@ -142,10 +142,7 @@ export default function JobsScreen() {
   
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <AnimatedBackground 
-                colors={['#000000', '#2d00f7', '#2d0a70', '#830db9']}
-                speed={10}
-              />
+      <AnimatedBackground colors={['#000000', '#2d00f7', '#2d0a70', '#830db9']} speed={10}/>
       <View style={styles.titleSection}>
         <Text variant="headlineLarge" style={styles.screenTitle}>
           💼 Jobs
@@ -193,16 +190,19 @@ const styles = StyleSheet.create({
     paddingBottom: 40, // Pour éviter que le tab bar cache le contenu
   },
   titleSection: {
-    marginBottom: 24,
-    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+    maxWidth: '70%',
+    //alignItems: 'center',
   },
   screenTitle: {
     color: '#a855f7',
     fontWeight: 'bold',
-    marginBottom: 8,
   },
   subtitle: {
     color: '#acacad',
+    fontSize: 14,
   },
   section: {
     marginBottom: 24,
