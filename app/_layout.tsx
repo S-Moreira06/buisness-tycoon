@@ -1,5 +1,7 @@
 import { useAchievementSystem } from '@/hooks/useAchievementSystem';
+import { useGameStore } from '@/hooks/useGameStore';
 import { useLevelUpTracker } from '@/hooks/useLevelUpTracker';
+import { useSyncGame } from '@/hooks/useSyncGame';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
@@ -10,6 +12,8 @@ export default function RootLayout() {
   useLevelUpTracker();
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { isHydrated } = useSyncGame();
+  const checkJobsCompletion = useGameStore((state) => state.checkJobsCompletion);
 
   useEffect(() => {
     console.log('📍 Auth state:', { 
@@ -35,6 +39,13 @@ export default function RootLayout() {
 
     return () => clearTimeout(timeout);
   }, [user, loading, router]);
+  useEffect(() => {
+    if (isHydrated) {
+      // Vérifier immédiatement si des jobs sont terminés
+      checkJobsCompletion();
+      console.log('🔍 Vérification des jobs au démarrage');
+    }
+  }, [isHydrated, checkJobsCompletion]);
 
   return (
     <PaperProvider>

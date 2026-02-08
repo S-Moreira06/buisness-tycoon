@@ -89,6 +89,7 @@ export function useSyncGame() {
         clickUpgrades: gameState.clickUpgrades,
         stats: gameState.stats,
         unlockedAchievements: gameState.unlockedAchievements,
+        jobs: gameState.jobs,
       });
 
       if (currentStateString !== lastSaveRef.current && !isSavingRef.current) {

@@ -781,12 +781,44 @@ export const useGameStore = create<ExtendedGameState>()(
           // Système
           totalResets: cloudStats.totalResets ?? (state.stats.totalResets || 0),
         };
+        // ========================================
+        // 🆕 3. MIGRATION DES JOBS AVEC VALIDATION
+        // ========================================
+        const cloudJobs = payload.jobs || {
+          activeJobs: {},
+          completedJobsCount: {},
+          totalJobsCompleted: 0,
+        };
+        
+        const now = Date.now();
+        const validatedActiveJobs: Record<string, ActiveJob> = {};
+        
+        Object.entries(cloudJobs.activeJobs || {}).forEach(([jobId, job]: [string, any]) => {
+          // Cas 1 : Job en cours mais le temps est dépassé → Marquer comme completed
+          if (job.status === 'in_progress' && now >= job.endTime) {
+            validatedActiveJobs[jobId] = {
+              ...job,
+              status: 'completed',
+              completedAt: now,
+            };
+            console.log(`✅ Job ${jobId} terminé pendant l'absence (restauré comme completed)`);
+          } 
+          // Cas 2 : Job en cooldown mais le cooldown est expiré → Supprimer
+          else if (job.status === 'claimed' && job.cooldownEndTime && now >= job.cooldownEndTime) {
+            console.log(`🔄 Cooldown du job ${jobId} expiré (supprimé)`);
+            // Ne pas l'ajouter (équivaut à une suppression)
+          } 
+          // Cas 3 : Job valide → Garder tel quel
+          else {
+            validatedActiveJobs[jobId] = job;
+          }
+        });
           // 🆕 Migration des jobs
-          const migratedJobs: JobState = {
-            activeJobs: payload.jobs?.activeJobs || {},
-            completedJobsCount: payload.jobs?.completedJobsCount || {},
-            totalJobsCompleted: payload.jobs?.totalJobsCompleted || 0,
-          };
+        const migratedJobs: JobState = {
+          activeJobs: validatedActiveJobs,
+          completedJobsCount: cloudJobs.completedJobsCount || {},
+          totalJobsCompleted: cloudJobs.totalJobsCompleted || 0,
+        };
     
         // ========================================
         // 3. RETOUR FINAL AVEC TOUTES LES DONNÉES

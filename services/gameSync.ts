@@ -20,6 +20,7 @@ export async function saveGame(uid: string, state: GameState) {
       clickUpgrades: state.clickUpgrades,
       stats: state.stats,
       unlockedAchievements: state.unlockedAchievements || [],
+      jobs: state.jobs,
       lastSavedAt: serverTimestamp(),
     };
     
