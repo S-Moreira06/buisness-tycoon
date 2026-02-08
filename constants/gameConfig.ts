@@ -38,7 +38,7 @@ export const GAME_CONFIG = {
   BASE_XP_REQUIRED: 100,         // XP nécessaire pour passer du niveau 1 au niveau 2
   XP_MULTIPLIER_PER_LEVEL: 1.9,    // Doublement de l'XP requise à chaque niveau
   INITIAL_PLAYER_LEVEL: 1,              // Niveau de départ
-  INITIAL_EXPERIENCE: 0,         // XP de départ
+  INITIAL_EXPERIENCE: 98,         // XP de départ
 
 } as const;
 export const calculateXPForLevel = (targetLevel: number): number => {

@@ -1,8 +1,8 @@
-import { formatMoney, formatNumber, formatPrice, formatReputation, formatXP } from '@/utils/formatNumber';
+import { formatMoney, formatNumber, formatReputation, formatXP } from '@/utils/formatNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import { calculateXPForLevel, GAME_CONFIG, getXPForNextLevel } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
@@ -28,7 +28,13 @@ export const GameHeader = () => {
     playerName,
     sessionNewAchievements // 🆕 Récupérer les nouveaux succès
   } = useGameStore();
-  
+  const previousLevelRef = useRef(playerLevel);
+
+  // Animations
+  const levelScale = useRef(new Animated.Value(1)).current;
+  const xpGlowOpacity = useRef(new Animated.Value(0)).current;
+  const levelUpLabelOpacity = useRef(new Animated.Value(0)).current;
+  const levelUpLabelTranslateY = useRef(new Animated.Value(0)).current;
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
   const [avatarModalVisible, setAvatarModalVisible] = useState(false); // 🆕
@@ -49,6 +55,67 @@ export const GameHeader = () => {
     setTooltipVisible(false);
     setTooltipData(null);
   };
+  useEffect(() => {
+    const previousLevel = previousLevelRef.current;
+
+    if (playerLevel > previousLevel) {
+      // PULSE DU TEXTE DE NIVEAU
+      Animated.sequence([
+        Animated.timing(levelScale, {
+          toValue: 1.5,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(levelScale, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // GLOW SUR LA BARRE D'XP
+      xpGlowOpacity.setValue(0);
+      Animated.sequence([
+        Animated.timing(xpGlowOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(xpGlowOpacity, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // LABEL "LEVEL UP!"
+      levelUpLabelOpacity.setValue(0);
+      levelUpLabelTranslateY.setValue(8); // part un peu plus bas
+
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(levelUpLabelOpacity, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(levelUpLabelOpacity, {
+            toValue: 0,
+            duration: 400,
+            delay: 400, // reste visible un peu puis disparaît
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.timing(levelUpLabelTranslateY, {
+          toValue: -4,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+
+    previousLevelRef.current = playerLevel;
+  }, [playerLevel, levelScale, xpGlowOpacity, levelUpLabelOpacity, levelUpLabelTranslateY]);
 
   return (
     <>
@@ -63,19 +130,60 @@ export const GameHeader = () => {
           {/* XP Bar à gauche */}
           <View style={styles.xpContainer}>
             <View style={styles.xpHeader}>
-              <Text style={styles.xpLabel}>⚡ LVL {playerLevel}</Text>
+              <Animated.Text
+                style={[
+                  styles.xpLabel,
+                  {
+                    transform: [{ scale: levelScale }],
+                  },
+                ]}
+              >
+                ⚡ LVL {playerLevel}
+              </Animated.Text>
+
               <Text style={styles.xpValue}>
                 {formatXP(currentLevelXP)} / {formatXP(xpForNextLevel)} XP
               </Text>
             </View>
+
             <View style={styles.progressBarContainer}>
+              {/* Barre XP normale */}
               <ProgressBar
                 progress={xpProgress}
                 color="#a855f7"
                 style={styles.progressBar}
               />
-              <View style={[styles.progressGlow, { width: `${xpProgress * 100}%` }]} />
+
+              {/* Glow par-dessus la barre */}
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.progressGlow,
+                  {
+                    opacity: xpGlowOpacity,
+                    // Optionnel : tu peux aussi faire varier scaleX pour un effet de "flash"
+                    transform: [{ scaleX: 1.05 }, { scaleY: 1.4 }],
+                  },
+                ]}
+              />
+
+              {/* Label LEVEL UP au-dessus de la barre */}
+              <Animated.View
+                pointerEvents="none"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: -18,
+                  alignItems: 'center',
+                  opacity: levelUpLabelOpacity,
+                  transform: [{ translateY: levelUpLabelTranslateY }],
+                }}
+              >
+                <Text style={styles.levelUpLabel}>LEVEL UP!</Text>
+              </Animated.View>
             </View>
+
           </View>
 
           {/* Avatar (Dynamique) avec Badge 🆕 */}
@@ -118,7 +226,7 @@ export const GameHeader = () => {
             <Text style={styles.statEmoji}>💰</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Argent</Text>
-              <Text style={styles.statValue}>{formatPrice(money)}</Text>
+              <Text style={styles.statValue}>{formatMoney(money)}</Text>
             </View>
           </Pressable>
 
@@ -243,6 +351,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 8,
   },
+  levelUpLabel: {
+  fontSize: 25,
+  fontWeight: 'bold',
+  color: '#fdb90e', // jaune/or pour contraster avec le violet
+  textShadowColor: '#fbbf24',
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 8,
+},
+
   avatarContainer: {
     position: 'relative',
   },
