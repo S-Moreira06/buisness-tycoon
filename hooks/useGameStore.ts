@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import { BUSINESSES_CONFIG } from '@/constants/businessesConfig';
 import { CLICK_UPGRADES_CONFIG } from '@/constants/clickUpgradesConfig';
 import { calculateLevelFromXP, GAME_CONFIG } from '@/constants/gameConfig';
+import { JOBS_CONFIG } from '@/constants/jobsConfig';
 import { UPGRADES_CONFIG } from '@/constants/upgradesConfig';
 import { ClickUpgradeState, GameState, GameStats } from '@/types/game';
+import { ActiveJob, JobConfig, JobState } from '@/types/job';
 
 interface GameActions {
   setPlayerName: (name: string) => void;
@@ -30,6 +32,11 @@ interface GameActions {
   updateDailyStreak: () => void; // 🆕
   clearSessionAchievements: () => void; 
   addLevelUpReward: (level: number) => void;
+  startJob: (jobId: string) => void; // 🆕
+  claimJobReward: (jobId: string) => void; // 🆕
+  checkJobsCompletion: () => void; // 🆕 Vérifier les jobs terminés
+  getActiveJobsWithDetails: () => Array<ActiveJob & JobConfig>; // 🆕 Helper pour l'UI
+  hasCompletedJobs: () => boolean;
 };
 
 type ExtendedGameState = GameState & GameActions;
@@ -112,12 +119,18 @@ const initialState: GameState = {
   unlockedAchievements: [],
   sessionNewAchievements: [],
   combo: { currentStreak: 0 },
+  jobs: {
+        activeJobs: {},
+        completedJobsCount: {},
+        totalJobsCompleted: 0,
+      },
+
 };
 
 export const useGameStore = create<ExtendedGameState>()(
     (set, get) => ({
       ...initialState,
-
+      
       setPlayerName: (name) => set({ playerName: name }),
       setProfileEmoji: (emoji) => set({ profileEmoji: emoji }),
       clearSessionAchievements: () => set({ sessionNewAchievements: [] }),
@@ -484,6 +497,155 @@ export const useGameStore = create<ExtendedGameState>()(
             }
           };
         }),
+
+      startJob: (jobId) =>
+        set((state) => {
+          const jobConfig = JOBS_CONFIG[jobId];
+          if (!jobConfig) {
+            console.error(`❌ Job ${jobId} n'existe pas`);
+            return state;
+          }
+          
+          // Vérifier si le job est déjà en cours
+          if (state.jobs.activeJobs[jobId]?.status === 'in_progress') {
+            console.warn(`⚠️ Job ${jobId} déjà en cours`);
+            return state;
+          }
+          
+          // Vérifier le niveau requis
+          if (jobConfig.unlockLevel && state.playerLevel < jobConfig.unlockLevel) {
+            console.warn(`⚠️ Niveau ${jobConfig.unlockLevel} requis pour ${jobConfig.name}`);
+            return state;
+          }
+          
+          const now = Date.now();
+          const endTime = now + jobConfig.duration * 1000;
+          
+          const newJob: ActiveJob = {
+            jobId,
+            status: 'in_progress',
+            startedAt: now,
+            endTime,
+          };
+          
+          console.log(`🚀 Job ${jobConfig.name} démarré (fin prévue à ${new Date(endTime).toLocaleTimeString()})`);
+          
+          return {
+            jobs: {
+              ...state.jobs,
+              activeJobs: {
+                ...state.jobs.activeJobs,
+                [jobId]: newJob,
+              },
+            },
+          };
+        }),
+      
+      claimJobReward: (jobId) =>
+        set((state) => {
+          const activeJob = state.jobs.activeJobs[jobId];
+          const jobConfig = JOBS_CONFIG[jobId];
+          
+          if (!activeJob || !jobConfig) {
+            console.error(`❌ Job ${jobId} non trouvé`);
+            return state;
+          }
+          
+          if (activeJob.status !== 'completed') {
+            console.warn(`⚠️ Job ${jobId} pas encore terminé`);
+            return state;
+          }
+          
+          // Ajouter les récompenses
+          const { money, reputation, xp } = jobConfig.rewards;
+          const newMoney = state.money + money;
+          const newReputation = state.reputation + reputation;
+          const newXp = state.experience + xp;
+          const newLevel = calculateLevelFromXP(newXp);
+          
+          const currentStats = state.stats || initialStats;
+          
+          // Mettre à jour les stats
+          const updatedStats = {
+            ...currentStats,
+            totalMoneyEarned: currentStats.totalMoneyEarned + money,
+            moneyFromAchievements: currentStats.moneyFromAchievements + money, // Jobs = "externe"
+            maxMoneyReached: Math.max(currentStats.maxMoneyReached, newMoney),
+            totalReputationEarned: currentStats.totalReputationEarned + reputation,
+            maxReputationReached: Math.max(currentStats.maxReputationReached, newReputation),
+          };
+          
+          // Mettre à jour le job
+          const updatedActiveJobs = { ...state.jobs.activeJobs };
+          updatedActiveJobs[jobId] = {
+            ...activeJob,
+            status: 'claimed',
+          };
+          
+          console.log(`✅ Récompenses réclamées : +${money}€, +${reputation} 🏆, +${xp} XP`);
+          
+          return {
+            money: newMoney,
+            reputation: newReputation,
+            experience: newXp,
+            playerLevel: newLevel,
+            stats: updatedStats,
+            jobs: {
+              ...state.jobs,
+              activeJobs: updatedActiveJobs,
+              completedJobsCount: {
+                ...state.jobs.completedJobsCount,
+                [jobId]: (state.jobs.completedJobsCount[jobId] || 0) + 1,
+              },
+              totalJobsCompleted: state.jobs.totalJobsCompleted + 1,
+            },
+          };
+        }),
+      
+      checkJobsCompletion: () =>
+        set((state) => {
+          const now = Date.now();
+          const updatedActiveJobs = { ...state.jobs.activeJobs };
+          let hasChanges = false;
+          
+          Object.values(updatedActiveJobs).forEach((job) => {
+            if (job.status === 'in_progress' && now >= job.endTime) {
+              updatedActiveJobs[job.jobId] = {
+                ...job,
+                status: 'completed',
+                completedAt: now,
+              };
+              hasChanges = true;
+              console.log(`✅ Job ${job.jobId} terminé !`);
+            }
+          });
+          
+          if (!hasChanges) return state;
+          
+          return {
+            jobs: {
+              ...state.jobs,
+              activeJobs: updatedActiveJobs,
+            },
+          };
+        }),
+      
+      getActiveJobsWithDetails: () => {
+        const state = get();
+        return Object.values(state.jobs.activeJobs)
+          .filter(job => job.status !== 'claimed')
+          .map(job => {
+            const config = JOBS_CONFIG[job.jobId];
+            return { ...job, ...config };
+          });
+      },
+      
+      hasCompletedJobs: () => {
+        const state = get();
+        return Object.values(state.jobs.activeJobs).some(
+          job => job.status === 'completed'
+        );
+      },
       
       hydrateFromServer: (payload: any) => set((state) => {
         // ========================================
@@ -577,7 +739,13 @@ export const useGameStore = create<ExtendedGameState>()(
           // Système
           totalResets: cloudStats.totalResets ?? (state.stats.totalResets || 0),
         };
-
+          // 🆕 Migration des jobs
+          const migratedJobs: JobState = {
+            activeJobs: payload.jobs?.activeJobs || {},
+            completedJobsCount: payload.jobs?.completedJobsCount || {},
+            totalJobsCompleted: payload.jobs?.totalJobsCompleted || 0,
+          };
+    
         // ========================================
         // 3. RETOUR FINAL AVEC TOUTES LES DONNÉES
         // ========================================
@@ -586,6 +754,7 @@ export const useGameStore = create<ExtendedGameState>()(
           ...payload,         // Override avec le cloud (money, reputation, businesses, etc.)
           stats: migratedStats,
           unlockedAchievements: mergedAchievements,
+          jobs: migratedJobs,
         };
       }),
 

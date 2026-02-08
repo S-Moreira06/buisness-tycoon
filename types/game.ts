@@ -1,4 +1,5 @@
 import { TierType } from "@/constants/tierConfig";
+import { JobState } from "./job";
 import { UnlockCondition } from './unlockConditions';
 
 // ==========================================
@@ -212,4 +213,5 @@ export interface GameState {
   unlockedAchievements: string[];
   sessionNewAchievements: string[];
   combo?: { currentStreak: number };
+  jobs: JobState;
 }

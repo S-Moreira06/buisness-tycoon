@@ -1,8 +1,11 @@
+import { useJobNotification } from '@/hooks/useJobNotification';
 import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
+import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 export default function TabsLayout() {
+  const hasCompletedJobs = useJobNotification();
   return (
     <Tabs
       screenOptions={{
@@ -52,6 +55,20 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="jobs"
+        options={{
+          title: 'Jobs',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIconWithBadge 
+              emoji="💼" 
+              color={color} 
+              focused={focused} 
+              showBadge={hasCompletedJobs} // 🆕
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="upgrades"
         options={{
           title: 'Boosts',
@@ -72,6 +89,7 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
 // Composant pour les icônes avec effet glow
 function TabIcon({ emoji, color, focused }: { emoji: string; color: string; focused: boolean }) {
   return (
@@ -86,5 +104,50 @@ function TabIcon({ emoji, color, focused }: { emoji: string; color: string; focu
     >
       {emoji}
     </Text>
+  );
+}
+
+function TabIconWithBadge({ 
+  emoji, 
+  color, 
+  focused, 
+  showBadge 
+}: { 
+  emoji: string; 
+  color: string; 
+  focused: boolean;
+  showBadge: boolean;
+}) {
+  return (
+    <View style={{ position: 'relative' }}>
+      <Text
+        style={{
+          fontSize: 20,
+          filter: focused ? `drop-shadow(0 0 8px ${color})` : 'none',
+          transform: [{ scale: focused ? 1.4 : 1 }],
+        }}
+      >
+        {emoji}
+      </Text>
+      {showBadge && (
+        <View
+          style={{
+            position: 'absolute',
+            top: -4,
+            right: -8,
+            backgroundColor: '#ef4444',
+            borderRadius: 10,
+            width: 16,
+            height: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>
+            !
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
