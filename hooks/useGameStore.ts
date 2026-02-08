@@ -29,6 +29,7 @@ interface GameActions {
   endSession: () => void; // 🆕
   updateDailyStreak: () => void; // 🆕
   clearSessionAchievements: () => void; 
+  addLevelUpReward: (level: number) => void;
 };
 
 type ExtendedGameState = GameState & GameActions;
@@ -632,6 +633,34 @@ export const useGameStore = create<ExtendedGameState>()(
             }
           };
         }),
+      
+      addLevelUpReward: (level) =>
+        set((state) => {
+          // Calcul de la réputation
+          let reputationGain = GAME_CONFIG.REPUTATION_PER_LEVEL; // Base : 5
+
+          if (level % 5 === 0) {
+            reputationGain += GAME_CONFIG.REPUTATION_BONUS_EVERY_5_LEVELS; // +10
+          }
+
+          if (level % 10 === 0) {
+            reputationGain += GAME_CONFIG.REPUTATION_BONUS_EVERY_10_LEVELS; // +20
+          }
+
+          const newReputation = state.reputation + reputationGain;
+
+          console.log(`🎉 Level ${level} atteint! +${reputationGain} réputation`);
+
+          return {
+            reputation: newReputation,
+            stats: {
+              ...state.stats,
+              totalReputationEarned: state.stats.totalReputationEarned + reputationGain,
+              maxReputationReached: Math.max(state.stats.maxReputationReached, newReputation),
+            },
+          };
+        }),
+
 
       updateDailyStreak: () =>
         set((state) => {

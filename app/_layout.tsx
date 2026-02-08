@@ -1,4 +1,5 @@
 import { useAchievementSystem } from '@/hooks/useAchievementSystem';
+import { useLevelUpTracker } from '@/hooks/useLevelUpTracker';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
@@ -6,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function RootLayout() {
   useAchievementSystem();
+  useLevelUpTracker();
   const { user, loading } = useAuth();
   const router = useRouter();
 
