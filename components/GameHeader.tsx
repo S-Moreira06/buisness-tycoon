@@ -226,7 +226,7 @@ export const GameHeader = () => {
             <Text style={styles.statEmoji}>💰</Text>
             <View style={styles.statContent}>
               <Text style={styles.statLabel}>Argent</Text>
-              <Text style={styles.statValue}>{formatMoney(money)}</Text>
+              <Text style={[styles.statValue, styles.statContentMoney]}>{formatMoney(money)}</Text>
             </View>
           </Pressable>
 
@@ -429,6 +429,7 @@ const styles = StyleSheet.create({
   },
   statCardMed: {
     flex: 2,
+    paddingRight: 4,
   },
   statCardBig: {
     flex: 3,
@@ -442,6 +443,9 @@ const styles = StyleSheet.create({
   },
   statContentCenter: {
     alignItems: 'center',
+  },
+  statContentMoney: {
+    marginLeft: -3,
   },
   statLabel: {
     fontSize: 10,
