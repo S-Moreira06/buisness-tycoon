@@ -1,4 +1,5 @@
 import { AchievementsModal } from '@/components/AchievementsModal';
+import AnimatedBackground from '@/components/AnimatedBackground';
 import { CustomModal } from '@/components/CustomModal';
 import { StatsModal } from '@/components/StatsModal';
 import { useSettingsStore } from '@/hooks/useSettingsStore';
@@ -203,6 +204,10 @@ export default function SettingsScreen() {
     >
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <AnimatedBackground 
+                          colors={['#000000', '#2d00f7', '#2d0a70', '#830db9']}
+                          speed={10}
+                        />
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerIconContainer}>
@@ -760,8 +765,8 @@ setProfileEmoji(tempEmoji);
         </LinearGradient>
       </CustomModal>
 
-
     </LinearGradient>
+
 
   );
 }

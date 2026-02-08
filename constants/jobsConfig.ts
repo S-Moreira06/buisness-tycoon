@@ -53,28 +53,12 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
   // ========================================
   // 🔰 TIER DÉBUTANT (Niveau 1-5)
   // ========================================
-  
-  courier_bike: {
-    id: 'courier_bike',
-    name: 'Coursier en 2 roues',
-    description: 'Livrez des colis à travers la ville en scooter. Rapide, efficace, et lucratif pour les débutants.',
-    icon: '🛵',
-    duration: 5 * 60, // 5 minutes
-    rewards: {
-      money: 150,
-      reputation: 6,
-      xp: 55,
-    },
-    unlockLevel: 1,
-    cooldown: 0,
-  },
-
   flyer_distributor: {
     id: 'flyer_distributor',
     name: 'Distributeur de Flyers',
-    description: 'Distribuez des prospectus dans les rues pour promouvoir des commerces locaux. Un bon moyen de gagner rapidement.',
+    description: 'Distribuez des prospectus dans les rues pour promouvoir des commerces locaux. Un bon moyen de gagner rapidement ses premiers sous.',
     icon: '📄',
-    duration: 3 * 60, // 3 minutes
+    duration: 5 * 60, // 5 minutes
     rewards: {
       money: 80,
       reputation: 3,
@@ -83,6 +67,22 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
     unlockLevel: 1,
     cooldown: 0,
   },
+  courier_bike: {
+    id: 'courier_bike',
+    name: 'Coursier en 2 roues',
+    description: 'Livrez des colis à travers la ville en scooter. Rapide, efficace, et lucratif pour les débutants.',
+    icon: '🛵',
+    duration: 7 * 60, // 7 minutes
+    rewards: {
+      money: 150,
+      reputation: 6,
+      xp: 55,
+    },
+    unlockLevel: 3,
+    cooldown: 0,
+  },
+  
+  
 
   dog_walker: {
     id: 'dog_walker',
@@ -95,41 +95,59 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       reputation: 8,
       xp: 75,
     },
-    unlockLevel: 2,
-    cooldown: 0,
-  },
-
-  // ========================================
-  // 💼 TIER INTERMÉDIAIRE (Niveau 5-10)
-  // ========================================
-
-  delivery_van: {
-    id: 'delivery_van',
-    name: 'Livreur en Camionnette',
-    description: 'Transportez des marchandises volumineuses pour des entreprises locales. Plus lucratif que le scooter.',
-    icon: '🚚',
-    duration: 12 * 60, // 12 minutes
-    rewards: {
-      money: 450,
-      reputation: 15,
-      xp: 140,
-    },
     unlockLevel: 5,
     cooldown: 0,
   },
+
+  // ========================================
+  // 💼 TIER INTERMÉDIAIRE (Niveau 6-10)
+  // ========================================
+
+  babysitter: {
+    id: 'babysitter',
+    name: 'Baby-Sitting',
+    description: ' Garde d\'enfants au domicile des parents, surveillance des devoirs et activités ludiques.',
+    icon: '👶',
+    duration: 10 * 60, // 10 minutes
+    rewards: {
+      money: 250,
+      reputation: 15,
+      xp: 100,
+    },
+    unlockLevel: 6,
+    cooldown: 0,
+  },
+  barman: {
+    id: 'barman',
+    name: 'Barman',
+    description: ' Spécialisé dans le shaking abusif de Toutalegout.',
+    icon: '🍹',
+    duration: 10 * 60, // 10 minutes
+    rewards: {
+      money: 350,
+      reputation: 5,
+      xp: 190,
+    },
+    unlockLevel: 10,
+    cooldown: 0,
+  },
+
+    // ========================================
+  // 🏆 TIER AVANCÉ (Niveau 11-30)
+  // ========================================
 
   freelance_designer: {
     id: 'freelance_designer',
     name: 'Designer Freelance',
     description: 'Créez des visuels pour des petites entreprises. Travail créatif et bien payé.',
     icon: '🎨',
-    duration: 15 * 60, // 15 minutes
+    duration: 25 * 60, // 25 minutes
     rewards: {
       money: 600,
       reputation: 20,
-      xp: 180,
+      xp: 250,
     },
-    unlockLevel: 6,
+    unlockLevel:15,
     cooldown: 0,
   },
 
@@ -140,30 +158,26 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
     icon: '📸',
     duration: 20 * 60, // 20 minutes
     rewards: {
-      money: 850,
-      reputation: 28,
-      xp: 240,
+      money: 500,
+      reputation: 30,
+      xp: 290,
     },
-    unlockLevel: 8,
+    unlockLevel: 19,
     cooldown: 0,
   },
-
-  // ========================================
-  // 🏆 TIER AVANCÉ (Niveau 10-15)
-  // ========================================
 
   tech_consultant: {
     id: 'tech_consultant',
     name: 'Consultant IT',
     description: 'Accompagnez des PME dans leur transformation numérique. Expertise technique et rémunération premium.',
     icon: '💻',
-    duration: 25 * 60, // 25 minutes
+    duration: 40 * 60, // 40 minutes
     rewards: {
       money: 1200,
       reputation: 35,
       xp: 320,
     },
-    unlockLevel: 10,
+    unlockLevel: 15,
     cooldown: 0,
   },
 
@@ -172,32 +186,33 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
     name: 'Agent Immobilier',
     description: 'Vendez des biens immobiliers haut de gamme. Commissions généreuses et réseau influent.',
     icon: '🏡',
-    duration: 30 * 60, // 30 minutes
+    duration: 45 * 60, // 45 minutes
     rewards: {
       money: 1800,
       reputation: 45,
       xp: 420,
     },
-    unlockLevel: 12,
+    unlockLevel: 25,
     cooldown: 0,
   },
 
   // ========================================
-  // 💎 TIER ÉLITE (Niveau 15+)
+  // 💎 TIER ÉLITE (Niveau 30+)
   // ========================================
 
   investment_banker: {
+    // A prévoir : investissement d'un montant au choix du joueur, prevision de gain et benefices reels aléatoires
     id: 'investment_banker',
     name: 'Banquier d\'Affaires',
     description: 'Gérez des fusions-acquisitions pour des multinationales. Les montants en jeu sont colossaux.',
     icon: '💼',
-    duration: 40 * 60, // 40 minutes
+    duration: 60 * 60, // 1 heure
     rewards: {
       money: 3500,
       reputation: 60,
       xp: 600,
     },
-    unlockLevel: 15,
+    unlockLevel: 30,
     cooldown: 0,
   },
 
@@ -206,13 +221,13 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
     name: 'Manager de Célébrités',
     description: 'Gérez la carrière de stars internationales. Prestige maximum et revenus stratosphériques.',
     icon: '⭐',
-    duration: 50 * 60, // 50 minutes
+    duration: 90 * 60, // 1h30
     rewards: {
       money: 5000,
-      reputation: 80,
+      reputation: 100,
       xp: 850,
     },
-    unlockLevel: 18,
+    unlockLevel: 35,
     cooldown: 0,
   },
 };

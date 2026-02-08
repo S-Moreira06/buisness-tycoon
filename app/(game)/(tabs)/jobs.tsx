@@ -1,4 +1,5 @@
 // app/(game)/(tabs)/jobs.tsx
+import AnimatedBackground from '@/components/AnimatedBackground';
 import { JOBS_CONFIG } from '@/constants/jobsConfig';
 import { useGameStore } from '@/hooks/useGameStore';
 import { ActiveJob, JobConfig } from '@/types/job';
@@ -71,27 +72,31 @@ export default function JobsScreen() {
               <Text variant="titleMedium" style={styles.title}>
                 {jobConfig.name}
               </Text>
-              {isLocked && (
+              {/* {isLocked && (
                 <Text variant="bodySmall" style={styles.lockText}>
                   🔒 Niveau {jobConfig.unlockLevel} requis
                 </Text>
-              )}
+              )} */}
             </View>
           </View>
           
-          <Text variant="bodyMedium" style={styles.description}>
-            {jobConfig.description}
-          </Text>
+          {!isLocked && (
+            <>
+              <Text variant="bodyMedium" style={styles.description}>
+                {jobConfig.description}
+              </Text>
+              <View style={styles.rewards}>
+                <Text variant="bodySmall">💰 {jobConfig.rewards.money}€</Text>
+                <Text variant="bodySmall">⭐ {jobConfig.rewards.reputation}</Text>
+                <Text variant="bodySmall">🏆 {jobConfig.rewards.xp} XP</Text>
+                <Text variant="bodySmall" style={styles.duration}>
+                  ⏱️ Durée : {formatTime(jobConfig.duration)}
+                </Text>
+              </View>
+            </>
+          )}
           
-          <View style={styles.rewards}>
-            <Text variant="bodySmall">💰 {jobConfig.rewards.money}€</Text>
-            <Text variant="bodySmall">🏆 {jobConfig.rewards.reputation}</Text>
-            <Text variant="bodySmall">⭐ {jobConfig.rewards.xp} XP</Text>
-          </View>
           
-          <Text variant="bodySmall" style={styles.duration}>
-            ⏱️ Durée : {formatTime(jobConfig.duration)}
-          </Text>
           
           {isActive && (
             <View style={styles.progressContainer}>
@@ -125,7 +130,9 @@ export default function JobsScreen() {
               disabled={isLocked}
               style={styles.startButton}
             >
-              {isLocked ? 'Verrouillé' : 'Démarrer'}
+              {isLocked ? <Text variant="bodySmall" style={styles.lockText}>
+                  🔒 Niveau {jobConfig.unlockLevel} requis
+                </Text> : 'Démarrer'}
             </Button>
           )}
         </Card.Content>
@@ -135,9 +142,13 @@ export default function JobsScreen() {
   
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <AnimatedBackground 
+                colors={['#000000', '#2d00f7', '#2d0a70', '#830db9']}
+                speed={10}
+              />
       <View style={styles.titleSection}>
         <Text variant="headlineLarge" style={styles.screenTitle}>
-          💼 Jobs Disponibles
+          💼 Jobs
         </Text>
         <Text variant="bodyMedium" style={styles.subtitle}>
           Complétez des missions pour gagner de l'argent et de la réputation
@@ -159,7 +170,7 @@ export default function JobsScreen() {
       {/* Afficher tous les jobs disponibles */}
       <View style={styles.section}>
         <Text variant="titleLarge" style={styles.sectionTitle}>
-          📋 Tous les jobs
+          📋 Liste des jobs
         </Text>
         {Object.values(JOBS_CONFIG).map((jobConfig) => {
           const activeJob = activeJobs.find(aj => aj.jobId === jobConfig.id);
@@ -179,10 +190,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 80, // Pour éviter que le tab bar cache le contenu
+    paddingBottom: 40, // Pour éviter que le tab bar cache le contenu
   },
   titleSection: {
     marginBottom: 24,
+    alignItems: 'center',
   },
   screenTitle: {
     color: '#a855f7',
@@ -233,8 +245,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   duration: {
+    flex: 1,
     color: '#acacad',
-    marginBottom: 16,
+    textAlign: 'right',
   },
   progressContainer: {
     marginTop: 12,
