@@ -2,6 +2,54 @@
 import { JobConfig } from '@/types/job';
 
 export const JOBS_CONFIG: Record<string, JobConfig> = {
+    // ========================================
+  // 🔧 TIER DEV/DEBUG (À RETIRER EN PRODUCTION)
+  // ========================================
+  
+  dev_xp_boost: {
+    id: 'dev_xp_boost',
+    name: '[DEV] XP Booster',
+    description: '⚠️ Job de test uniquement. Donne 500 XP instantanément pour tester la progression des niveaux.',
+    icon: '⭐',
+    duration: 5, // 5 secondes
+    rewards: {
+      money: 0,
+      reputation: 0,
+      xp: 500,
+    },
+    unlockLevel: 1,
+    cooldown: 0,
+  },
+
+  dev_reputation_boost: {
+    id: 'dev_reputation_boost',
+    name: '[DEV] Reputation Booster',
+    description: '⚠️ Job de test uniquement. Donne 100 réputation pour débloquer rapidement les upgrades.',
+    icon: '🏆',
+    duration: 5, // 5 secondes
+    rewards: {
+      money: 0,
+      reputation: 100,
+      xp: 0,
+    },
+    unlockLevel: 1,
+    cooldown: 0,
+  },
+
+  dev_money_boost: {
+    id: 'dev_money_boost',
+    name: '[DEV] Money Printer',
+    description: '⚠️ Job de test uniquement. Génère 1000€ pour tester les achats de businesses.',
+    icon: '💰',
+    duration: 5, // 5 secondes
+    rewards: {
+      money: 1000,
+      reputation: 0,
+      xp: 0,
+    },
+    unlockLevel: 1,
+    cooldown: 0,
+  },
   // ========================================
   // 🔰 TIER DÉBUTANT (Niveau 1-5)
   // ========================================
