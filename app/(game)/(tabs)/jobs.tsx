@@ -13,6 +13,7 @@ export default function JobsScreen() {
   const startJob = useGameStore((state) => state.startJob);
   const claimJobReward = useGameStore((state) => state.claimJobReward);
   const getActiveJobsWithDetails = useGameStore((state) => state.getActiveJobsWithDetails);
+  const getJobAvailability = useGameStore((state) => state.getJobAvailability);
   const playerLevel = useGameStore((state) => state.playerLevel);
   
   const activeJobs = getActiveJobsWithDetails();
@@ -30,8 +31,28 @@ export default function JobsScreen() {
     const job = JOBS_CONFIG[jobId];
     if (!job) return;
     
+    // Vérifier le niveau
     if (job.unlockLevel && playerLevel < job.unlockLevel) {
       Alert.alert('Niveau insuffisant', `Vous devez être niveau ${job.unlockLevel} pour débloquer ce job.`);
+      return;
+    }
+
+    // Vérifier si un job est déjà actif
+    const hasActiveJob = activeJobs.some(j => j.status === 'in_progress');
+    if (hasActiveJob) {
+      Alert.alert('Job en cours', 'Vous avez déjà un job actif. Terminez-le avant d\'en lancer un autre.');
+      return;
+    }
+
+    // Vérifier le cooldown
+    const { available, cooldownRemaining } = getJobAvailability(jobId);
+    if (!available) {
+      const minutes = Math.floor(cooldownRemaining / 60);
+      const seconds = cooldownRemaining % 60;
+      Alert.alert(
+        'Cooldown actif', 
+        `Ce job est disponible dans ${minutes}m ${seconds}s`
+      );
       return;
     }
     
@@ -46,7 +67,9 @@ export default function JobsScreen() {
     const isActive = activeJob?.status === 'in_progress';
     const isCompleted = activeJob?.status === 'completed';
     const isLocked = jobConfig.unlockLevel ? playerLevel < jobConfig.unlockLevel : false;
-    
+    // 🆕 Vérifier le cooldown
+    const { available, cooldownRemaining } = getJobAvailability(jobConfig.id);
+    const isOnCooldown = !available && cooldownRemaining > 0;
     // Calcul du temps restant
     let remainingSeconds = 0;
     let progress = 0;
@@ -123,6 +146,15 @@ export default function JobsScreen() {
             </View>
           )}
           
+           {/* 🆕 Afficher le cooldown */}
+          {isOnCooldown && (
+            <View style={styles.cooldownContainer}>
+              <Text variant="bodyMedium" style={styles.cooldownText}>
+                ⏳ Cooldown : {formatTime(cooldownRemaining)}
+              </Text>
+            </View>
+          )}
+          {/* Bouton démarrer */}
           {!isActive && !isCompleted && (
             <Button
               mode="contained"
@@ -282,5 +314,17 @@ const styles = StyleSheet.create({
   startButton: {
     backgroundColor: '#a855f7',
     marginTop: 12,
+  },
+  // 🆕 Styles pour le cooldown
+  cooldownContainer: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cooldownText: {
+    color: '#fbbf24',
+    fontWeight: 'bold',
   },
 });

@@ -23,6 +23,7 @@ export interface ActiveJob {
   startedAt: number; // Timestamp en millisecondes
   completedAt?: number; // Timestamp en millisecondes (undefined si pas terminé)
   endTime: number; // Timestamp calculé (startedAt + duration)
+  cooldownEndTime?: number; // 🆕 Timestamp de fin du cooldown
 }
 
 export interface JobState {

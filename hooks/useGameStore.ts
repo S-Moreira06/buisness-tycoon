@@ -37,6 +37,7 @@ interface GameActions {
   checkJobsCompletion: () => void; // 🆕 Vérifier les jobs terminés
   getActiveJobsWithDetails: () => Array<ActiveJob & JobConfig>; // 🆕 Helper pour l'UI
   hasCompletedJobs: () => boolean;
+  getJobAvailability: (jobId: string) => { available: boolean; cooldownRemaining: number };
 };
 
 type ExtendedGameState = GameState & GameActions;
@@ -506,13 +507,25 @@ export const useGameStore = create<ExtendedGameState>()(
             return state;
           }
           
-          // Vérifier si le job est déjà en cours
-          if (state.jobs.activeJobs[jobId]?.status === 'in_progress') {
-            console.warn(`⚠️ Job ${jobId} déjà en cours`);
+           // 🔒 VÉRIFICATION 1 : Un seul job actif à la fois
+          const hasActiveJob = Object.values(state.jobs.activeJobs).some(
+            job => job.status === 'in_progress'
+          );
+          
+          if (hasActiveJob) {
+            console.warn(`⚠️ Vous avez déjà un job en cours. Terminez-le avant d'en lancer un autre.`);
             return state;
           }
-          
-          // Vérifier le niveau requis
+
+          // 🔒 VÉRIFICATION 2 : Ce job est-il en cooldown ?
+          const existingJob = state.jobs.activeJobs[jobId];
+          if (existingJob?.cooldownEndTime && Date.now() < existingJob.cooldownEndTime) {
+            const remainingCooldown = Math.ceil((existingJob.cooldownEndTime - Date.now()) / 1000);
+            console.warn(`⚠️ Job ${jobConfig.name} en cooldown. Disponible dans ${remainingCooldown}s`);
+            return state;
+          }
+
+          // 🔒 VÉRIFICATION 3 : Niveau requis
           if (jobConfig.unlockLevel && state.playerLevel < jobConfig.unlockLevel) {
             console.warn(`⚠️ Niveau ${jobConfig.unlockLevel} requis pour ${jobConfig.name}`);
             return state;
@@ -574,12 +587,18 @@ export const useGameStore = create<ExtendedGameState>()(
             totalReputationEarned: currentStats.totalReputationEarned + reputation,
             maxReputationReached: Math.max(currentStats.maxReputationReached, newReputation),
           };
-          
+          // 🆕 CALCUL DU COOLDOWN
+          const now = Date.now();
+          const cooldownEndTime = jobConfig.cooldown 
+            ? now + jobConfig.cooldown * 1000 
+            : undefined;
+                
           // Mettre à jour le job
           const updatedActiveJobs = { ...state.jobs.activeJobs };
           updatedActiveJobs[jobId] = {
             ...activeJob,
             status: 'claimed',
+            cooldownEndTime,
           };
           
           console.log(`✅ Récompenses réclamées : +${money}€, +${reputation} 🏆, +${xp} XP`);
@@ -609,6 +628,7 @@ export const useGameStore = create<ExtendedGameState>()(
           let hasChanges = false;
           
           Object.values(updatedActiveJobs).forEach((job) => {
+            // 1. Vérifier si le job est terminé
             if (job.status === 'in_progress' && now >= job.endTime) {
               updatedActiveJobs[job.jobId] = {
                 ...job,
@@ -617,6 +637,12 @@ export const useGameStore = create<ExtendedGameState>()(
               };
               hasChanges = true;
               console.log(`✅ Job ${job.jobId} terminé !`);
+            }
+            // 2. 🆕 Nettoyer les jobs en cooldown expiré
+            if (job.status === 'claimed' && job.cooldownEndTime && now >= job.cooldownEndTime) {
+              delete updatedActiveJobs[job.jobId];
+              hasChanges = true;
+              console.log(`🔄 Cooldown du job ${job.jobId} expiré, job supprimé.`);
             }
           });
           
@@ -629,7 +655,23 @@ export const useGameStore = create<ExtendedGameState>()(
             },
           };
         }),
-      
+      // 🆕 HELPER : Vérifier si un job est disponible (pas en cooldown)
+      getJobAvailability: (jobId: string) => {
+        const state = get();
+        const job = state.jobs.activeJobs[jobId];
+        
+        if (!job) return { available: true, cooldownRemaining: 0 };
+        
+        if (job.cooldownEndTime) {
+          const remaining = Math.max(0, job.cooldownEndTime - Date.now());
+          return {
+            available: remaining === 0,
+            cooldownRemaining: Math.ceil(remaining / 1000), // En secondes
+          };
+        }
+        
+        return { available: true, cooldownRemaining: 0 };
+      },
       getActiveJobsWithDetails: () => {
         const state = get();
         return Object.values(state.jobs.activeJobs)

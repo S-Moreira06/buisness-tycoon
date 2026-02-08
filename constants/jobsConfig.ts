@@ -5,7 +5,6 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
     // ========================================
   // 🔧 TIER DEV/DEBUG (À RETIRER EN PRODUCTION)
   // ========================================
-  
   dev_xp_boost: {
     id: 'dev_xp_boost',
     name: '[DEV] XP Booster',
@@ -18,9 +17,8 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 500,
     },
     unlockLevel: 1,
-    cooldown: 60,
+    cooldown: 5,
   },
-
   dev_reputation_boost: {
     id: 'dev_reputation_boost',
     name: '[DEV] Reputation Booster',
@@ -33,7 +31,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 0,
     },
     unlockLevel: 1,
-    cooldown: 0,
+    cooldown: 5,
   },
 
   dev_money_boost: {
@@ -48,7 +46,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 0,
     },
     unlockLevel: 1,
-    cooldown: 0,
+    cooldown: 5,
   },
   // ========================================
   // 🔰 TIER DÉBUTANT (Niveau 1-5)
@@ -65,7 +63,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 35,
     },
     unlockLevel: 1,
-    cooldown: 0,
+    cooldown: 60,
   },
   courier_bike: {
     id: 'courier_bike',
@@ -79,7 +77,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 55,
     },
     unlockLevel: 3,
-    cooldown: 0,
+    cooldown: 120,
   },
   
   
@@ -96,7 +94,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 75,
     },
     unlockLevel: 5,
-    cooldown: 0,
+    cooldown: 180,
   },
 
   // ========================================
@@ -115,7 +113,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 100,
     },
     unlockLevel: 6,
-    cooldown: 0,
+    cooldown: 300,
   },
   barman: {
     id: 'barman',
@@ -129,7 +127,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 190,
     },
     unlockLevel: 10,
-    cooldown: 0,
+    cooldown: 500,
   },
 
     // ========================================
@@ -148,7 +146,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 250,
     },
     unlockLevel:15,
-    cooldown: 0,
+    cooldown: 600,
   },
 
   event_photographer: {
@@ -163,7 +161,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 290,
     },
     unlockLevel: 19,
-    cooldown: 0,
+    cooldown: 700,
   },
 
   tech_consultant: {
@@ -178,7 +176,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 320,
     },
     unlockLevel: 15,
-    cooldown: 0,
+    cooldown: 800,
   },
 
   real_estate_agent: {
@@ -193,7 +191,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 420,
     },
     unlockLevel: 25,
-    cooldown: 0,
+    cooldown: 900,
   },
 
   // ========================================
@@ -213,7 +211,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 600,
     },
     unlockLevel: 30,
-    cooldown: 0,
+    cooldown:1000,
   },
 
   celebrity_manager: {
@@ -228,7 +226,7 @@ export const JOBS_CONFIG: Record<string, JobConfig> = {
       xp: 850,
     },
     unlockLevel: 35,
-    cooldown: 0,
+    cooldown: 1100,
   },
 };
 
