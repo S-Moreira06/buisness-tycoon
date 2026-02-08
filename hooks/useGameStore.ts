@@ -28,6 +28,7 @@ interface GameActions {
   startSession: () => void; // 🆕
   endSession: () => void; // 🆕
   updateDailyStreak: () => void; // 🆕
+  clearSessionAchievements: () => void; 
 };
 
 type ExtendedGameState = GameState & GameActions;
@@ -108,6 +109,7 @@ const initialState: GameState = {
     ])
   ),
   unlockedAchievements: [],
+  sessionNewAchievements: [],
   combo: { currentStreak: 0 },
 };
 
@@ -119,7 +121,7 @@ export const useGameStore = create<ExtendedGameState>()(
 
       setPlayerName: (name) => set({ playerName: name }),
       setProfileEmoji: (emoji) => set({ profileEmoji: emoji }),
-
+      clearSessionAchievements: () => set({ sessionNewAchievements: [] }),
       purchaseClickUpgrade: (upgradeId) =>
         set((state) => {
           const upgrade = state.clickUpgrades[upgradeId];
@@ -468,6 +470,7 @@ export const useGameStore = create<ExtendedGameState>()(
           
           return {
             unlockedAchievements: [...state.unlockedAchievements, id],
+            sessionNewAchievements: [...state.sessionNewAchievements, id],
             reputation: newReputation,
             experience: newXp,
             playerLevel: newLevel,
@@ -617,6 +620,7 @@ export const useGameStore = create<ExtendedGameState>()(
           // Si daysDiff === 0 (même jour), on garde le streak actuel
           
           return {
+            sessionNewAchievements: [],
             stats: {
               ...state.stats,
               sessionsPlayed: state.stats.sessionsPlayed + 1,

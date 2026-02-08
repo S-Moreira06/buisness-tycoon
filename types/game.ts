@@ -210,5 +210,6 @@ export interface GameState {
   clickUpgrades: Record<string, ClickUpgradeState>;
   stats: GameStats;
   unlockedAchievements: string[];
+  sessionNewAchievements: string[];
   combo?: { currentStreak: number };
 }

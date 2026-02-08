@@ -3,9 +3,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, ProgressBar } from 'react-native-paper';
+import { ProgressBar } from 'react-native-paper';
 import { calculateXPForLevel, GAME_CONFIG, getXPForNextLevel } from '../constants/gameConfig';
 import { useGameStore } from '../hooks/useGameStore';
+import { AvatarModal } from './AvatarModal'; // 🆕
 import { CustomModal } from './CustomModal';
 
 interface TooltipData {
@@ -17,9 +18,20 @@ interface TooltipData {
 
 export const GameHeader = () => {
   const router = useRouter();
-  const { money, reputation, totalPassiveIncome, playerLevel, experience, profileEmoji, playerName} = useGameStore();
+  const { 
+    money, 
+    reputation, 
+    totalPassiveIncome, 
+    playerLevel, 
+    experience, 
+    profileEmoji, 
+    playerName,
+    sessionNewAchievements // 🆕 Récupérer les nouveaux succès
+  } = useGameStore();
+  
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false); // 🆕
 
   // Calcul XP
   const xpForCurrentLevel = calculateXPForLevel(playerLevel);
@@ -36,10 +48,6 @@ export const GameHeader = () => {
   const hideTooltip = () => {
     setTooltipVisible(false);
     setTooltipData(null);
-  };
-  const goToSettings = () => {
-    hideTooltip();
-    router.push('/(game)/(tabs)/settings');
   };
 
   return (
@@ -70,26 +78,28 @@ export const GameHeader = () => {
             </View>
           </View>
 
-          {/* Avatar (Dynamique) */}
+          {/* Avatar (Dynamique) avec Badge 🆕 */}
           <Pressable 
             style={styles.avatarContainer}
-            onPress={() => showTooltip({
-              title: `${profileEmoji || '👤'} Profil`, // Affiche l'emoji dans le titre
-              description: `PDG : ${playerName || 'Non défini'}`, // Affiche le nom du joueur
-              value: `Niveau ${playerLevel}`,
-              isAvatar: true
-            })}
+            onPress={() => setAvatarModalVisible(true)} // 🆕 Ouvre la modal au lieu du tooltip
           >
             <LinearGradient
               colors={['rgba(168, 85, 247, 0.2)', 'rgba(124, 58, 237, 0.1)']}
               style={styles.avatar}
             >
-              {/* Affiche l'emoji du store, ou un fallback */}
               <Text style={styles.avatarEmoji}>{profileEmoji || '👤'}</Text>
             </LinearGradient>
             <View style={styles.avatarGlow} />
+            
+            {/* 🆕 BADGE DE NOTIFICATION */}
+            {sessionNewAchievements.length > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {sessionNewAchievements.length}
+                </Text>
+              </View>
+            )}
           </Pressable>
-
         </View>
 
         {/* LIGNE 2 : Ressources (Money, Reputation, Passif) */}
@@ -101,7 +111,7 @@ export const GameHeader = () => {
               showTooltip({
                 title: '💰 Argent',
                 description: 'Ton capital total pour acheter des businesses et faire des upgrades.',
-                value: `${formatNumber(money,2)} €`,
+                value: `${formatNumber(money, 2)} €`,
               })
             }
           >
@@ -111,21 +121,23 @@ export const GameHeader = () => {
               <Text style={styles.statValue}>{formatPrice(money)}</Text>
             </View>
           </Pressable>
-           <Pressable
+
+          <Pressable
             style={styles.statCard}
             onPress={() =>
               showTooltip({
                 title: '⭐ Réputation',
-                description: 'Ta réputation te permet d\'acheter des upgrades puissants.',
+                description: "Ta réputation te permet d'acheter des upgrades puissants.",
                 value: formatNumber(reputation),
               })
             }
           >
-            <View style={[styles.statContent,styles.statContentCenter]}>
+            <View style={[styles.statContent, styles.statContentCenter]}>
               <Text style={styles.statLabel}>⭐</Text>
               <Text style={styles.statValue}>{formatReputation(reputation)}</Text>
             </View>
           </Pressable>
+
           {/* Revenu Passif */}
           <Pressable
             style={[styles.statCard, styles.statCardMed]}
@@ -146,11 +158,8 @@ export const GameHeader = () => {
         </View>
       </LinearGradient>
 
-     {/* CUSTOM MODAL POUR LES TOOLTIPS */}
-      <CustomModal
-        visible={tooltipVisible}
-        onDismiss={hideTooltip}
-      >
+      {/* CUSTOM MODAL POUR LES TOOLTIPS (ressources Money/Rep/Passif) */}
+      <CustomModal visible={tooltipVisible} onDismiss={hideTooltip}>
         <View style={styles.tooltipCard}>
           <LinearGradient
             colors={['#1a1a2e', '#0f0f1e']}
@@ -161,23 +170,15 @@ export const GameHeader = () => {
             <View style={styles.tooltipValueContainer}>
               <Text style={styles.tooltipValue}>{tooltipData?.value}</Text>
             </View>
-
-            {/* 🆕 Bouton Paramètres si c'est le tooltip avatar */}
-            {tooltipData?.isAvatar && (
-              <Button
-                mode="contained"
-                icon="cog"
-                onPress={goToSettings}
-                style={styles.settingsButton}
-                buttonColor="#a855f7"
-                textColor="#ffffff"
-              >
-                Paramètres
-              </Button>
-            )}
           </LinearGradient>
         </View>
       </CustomModal>
+
+      {/* 🆕 AVATAR MODAL (Profil + Nouveautés) */}
+      <AvatarModal
+        visible={avatarModalVisible}
+        onClose={() => setAvatarModalVisible(false)}
+      />
     </>
   );
 };
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
   },
   avatarGlow: {
     position: 'absolute',
-        width: 50,
+    width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: '#a855f7',
@@ -268,6 +269,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 15,
+  },
+  // 🆕 STYLES BADGE NOTIFICATION
+  notificationBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    borderWidth: 2,
+    borderColor: '#0a0a0a',
+  },
+  notificationBadgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   bottomRow: {
     flexDirection: 'row',
@@ -301,7 +322,8 @@ const styles = StyleSheet.create({
   },
   statContent: {
     flex: 1,
-  },statContentCenter: {
+  },
+  statContentCenter: {
     alignItems: 'center',
   },
   statLabel: {
@@ -315,15 +337,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  // Tooltip Styles simplifiés (plus besoin de l'overlay modal ici)
   tooltipCard: {
-    // La CustomModal a déjà un container avec overflow hidden et border radius
     width: '100%',
   },
   tooltipGradient: {
     padding: 20,
     minWidth: 280,
-    alignItems: 'center', // Centrer le contenu
+    alignItems: 'center',
   },
   tooltipTitle: {
     fontSize: 20,
@@ -352,10 +372,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#a855f7',
     textAlign: 'center',
-  },
-   settingsButton: {
-    marginTop: 16,
-    borderRadius: 8,
-    width: '100%', 
   },
 });
