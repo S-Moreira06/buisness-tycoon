@@ -1,4 +1,5 @@
 import { useHaptics } from '@/hooks/useHaptics';
+import { BusinessCardProps } from '@/types/business';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -10,19 +11,13 @@ import { BusinessHeader } from './business/BusinessHeader';
 import { BusinessStats } from './business/BusinessStats';
 import { BusinessUpgradesModal } from './business/BusinessUpgradesModal';
 
-interface BusinessCardProps {
-  businessId: string;
-  name: string;
-  baseIncome: number;
-  buyPrice: number;
-  baseCost?: number,
-}
-
 export const BusinessCard = ({
   businessId,
   name,
   buyPrice,
   baseCost,
+  baseIncome,
+  locked = false
 }: BusinessCardProps) => {
   const router = useRouter();
   const { businesses, money, buyBusiness, upgradeBusiness, upgrades } = useGameStore();
@@ -68,7 +63,7 @@ export const BusinessCard = ({
         colors={business?.owned ? ['#1a1a2e', '#16213e'] : ['#0f0f1e', '#1a1a2e']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.card, business?.owned && styles.ownedCard]}
+        style={[styles.card, business?.owned && styles.ownedCard, locked && styles.lockedCard,]}
       >
         <BusinessHeader
           name={name}
@@ -127,6 +122,10 @@ const styles = StyleSheet.create({
     borderColor: '#374151',
     position: 'relative',
     overflow: 'hidden',
+  },
+   lockedCard: {
+    opacity: 0.6,
+    borderColor: '#555',
   },
   ownedCard: {
     borderColor: '#a855f7',

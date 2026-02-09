@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AnimatedBackground from '@/components/AnimatedBackground';
 import { BusinessCard } from '../../../components/BusinessCard';
 import { ClickButton } from '../../../components/ClickButton';
-import { BUSINESSES_CONFIG, calculateBusinessPrice } from '../../../constants/businessesConfig';
+import { BUSINESSES_CONFIG, calculateBusinessPrice, getNextLockedBusiness } from '../../../constants/businessesConfig';
 import { useAutoIncrement } from '../../../hooks/useAutoIncrement';
 import { useGameStore } from '../../../hooks/useGameStore'; // ✅ AJOUT
 import { useImmersiveMode } from '../../../hooks/useImmersiveMode';
@@ -18,9 +18,8 @@ export default function GameScreen() {
   useAutoIncrement();
   useSyncGame();
   const { isHidden, toggleNavigationBar } = useImmersiveMode();
-  
-  // ✅ NOUVEAU : Récupération de l'état des businesses pour calculer les prix dynamiquement
-  const { businesses } = useGameStore();
+  const { businesses, playerLevel } = useGameStore();// Récupération de l'état des businesses pour calculer les prix dynamiquement et du level pour l'affichage du prochain a unlock uniquement
+  const nextLockedBusiness = getNextLockedBusiness(playerLevel);// Récupérer le prochain business à débloquer
   
   useEffect(() => {
     toggleNavigationBar(); // Cache au démarrage
@@ -36,15 +35,20 @@ export default function GameScreen() {
         <ClickButton />
 
         <View style={styles.section}>
-          {Object.values(BUSINESSES_CONFIG).map((businessConfig) => {
-            // ✅ CALCUL DYNAMIQUE : Le prix augmente selon la quantité possédée
-            const businessState = businesses[businessConfig.id];
-            const currentQuantity = businessState?.quantity || 0;
-            const currentPrice = calculateBusinessPrice(
-              businessConfig.baseCost,
-              businessConfig.costMultiplier,
-              currentQuantity
-            );
+          {Object.values(BUSINESSES_CONFIG)
+            .filter(businessConfig => {
+              // 🆕 Afficher uniquement les businesses débloqués
+              const isUnlocked = !businessConfig.unlockLevel || playerLevel >= businessConfig.unlockLevel;
+              return isUnlocked;
+            })
+            .map((businessConfig) => {
+              const businessState = businesses[businessConfig.id];
+              const currentQuantity = businessState?.quantity || 0;
+              const currentPrice = calculateBusinessPrice(
+                businessConfig.baseCost,
+                businessConfig.costMultiplier,
+                currentQuantity
+              );
 
             return (
               <BusinessCard
@@ -57,6 +61,26 @@ export default function GameScreen() {
             );
           })}
         </View>
+        {nextLockedBusiness && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                🔒 Prochain Business
+              </Text>
+              <Text style={styles.levelBadge}>
+                Niveau {nextLockedBusiness.unlockLevel} requis
+              </Text>
+            </View>
+            
+            <BusinessCard
+              key={nextLockedBusiness.id}
+              businessId={nextLockedBusiness.id}
+              name={`${nextLockedBusiness.emoji} ${nextLockedBusiness.name}`}
+              buyPrice={nextLockedBusiness.baseCost}
+              locked={true} // 🆕 Prop pour afficher l'état verrouillé
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -81,5 +105,26 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 60,
+  },
+   sectionTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+  levelBadge: {
+    color: '#fbbf24',
+    backgroundColor: '#2a2a2a',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    fontWeight: 'bold',
   },
 });

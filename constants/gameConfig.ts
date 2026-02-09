@@ -23,27 +23,27 @@ export const GAME_CONFIG = {
   SAVE_INTERVAL: 5000, //Sauvegarde automatique toutes les 5 secondes
   
   // 🔧 Upgrades de business
-  BUSINESS_UPGRADE_COST_MULTIPLIER: 0.1, // Coût x1.9 à chaque niveau
-  BUSINESS_LEVEL_INCOME_BOOST: 0.1, // +20% de revenu par niveau
+  BUSINESS_UPGRADE_COST_MULTIPLIER: 0.1, // Coût x1.1 à chaque niveau
+  BUSINESS_LEVEL_INCOME_BOOST: 0.05, // +5% de revenu par niveau
   
   // ⭐ Progression
-  UPGRADE_MULTIPLIER: 1.1, // +10% de revenu par upgrade acheté (défini aussi dans chaque upgrade)
+  UPGRADE_MULTIPLIER: 1.07, // +7% de revenu par upgrade acheté (défini aussi dans chaque upgrade)
   
   // 🎯 UI
   MONEY_PROGRESS_MAX: 1_000_000, // Montant max pour la barre de progression
 
   // 🎯 Système d'expérience et de niveau
-  XP_PER_CLICK: 20,              // XP gagnée par clic
-  XP_PER_NEW_BUSINESS: 30,       // XP pour l'achat d'un nouveau business
-  BASE_XP_REQUIRED: 100,         // XP nécessaire pour passer du niveau 1 au niveau 2
+  XP_PER_CLICK: 1,              // XP gagnée par clic
+  XP_PER_NEW_BUSINESS: 50,       // XP pour l'achat d'un nouveau business
+  BASE_XP_REQUIRED: 50,         // XP nécessaire pour passer du niveau 1 au niveau 2
   XP_MULTIPLIER_PER_LEVEL: 1.9,    // Doublement de l'XP requise à chaque niveau
   INITIAL_PLAYER_LEVEL: 1,              // Niveau de départ
-  INITIAL_EXPERIENCE: 98,         // XP de départ
+  INITIAL_EXPERIENCE: 0,         // XP de départ
 
   // 🎯 Récompenses par niveau
   REPUTATION_PER_LEVEL: 5,              // +5 réputation par niveau
-  REPUTATION_BONUS_EVERY_5_LEVELS: 10,  // +10 tous les 5 niveaux
-  REPUTATION_BONUS_EVERY_10_LEVELS: 20, // +20 tous les 10 niveaux
+  REPUTATION_BONUS_EVERY_5_LEVELS: 5,  // +10 tous les 5 niveaux
+  REPUTATION_BONUS_EVERY_10_LEVELS: 15, // +20 tous les 10 niveaux
 
 } as const;
 export const calculateXPForLevel = (targetLevel: number): number => {
