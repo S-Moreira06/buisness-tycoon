@@ -1,4 +1,5 @@
 # Business Tycoon
+![](https://komarev.com/ghpvc/?username=S-Moreira06)
 
 [![Expo](https://img.shields.io/badge/Expo-Go-000020?style=flat-square&logo=expo&logoColor=white)](https://expo.dev)
 [![React Native](https://img.shields.io/badge/React_Native-0.81-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactnative.dev)
