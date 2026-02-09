@@ -1,11 +1,12 @@
 // app/(game)/(tabs)/jobs.tsx
 import AnimatedBackground from '@/components/AnimatedBackground';
-import { JOBS_CONFIG } from '@/constants/jobsConfig';
+import { getNextLockedJob, JOBS_CONFIG } from '@/constants/jobsConfig';
 import { useGameStore } from '@/hooks/useGameStore';
 import { ActiveJob, JobConfig } from '@/types/job';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Card, ProgressBar, Text } from 'react-native-paper';
+import { Button, ProgressBar, Text } from 'react-native-paper';
 
 export default function JobsScreen() {
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -15,7 +16,7 @@ export default function JobsScreen() {
   const getActiveJobsWithDetails = useGameStore((state) => state.getActiveJobsWithDetails);
   const getJobAvailability = useGameStore((state) => state.getJobAvailability);
   const playerLevel = useGameStore((state) => state.playerLevel);
-  
+  const nextLockedJob = getNextLockedJob(playerLevel);
   const activeJobs = getActiveJobsWithDetails();
   
   // Mettre à jour le timer toutes les secondes
@@ -87,8 +88,13 @@ export default function JobsScreen() {
     };
     
     return (
-      <Card key={jobConfig.id} style={styles.card}>
-        <Card.Content>
+      
+      <LinearGradient 
+        colors={['#1a1a2e', '#16213e']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }} key={jobConfig.id} 
+        style={styles.card}
+        >
           <View style={styles.header}>
             <Text variant="headlineMedium">{jobConfig.icon}</Text>
             <View style={styles.titleContainer}>
@@ -167,8 +173,8 @@ export default function JobsScreen() {
                 </Text> : 'Démarrer'}
             </Button>
           )}
-        </Card.Content>
-      </Card>
+
+      </LinearGradient>
     );
   };
   
@@ -196,18 +202,33 @@ export default function JobsScreen() {
         </View>
       )}
       
-      {/* Afficher tous les jobs disponibles */}
+      {/* 📋 Jobs disponibles (débloqués) */}
       <View style={styles.section}>
         <Text variant="titleLarge" style={styles.sectionTitle}>
-          📋 Liste des jobs
+          📋 Jobs disponibles
         </Text>
-        {Object.values(JOBS_CONFIG).map((jobConfig) => {
-          const activeJob = activeJobs.find(aj => aj.jobId === jobConfig.id);
-          // Ne pas afficher si déjà dans "en cours"
-          if (activeJob) return null;
-          return renderJobCard(jobConfig);
-        })}
+        {Object.values(JOBS_CONFIG)
+          .filter(jobConfig => {
+            // Exclure les jobs actifs/complétés (déjà affichés en haut)
+            const isActive = activeJobs.some(aj => aj.jobId === jobConfig.id);
+            if (isActive) return false;
+            
+            // Afficher seulement les jobs débloqués
+            const isUnlocked = !jobConfig.unlockLevel || playerLevel >= jobConfig.unlockLevel;
+            return isUnlocked;
+          })
+          .map(jobConfig => renderJobCard(jobConfig))}
       </View>
+
+      {/* 🔒 Prochain job à débloquer */}
+      {nextLockedJob && (
+        <View style={styles.section}>
+          <Text variant="titleLarge" style={styles.sectionTitle}>
+            🔒 Prochain job à débloquer
+          </Text>
+          {renderJobCard(nextLockedJob)}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -245,10 +266,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   card: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#1a1a1a7c',
+    borderRadius: 12,
     marginBottom: 16,
+    padding: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#3c5872',
   },
   header: {
     flexDirection: 'row',
