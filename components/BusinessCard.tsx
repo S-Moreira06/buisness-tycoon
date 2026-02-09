@@ -37,6 +37,7 @@ export const BusinessCard = ({
     lockedUpgrades,
     hasUpgrades,
   } = useBusinessData(businessId, business, upgrades);
+  
 
   const canUpgrade = business?.owned && money >= upgradeCost;
   const canBuy = money >= buyPrice;
@@ -81,6 +82,7 @@ export const BusinessCard = ({
             incomeLabel={incomeLabel}
             upgradeCost={upgradeCost}
             upgradeBoost={upgradeBoost}
+            quantity={business.quantity}
           />
         )}
 

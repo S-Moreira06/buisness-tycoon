@@ -26,6 +26,7 @@ export const useBusinessData = (
       };
     }
     const upgradeCost = Math.floor(baseCost * (business.level + 1) * 0.1);
+    const incomePerUnit = business?.income || 0; 
     const currentIncome = business.income || 0;
     const totalBoost = currentIncome * GAME_CONFIG.UPGRADE_MULTIPLIER;
     const upgradeBoost = totalBoost - currentIncome;
@@ -69,6 +70,7 @@ export const useBusinessData = (
     return {
       upgradeCost,
       upgradeBoost,
+      incomePerUnit,
       incomePerSecond,
       incomeLabel,
       businessUpgrades,

@@ -24,10 +24,8 @@ export const GAME_CONFIG = {
   
   // 🔧 Upgrades de business
   BUSINESS_UPGRADE_COST_MULTIPLIER: 0.1, // Coût x1.1 à chaque niveau
-  BUSINESS_LEVEL_INCOME_BOOST: 0.05, // +5% de revenu par niveau
-  
-  // ⭐ Progression
-  UPGRADE_MULTIPLIER: 1.07, // +7% de revenu par upgrade acheté (défini aussi dans chaque upgrade)
+  BUSINESS_LEVEL_INCOME_BOOST: 0.1, // +5% de revenu par niveau
+  UPGRADE_MULTIPLIER: 1.1, // +7% de revenu par upgrade acheté (ceci est le meme que juste avant = multiplier et diviseur)
   
   // 🎯 UI
   MONEY_PROGRESS_MAX: 1_000_000, // Montant max pour la barre de progression

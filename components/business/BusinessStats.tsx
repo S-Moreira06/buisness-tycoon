@@ -1,32 +1,49 @@
+// components/business/BusinessStats.tsx
 import { formatIncomePerSecond } from '@/utils/formatNumber';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface BusinessStatsProps {
   incomePerSecond: number;
   incomeLabel: string;
   upgradeCost: number;
   upgradeBoost: number;
+  quantity: number; // 🆕 AJOUT : nombre de business possédés
 }
 
 export const BusinessStats = ({
   incomePerSecond,
   upgradeCost,
   upgradeBoost,
+  quantity, // 🆕
 }: BusinessStatsProps) => {
+  const [showUnit, setShowUnit] = useState(false); // 🆕 État du toggle
+
+  // 🆕 Calculs selon le mode
+  const income = showUnit ? incomePerSecond / quantity : incomePerSecond;
+  const upgrade = showUnit ? upgradeBoost : upgradeBoost * quantity ;
+  const badge = showUnit ? '- X 1' : `- X ${quantity}`;
+
   return (
-    <View style={styles.statsRow}>
+    <TouchableOpacity 
+      style={styles.statsRow} 
+      onPress={() => setShowUnit(!showUnit)} // 🆕 Toggle au clic
+      activeOpacity={0.7}
+    >
       <View style={styles.statItem}>
-        <Text style={styles.statLabel}>💰 Revenu</Text>
+        <Text style={styles.statLabel}>💰 Revenu {badge}</Text>
         <Text style={styles.statValue}>
-          {formatIncomePerSecond(incomePerSecond)}
+          {formatIncomePerSecond(income, false)}
         </Text>
       </View>
+
       <View style={styles.statItem}>
-        <Text style={styles.statLabel}>🔼 Upgrade</Text>
-        <Text style={styles.statValue}>+{formatIncomePerSecond(upgradeBoost)}</Text>
+        <Text style={styles.statLabel}>🔼Bonus d'Upgrade {badge}</Text>
+        <Text style={styles.statValue}>
+          +{formatIncomePerSecond(upgrade,false)}
+        </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

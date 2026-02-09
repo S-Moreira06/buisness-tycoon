@@ -354,7 +354,8 @@ export const useGameStore = create<ExtendedGameState>()(
           if (!business || !business.owned || state.money < cost) return state;
           
           const newLevel = business.level + 1;
-          const boost = business.income * GAME_CONFIG.BUSINESS_LEVEL_INCOME_BOOST;
+          const boostPerUnit = business.income * GAME_CONFIG.BUSINESS_LEVEL_INCOME_BOOST;
+          const totalBoost = boostPerUnit * business.quantity;
           
           return {
             money: state.money - cost,
@@ -363,15 +364,15 @@ export const useGameStore = create<ExtendedGameState>()(
               [businessId]: { 
                 ...business, 
                 level: newLevel, 
-                income: business.income + boost 
+                income: business.income + boostPerUnit 
               },
             },
-            totalPassiveIncome: state.totalPassiveIncome + boost,
+            totalPassiveIncome: state.totalPassiveIncome + totalBoost,
             stats: {
               ...state.stats,
               totalMoneySpent: state.stats.totalMoneySpent + cost,
               totalBusinessLevels: state.stats.totalBusinessLevels + 1, // 🆕
-              bestPassiveIncomeReached: Math.max(state.stats.bestPassiveIncomeReached, state.totalPassiveIncome + boost), // 🆕
+              bestPassiveIncomeReached: Math.max(state.stats.bestPassiveIncomeReached, state.totalPassiveIncome + totalBoost), // 🆕
             }
           };
         }),
